@@ -14,6 +14,12 @@ Este arquivo é lido em toda sessão de desenvolvimento. Leia e siga rigorosamen
 - Antes de commitar: revise `git status`, `git diff` e o histórico recente (`git log --oneline -10`).
 - Mensagens de commit devem ser em português e concisas, refletindo o estilo do histórico existente.
 
+### 📦 Workflow de Commits (junto com a regra acima)
+
+- **Commits de código são feitos manualmente pelo usuário**, com o assistente guiando: o assistente prepara `git status`/`git diff` para revisão, indica quais arquivos dar `git add` e sugere a mensagem; o usuário executa os comandos no terminal.
+- **Docs e código vão juntos no mesmo commit do bloco**: a cada alteração de código, o assistente atualiza os docs de estado na mesma entrega, e o commit inclui ambos.
+- Na mensagem de commit **não é preciso detalhar** o que mudou nos docs — basta indicar que o doc foi atualizado junto (ex.: `docs: atualiza estado do desenvolvimento`).
+
 ---
 
 ## 📦 Contexto do Projeto
