@@ -140,15 +140,9 @@ Spring Security e tokens JWT; integração com Instagram/Meta API e portais de n
 *   **Passo 0.1**: Gerar o projeto em [start.spring.io](https://start.spring.io) — Maven, Java 21, Spring Boot 4.1.1, Jar, com Spring Web, Spring Data JPA, H2 Database, Lombok e Validation. ✅
 *   **Passo 0.2**: Criar os pacotes `controller`, `service`, `repository`, `model`, `dto`, `exception` e `integration`. ✅
 *   **Passo 0.3**: Criar `CLAUDE.md` na raiz e a pasta `docs/`. ✅
-*   **Passo 0.4**: Criar o repositório no GitHub (**separado** do front) e fazer o primeiro push:
-    ```bash
-    git init
-    git add .
-    git commit -m "estrutura inicial do backend"
-    git branch -M main
-    git remote add origin <url-do-repo>
-    git push -u origin main
-    ```
+*   **Passo 0.4**: Criar o repositório no GitHub (**separado** do front) e fazer o primeiro push. ✅
+    - Repositório: `https://github.com/Ericoos/Vigia-Backend.git` (branch `main`).
+    - O primeiro push foi feito localmente e depois houve merge da `LICENSE` criada no GitHub (`0abf4e0` Initial commit -> `1ddcac8` Estrutura Inicial do Backend -> `847da80` Merge da licensa do repositorio remoto).
 *   **Passo 0.5**: Configurar a conexão em `src/main/resources/application.properties`:
     ```properties
     spring.datasource.url=jdbc:h2:file:./data/vigia;MODE=MySQL
