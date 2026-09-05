@@ -102,7 +102,7 @@ vigia-api/
 2. **Chave estrangeira vira referência de objeto**, nunca `int`. Ex.: `idBairro` vira um campo `Bairro` com `@ManyToOne`.
 3. **Métodos de regra de negócio vão para o `@Service`**, nunca para as `@Entity`. Ex.: `criarReporte()`, `suspenderUsuario()`, `calcularClassificacao()`.
 4. **Sem acentos nem cedilha em identificadores Java.** `endereço` vira `endereco`.
-5. **Herança** usa `@Inheritance(strategy = InheritanceType.JOINED)`.
+5. **Herança** usa `@MappedSuperclass` (molde sem tabela própria, ex.: `UsuarioBase`), não `@Inheritance(JOINED)`.
 6. **A senha nunca aparece em nenhuma resposta da API.**
 7. **A falha da integração (OpenStreetMap/Nominatim) nunca pode impedir um reporte de ser salvo.**
 8. **Sem SQL escrito à mão.** O schema é gerado pelo Hibernate a partir das `@Entity` (`ddl-auto=update`).
@@ -126,7 +126,7 @@ Em português, concisas, refletindo o estilo do histórico.
 
 - Fase 0 concluída: projeto gerado, pacotes criados, `AGENTS.md` e `docs/` existem, repositório no GitHub com primeiro push, banco configurado (`application.properties`) e app rodando em 8080 com h2-console acessível.
 - Entidades esqueleto do Murilo já existem no `model`: `Reporte`, `Categoria`, `Subcategoria`, `Bairro` e o enum `StatusReporte` — só atributos e construtor padrão (`@NoArgsConstructor`), **sem métodos**.
-- **Próximo passo: Fase 1** — criar a entidade `Usuario` (herança `Pessoa → Usuario/Admin`), confirmar as tabelas no h2-console e subir Repository → Service → Controller, com commit a cada camada.
+- **Próximo passo: Fase 1** — confirmar tabelas no h2-console e subir Repository → Service → Controller, com commit a cada camada. A herança de usuário já foi resolvida: `UsuarioBase` (`@MappedSuperclass`) é o molde de `Usuario` e `Admin` (sem tabela `pessoa`).
 - Pendências para o grupo resolverem: validar contrato com o front, definir fórmula de `calcularClassificacao()`, credenciais do MySQL, CORS.
 
 ---

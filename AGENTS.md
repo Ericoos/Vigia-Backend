@@ -116,7 +116,7 @@ O diagrama mostra `idBairro: int`; no código isso vira um atributo do tipo `Bai
 **3. Sem acentos nem cedilha em identificadores Java.**
 `endereço` no diagrama vira `endereco` no código. Vale para atributos, métodos, classes e pacotes.
 
-**4. Herança (`Pessoa → Usuario/Admin`, `Noticia → NoticiaRedeSocial/NoticiaPortal`)** usa `@Inheritance(strategy = InheritanceType.JOINED)`, que gera uma tabela por classe — o mapeamento mais fiel ao diagrama.
+**4. Herança do diagrama (`Pessoa → Usuario/Admin`)** vira **`@MappedSuperclass`**, não `@Inheritance(JOINED)`. A `Pessoa` do diagrama é o molde `UsuarioBase` no código: define os campos comuns (id, nome, email, senha, dataNascimento, status) e **não gera tabela própria**. `Usuario` e `Admin` são `@Entity` independentes que copiam esses campos no schema gerado pelo Hibernate. A hierarquia `Noticia → NoticiaRedeSocial/NoticiaPortal` ainda não foi implementada — estratégia a definir quando entrar no escopo.
 
 ## 🔐 Autenticação
 

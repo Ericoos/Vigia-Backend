@@ -1,0 +1,1316 @@
+USCS – Universidade Municipal de São Caetano do Sul
+Curso: Análise e Desenvolvimento de Sistemas
+Projeto de Extensão
+Projeto Integrado Multidisciplinar
+Desenvolvimento de Software: Vigia
+Nome dos Integrantes do Grupo:
+Erick Teixeira Cruz	818105-8
+Murilo Mandelli Ribeiro	817789-6
+Fernando Domingues	816490-0
+Fabrício Bucardi	818232-7
+Kauã Nantes                           817353-7
+São Caetano do Sul
+2026
+SUMÁRIO
+TOC \h \u \z \t "Heading 1,1,Heading 2,2,Heading 4,4,Heading 6,6,"1. Descrição do Problema	9
+1. 1 Resumo e Descrição do método 5W2H	11
+1.2 Double Diamond	13
+1.3 Canvas de Proposta de Valor	14
+1.4 Canvas do Projeto	15
+2. Objetivos de Negócio da Solução	16
+2.1 Soluções Similares:	16
+2.2 Método de Levantamento de Dados	18
+3. Ideação do Produto	22
+3.1 Mapa de Empatia	22
+3.2 Funcionalidades do Sistema	26
+3.2 Mínimo Produto Viável (MVP):	28
+4. Prototipação do Software	29
+4.1 Protótipo de Baixa Fidelidade	29
+4.2 Protótipo de Média Fidelidade	33
+5. Tecnologias candidatas	50
+5.1 Plataforma e Ambiente Operacional	51
+5.2 Linguagens de Programação e Tecnologia de Banco de Dados	51
+5.2.1 Back-End	51
+5.2.2 Banco de Dados	52
+5.2.3 Front-End	52
+5.3 Ferramentas e ambiente para desenvolvimento e testes do software	53
+5.3.1 Ambientes de Desenvolvimento	53
+5.3.2 Versionamento de Código	54
+5.3.3 Conteinerização	54
+5.3.4 Arquitetura de Implantação	54
+5.3.5 Segurança da Aplicação	55
+6. Desenho e Especificação de Software	56
+6.1 Requisitos do Sistema	56
+6.1.1 Requisitos Funcionais	56
+6.1.2 Requisitos Não Funcionais	65
+6.2 Arquitetura do Sistema e Componentes de Software	69
+6.3 Modelagem e Projeto Físico do Banco de Dados	73
+6.3.1 Modelo Entidade Relacionamento (MER)	74
+6.3.2 Diagrama Entidade Relacionamento (DER)	75
+6.4 Especificação dos Casos de Usos	76
+6.4.1 Documento dos Casos de Uso	77
+CONCLUSÃO	91
+REFERÊNCIAS	92
+APÊNDICE A - CRONOGRAMA DE ATIVIDADES	93
+APÊNDICE B - RELATÓRIO DE PARTICIPAÇÃO	96
+APÊNDICE C - PESQUISA	98
+LISTA DE FIGURAS
+TOC \h \u \z \t "Heading 3,3,Heading 4,4,Heading 6,6,"Figura 1 – Double Diamond	13
+Figura 2 - Canvas de Proposta de Valor	14
+Figura 3 - Canvas de Projeto	15
+Figura 4 - Relatório gráfico sobre as respostas	19
+Figura 5 - Relatório gráfico sobre interesse no App	20
+Figura 6 - Mapa de Empatia (Persona 1)Fonte: Elaborado pelos autores (2025)	22
+Figura 7 - Mapa de Empatia (Persona 2)Fonte: Elaborado pelos autores (2025)	23
+Figura 8 - Mapa de Empatia	24
+Figura 9 - WBS / EAP - Funcionalidades do Mínimo Produto Viável	27
+Figura 10 -  Protótipo Baixa fidelidade	29
+Figura 11 -  Protótipo Baixa fidelidade	30
+Figura 12 -  Protótipo de Baixa fidelidade	31
+Figura 13 - Telas de Login do Usuário	33
+Figura 14 - Telas de Recuperação de Senha	34
+Figura 15 - Telas de Personalização, Recuperação de Senha e Desativação / Exclusão de Conta	35
+Figura 16 - Telas de Criação de Reporte	36
+Figura 17 - Telas de Exclusão de Reporte	37
+Figura 18 - Telas de Visualização de Bairro	38
+Figura 19 - Telas de Visualização de Reporte e Perfil	39
+Figura 20 - Telas de Denúncia de Reporte	40
+Figura 21 - Telas de Recorrer Reporte Punido	41
+Figura 22 - Telas de Recorrer Punição de Perfil	42
+Figura 23 - Tela de Login do Administrador	43
+Figura 24 - Painel de Controle do Administrador	44
+Figura 25 - Sequência de eventos para aplicação de punições pelo Administrador	45
+Figura 26 - Tela de Recurso do Usuário na visão do Administrador	46
+Figura 27 - Tela de Overview do Reporte	47
+Figura 28 - Diagrama de Contexto (C4 MODEL)	68
+Figura 29 - Diagrama de Containers do Sistema	69
+Figura 30 - Diagrama de Componentes do Sistema (UML)	70
+Figura 31 - Diagrama de implementação	71
+Figura 32 - Modelo Entidade Relacionamento (MER)	73
+Figura 33 - Diagrama Entidade Relacionamento (DER)	74
+Figura 34 - Diagrama de Casos de Uso do Sistema (UML)	75
+Figura 35  - Pergunta 1 do formulário de pesquisa de campo	100
+Figura 36 - Pergunta 2 do formulário de pesquisa de campo	101
+Figura 37 - Pergunta 3 do formulário de pesquisa de campo	102
+Figura 38 - Pergunta 4 do formulário de pesquisa de campo	102
+Figura 39 - Pergunta 5 do formulário de pesquisa de campo	103
+Figura 40 - Pergunta 6 do formulário de pesquisa de campo	103
+Figura 41 - Pergunta 7 do formulário de pesquisa de campo	103
+Figura 42 - Pergunta 8 do formulário de pesquisa de campo	104
+Figura 43 - Pergunta 9 do formulário de pesquisa de campo	104
+Figura 44 - Pergunta 10 do formulário de pesquisa de campo	105
+Figura 45 - Pergunta 11 do formulário de pesquisa de campo	105
+Figura 46 - Pergunta 12 do formulário de pesquisa de campo	106
+Figura 47 - Pergunta 13 do formulário de pesquisa de campo	106
+Figura 48 - Pergunta 14 do formulário de pesquisa de campo	106
+Figura 49 - Pergunta 15 do formulário de pesquisa de campo	107
+Figura 50 - Pergunta 16 do formulário de pesquisa de campo	107
+Figura 51 - Pergunta 17 do formulário de pesquisa de campo	108
+LISTA DE QUADROS
+TOC \h \u \z \t "Heading 2,2,Heading 4,4,Heading 5,5,Heading 6,6,"Quadro 1 - Quadro “Quando” da metodologia 5W2H	10
+Quadro 2 - Caso de Uso (Mantém usuário)	60
+Quadro 3 - Especificação de Caso de Uso (Mantém Gerencia Denúncias)	62
+Quadro 4 - Especificação de Caso de Uso (Denuncia reportes)	63
+Quadro 5 - Especificação de Caso de Uso (Denuncia Perfis)	64
+Quadro 6 - Especificação de Caso de Uso (Realiza Buscas no Mapa)	65
+Quadro 7 - Especificação de Caso de Uso (Mantém Perfil)	67
+Quadro 8 - Especificação de Caso de Uso (Mantém Reportes)	68
+Quadro 9 - Especificação de Caso de Uso (Criar reportes (API))	69
+Quadro 10 - Especificação de Caso de Uso (Gerencia Denuncias)	70
+Quadro 11 -  Especificação de Caso de Uso (Gerencia Denúncias Perfis)	71
+Quadro 12 -  Especificação de Caso de Uso (Gerencia Denúncias Reportes)	72
+Quadro 13 - Especificação de Caso de Uso (Gerencia Recursos)	73
+Quadro 14 - Especificação de Caso de Uso (Recorrer Recurso)	74
+Quadro 15 - Cronograma de Atividades do Projeto	78
+Quadro 16 - Lista de Papeis de Responsabilidades da Equipe do Projeto	82
+Desenvolvimento de Software: Vigia
+Erick Teixeira Cruz, Murilo Mandelli Ribeiro, Fernando Domingues, Fabrício Bucardi, Kauã Nantes
+Resumo
+A crescente preocupação com a segurança urbana, especialmente em áreas onde há dificuldade para identificar regiões com menor índice de risco, motivou o desenvolvimento de um aplicativo mobile voltado à prevenção. O projeto consiste em um mapa interativo que reúne informações sobre a segurança nas áreas da cidade, com base em dados fornecidos de forma colaborativa pelos próprios usuários e por fontes jornalísticas confiáveis. Por meio de uma pesquisa aplicada, confirmou-se o interesse e a relevância social da proposta, evidenciando a demanda por uma ferramenta acessível e prática, que auxilie os cidadãos a realizarem deslocamentos mais seguros. O aplicativo apresenta uma interface intuitiva, projetada para facilitar o uso por pessoas de todas as idades, promovendo o engajamento da comunidade e reforçando a importância da participação coletiva na construção de ambientes urbanos mais protegidos.
+Palavras-Chave: 1. Segurança. 2. Informação. 3. Aplicativo. 4. Cidade. 5. Urbano.
+Abstract
+The growing concern with urban safety, especially in areas where it is difficult to identify regions with lower risk levels, motivated the development of a mobile application focused on prevention. The project consists of an interactive map that gathers safety information about different areas of the city, based on data provided collaboratively by users and reliable journalistic sources. Through applied research, the interest and social relevance of the proposal were confirmed, highlighting the demand for an accessible and practical tool to help citizens move around more safely. The application features an intuitive interface designed to facilitate use by people of all ages, promoting community engagement and reinforcing the importance of collective participation in building safer urban environments.
+Keywords: 1. Security. 2. Information. 3. Application. 4. City. 5. Urban
+Introdução
+Este relatório apresenta o desenvolvimento de um projeto interdisciplinar realizado por um grupo de estudantes do curso de Análise e Desenvolvimento de Sistemas da Universidade Municipal de São Caetano do Sul (USCS). A iniciativa integra a grade curricular do curso e será desenvolvida ao longo dos cinco semestres, conforme previsto no Projeto de Extensão
+O objetivo principal do trabalho é a criação de um aplicativo mobile (“Vigia”) que organize e mapeie, de forma colaborativa, informações relacionadas à segurança em diferentes áreas da cidade de São Caetano do Sul. A proposta visa oferecer uma solução acessível, com interface intuitiva, que possa ser utilizada por pessoas de todas as idades, auxiliando na tomada de decisões mais seguras durante seus deslocamentos. As informações que alimentam o sistema serão provenientes de relatos de usuários e de fontes de notícias confiáveis, garantindo que os dados estejam em constante atualização.
+O desenvolvimento do projeto (“Vigia”) será dividido por etapas ao longo dos cinco semestres do curso. No primeiro semestre, ocorre a fase de ideação, com a definição do problema, do público-alvo e dos objetivos da solução. No segundo semestre, serão definidas a plataforma e as tecnologias mais adequadas para o projeto. O terceiro semestre será dedicado à construção da estrutura do aplicativo, com foco nas funcionalidades e no design da interface. No quarto semestre, será realizada a fase de testes e validações. Por fim, no quinto semestre, será feita a entrega da versão final, com os ajustes necessários e a apresentação dos resultados obtidos.
+1. Descrição do Problema
+Apesar de São Caetano do Sul apresentar baixos índices de criminalidade e investimentos significativos em segurança pública, como o programa “São Caetano Mais Segura” e o Centro de Gerenciamento de Emergências (CGE), muitos moradores ainda relatam sensação de insegurança em seu cotidiano.
+A Prefeitura de São Caetano do Sul anunciou um investimento superior a R$70 milhões no Programa São Caetano Mais Segura. Este esforço resultou em uma queda nos principais indicadores criminais da cidade, conforme os dados mais recentes divulgados pela Secretaria de Segurança Pública (SSP) do Estado de São Paulo. (São Caetano do Sul, 2024, p.1).
+Relatos colhidos em pesquisa de campo revelam ocorrências frequentes de furtos e assaltos em áreas consideradas seguras, o que evidencia uma discrepância entre os dados oficiais e a percepção da população. Essa lacuna aponta para a necessidade de uma solução que una informações formais com experiências reais dos cidadãos.
+Dessa forma, propõe-se o desenvolvimento de um aplicativo (“Vigia”), baseado em mapa interativo, que permita aos usuários consultar e compartilhar informações sobre a segurança nos diversos pontos da cidade, promovendo maior conscientização, participação comunitária e apoio à tomada de decisões mais seguras.	No Capítulo 1, é apresentada a descrição do problema identificado, utilizando a metodologia 5W2H para contextualização da situação estudada. Também são expostas as justificativas do projeto, bem como os elementos do Business Model Canvas relacionados à proposta da solução.
+No Capítulo 2, são descritos os objetivos gerais e específicos do projeto, a solução proposta para o problema identificado, os benefícios esperados, os desafios envolvidos em sua implementação e os estudos de viabilidade realizados. Além disso, são apresentados os fundamentos conceituais que sustentam a proposta, as pesquisas de campo realizadas e a definição dos perfis de usuários que utilizarão a plataforma.	No Capítulo 3, é abordada a ideação do produto por meio da metodologia Design Thinking. São apresentados o público-alvo, as personas, os mapas de empatia, o Produto Mínimo Viável (MVP) e as principais funcionalidades previstas para a solução, demonstrando como o sistema atenderá às necessidades identificadas durante a fase de pesquisa.	No Capítulo 4, é apresentada a prototipação do software, contemplando os protótipos de baixa e média fidelidade desenvolvidos para validar os requisitos funcionais e a experiência do usuário. As telas propostas demonstram o fluxo de navegação e as principais interações da aplicação.	No Capítulo 5, são descritas as tecnologias candidatas selecionadas para o desenvolvimento do sistema, incluindo plataforma, linguagens de programação, banco de dados, ferramentas de desenvolvimento, versionamento de código, conteinerização, infraestrutura de hospedagem e mecanismos de segurança da aplicação.	No Capítulo 6, é apresentado o desenho e a especificação do software. Inicialmente são definidos os requisitos funcionais e não funcionais do sistema. Também são apresentados os modelos arquiteturais e diagramas que representam a estrutura da solução, incluindo diagramas de contexto, containers, componentes e implantação. O capítulo também contempla a modelagem dos casos de uso e suas especificações detalhadas, modelagem e do projeto físico do banco de dados.
+1. 1 Resumo e Descrição do método 5W2H
+Quem? 	Estudantes do curso de Análise e Desenvolvimento de Sistemas (ADS), responsáveis pelo planejamento, desenvolvimento, testes e implantação da aplicação.
+O quê?	Desenvolvimento de um aplicativo mobile colaborativo que permita aos usuários consultar e registrar informações sobre ocorrências de criminalidade e violência em diferentes regiões, por meio de um mapa interativo com geolocalização.
+Como?
+Por meio da coleta e análise de dados obtidos em pesquisas com moradores, informações divulgadas em redes sociais, registros públicos disponíveis e denúncias realizadas pelos próprios usuários da plataforma. Essas informações serão organizadas e exibidas em um mapa interativo.
+Quanto custa?
+Os custos do projeto estão relacionados principalmente à hospedagem em nuvem, infraestrutura de servidores, registro e manutenção da aplicação, além de possíveis investimentos futuros em divulgação e expansão da plataforma.
+Por quê?	Fornecer à população uma ferramenta de consulta e compartilhamento de informações sobre segurança pública, contribuindo para a conscientização dos usuários e auxiliando na tomada de decisões sobre deslocamento e permanência em determinadas áreas.
+Onde?	Inicialmente, o projeto terá como foco a cidade de São Caetano do Sul e regiões metropolitanas próximas, podendo ser expandido para outras localidades futuramente.
+Quando?
+Quadro 1 - Quadro “Quando” da metodologia 5W2H
+Datas
+Tarefas a Serem Cumpridas
+04/02/2025 – 30/06/2025
+Idealização do projeto.
+30/06/2025 – 30/11/2025
+Refinamento da concepção do projeto e consolidação de seus requisitos iniciais.
+04/02/2026 – 30/06/2026
+Definição da stack tecnológica e ferramentas a serem utilizadas.
+30/06/2026 – 30/11/2026
+Finalização da base programável e aparência do projeto
+Protótipo pronto para teste interno.
+04/02/2027
+Protótipo pronto para teste do público.
+Fonte: Elaborado pelos autores (2025)
+1.2 Double Diamond
+A partir do double diamond é possível visualizar que foi identificado um problema: a falta de informações confiáveis sobre segurança, causada pela ausência de plataformas que comuniquem quais áreas são seguras. A partir disso, o foco foi direcionado para a cidade de São Caetano do Sul, onde essa necessidade é evidente. Como solução, propôs-se o desenvolvimento de um aplicativo (“Vigia”) que permita visualizar o nível de segurança das regiões da cidade, inspirado em sistemas semelhantes como monitoramento por câmeras e mapas de crimes. Por fim, o objetivo do projeto é entregar uma ferramenta que ajude a reduzir a insegurança da população, oferecendo informações confiáveis e acessíveis sobre áreas seguras.
+Figura 1 – Double Diamond
+Fonte: Elaborado pelos autores (2025)
+1.3 Canvas de Proposta de Valor
+O nosso Mapa da Proposta de Valor mostra como o aplicativo desenvolvido (“Vigia”) atende às necessidades dos usuários. De um lado, estão as tarefas, dores e ganhos dos usuários, como a necessidade de se locomover com segurança, a falta de informações confiáveis e o desejo por mais tranquilidade. Do outro lado, estão os produtos, alívios das dores e ganhos gerados pelo app, como a oferta de informações seguras, fácil acesso e aumento da sensação de segurança. O objetivo é mostrar que a solução proposta resolve os problemas identificados e gera valor real para os usuários.
+Figura 2 - Canvas de Proposta de Valor
+Fonte: Elaborado pelos autores (2025)
+1.4 Canvas do Projeto
+O Canvas de Projeto foi utilizado para organizar de forma visual os principais elementos do aplicativo voltado à segurança pública em São Caetano do Sul. A ferramenta permitiu alinhar os interesses dos usuários com a viabilidade dos idealizadores, definindo funcionalidades essenciais como denúncias rápidas e disseminação de informações. Também ajudou a identificar benefícios esperados, como o aumento da sensação de segurança, e limitações, como o orçamento restrito. Com isso, o Project Model Canvas contribuiu para um planejamento mais claro e estratégico do projeto.
+Figura 3 - Canvas de Projeto
+Fonte: Elaborado pelos autores (2025)
+2. Objetivos de Negócio da Solução
+Nosso projeto tem o intuito de fornecer informações referentes à segurança em São Caetano do Sul, fornecendo informações confiáveis sobre a segurança da cidade. O objetivo principal é reduzir a insegurança dos cidadãos e aumentar a tranquilidade das pessoas ao se locomoverem, promovendo mais segurança por meio da tecnologia e da colaboração dos próprios usuários.
+Com essas informações fomos capazes de pesquisar por possíveis concorrentes e soluções similares no mercado.
+2.1 Análise de Soluções Similares
+Waze
+Embora seja primariamente um aplicativo de navegação, o Waze incorpora funcionalidades de segurança através de alertas colaborativos. Usuários podem reportar acidentes, perigos na via e até mesmo presença policial.
+O modelo de crowdsourcing do Waze é similar ao Vigia, mas falta-lhe o foco específico em segurança pública.
+Smart Sampa
+O Smart Sampa é uma iniciativa da Prefeitura de São Paulo que integra um sistema de monitoramento urbano com câmeras inteligentes distribuídas pela cidade. A plataforma permite o acompanhamento de ocorrências em tempo real, com recursos como reconhecimento de placas de veículos e detecção de comportamentos suspeitos.
+Diferentemente do Vigia, o Smart Sampa funciona primariamente como um sistema institucional operado pelo poder público, com menor participação direta dos cidadãos no reporte de áreas seguras.
+ONDEEUFUIROUBADO.COM
+Esta plataforma colaborativa permite que usuários registrem locais onde foram vítimas de crimes, criando um mapa de calor das áreas com maior incidência de ocorrências. O site permite filtrar por tipo de crime e período, ajudando os usuários a identificarem áreas de risco.
+No entanto, o OndeEuFuiRoubado.com não tem a opção de reportar regiões seguras com avaliações e comentários de usuários e funciona mais como um registro histórico de ocorrências.
+Diferente dessas plataformas, o Vigia possui funcionalidades mais complexas na questão de segurança, onde os próprios usuários reportam as áreas seguras com avaliações positivas ou negativas, e a integração de notícias locais. Essas diferenças fazem com que o Vigia seja melhor do que as outras plataformas na questão de segurança.
+2.2 Método de Levantamento de Dados
+É importante ressaltar que divulgamos o questionário por grupos de Whatsapp de moradores de pessoas que frequentam a cidade de São Caetano do Sul.
+Realizamos o questionário por meio da plataforma do Google Forms, no período do dia 06/05/2025 até o dia 08/05/2025, com o objetivo de avaliar a percepção de segurança dos habitantes/frequentadores da cidade de São Caetano do Sul.
+Foram registradas 46 respostas durante o levantamento de dados. Os resultados do questionário nos mostraram o interesse de um aplicativo que facilite o acesso de informações referentes à segurança na cidade de São Caetano.
+Relatório dos Dados	O relatório abaixo resume a análise de dados obtidos por meio de um formulário aplicado a moradores, trabalhadores e frequentadores de São Caetano do Sul. O objetivo foi entender a percepção de segurança local e o interesse em um aplicativo de segurança comunitária.
+Percepção de Segurança		Grande parte dos participantes relatou sentir-se inseguro durante a noite ou em regiões pouco movimentadas. Muitos apontaram piora na segurança nos últimos anos. 	Entre os crimes citados estão assaltos a residências, roubos e furtos de bicicletas. A avaliação da presença policial variou de regular a ruim, indicando insatisfação geral.
+Figura 4 - Relatório gráfico sobre as respostas
+Fonte: Elaborado pelos autores junto com Chat GPT (2025)
+Interesse em Aplicativo de Segurança	A maioria demonstrou interesse em um aplicativo que ofereça informações sobre segurança nos bairros. Recursos como mapa interativo e denúncias anônimas foram os mais valorizados. A integração com fontes confiáveis também foi bem recebida.
+Figura 5 - Relatório gráfico sobre interesse no App
+Fonte: Elaborado pelos autores junto com Chat GPT (2025)
+3. Ideação do Produto
+3.1 Mapa de Empatia
+Foram desenvolvidos 3 Mapas de Empatia e seus respectivos mapas de empatia com base nos dados coletados por meio da pesquisa de campo realizada através do Google Forms.	A elaboração das personas teve como objetivo consolidar e representar, de forma estruturada, as informações obtidas junto aos moradores de São Caetano do Sul. Dessa forma, foi possível transformar os dados coletados em perfis representativos dos potenciais usuários da solução, permitindo uma melhor compreensão de suas necessidades, comportamentos, desafios e expectativas em relação ao sistema proposto.	Além dos mapas de empatia individuais, foi desenvolvido um terceiro mapa de empatia consolidado, reunindo os principais insights obtidos a partir das duas personas. Esse mapa teve como finalidade fornecer uma visão abrangente do público-alvo, servindo como base para a definição dos requisitos, funcionalidades e decisões de design adotadas no projeto.
+Mapa de Empatia - Persona 1	O mapa de empatia da Persona 1 representa as necessidades, percepções e comportamentos identificados durante a pesquisa de campo. A análise evidencia a busca por informações confiáveis sobre segurança, a valorização de relatos comunitários e as dificuldades encontradas para acompanhar ocorrências de forma centralizada. Esses insights contribuíram para a definição das funcionalidades propostas para o sistema.
+Figura 6 - Mapa de Empatia (Persona 1)Fonte: Elaborado pelos autores (2025)
+Mapa de Empatia - Persona 2	O mapa de empatia da Persona 2 foi elaborado com base na pesquisa de campo e apresenta suas principais necessidades, comportamentos, dores e expectativas relacionadas à segurança urbana. As informações obtidas permitiram compreender melhor as dificuldades enfrentadas nos deslocamentos diários e contribuíram para a definição das funcionalidades propostas para o sistema.
+Figura 7 - Mapa de Empatia (Persona 2)Fonte: Elaborado pelos autores (2025)
+Mapa de Empatia - Persona 3
+O mapa de empatia consolidado foi elaborado a partir da análise conjunta das personas desenvolvidas durante a pesquisa de campo. Seu objetivo é representar de forma abrangente as principais necessidades, percepções, comportamentos e preocupações dos moradores e visitantes de São Caetano do Sul em relação à segurança urbana. Os resultados obtidos serviram como base para a validação dos requisitos e funcionalidades propostas para o sistema.
+Figura 8 - Mapa de Empatia
+Fonte: Elaborado pelos autores (2025)
+3.2 Funcionalidades do Sistema
+O Vigia será uma plataforma colaborativa voltada ao compartilhamento e à visualização de informações relacionadas à segurança urbana. Para utilizar todos os recursos da plataforma, os usuários poderão criar uma conta, realizar login, recuperar sua senha e gerenciar seu perfil, garantindo a identificação dos autores dos reportes e a rastreabilidade das informações publicadas.	O principal recurso da solução será o mapa interativo da cidade, que permitirá aos usuários navegar por diferentes regiões, visualizar ocorrências registradas pela comunidade e identificar padrões de segurança. A navegação poderá ser realizada por bairros ou pontos específicos da cidade, possibilitando uma análise detalhada das informações apresentadas.	Os reportes terão papel fundamental na construção colaborativa das informações da plataforma. Usuários autenticados poderão criar reportes georreferenciados, classificando-os como situações de segurança ou insegurança e selecionando categorias específicas relacionadas ao ocorrido. Os relatos poderão abordar eventos como furtos, assaltos, vandalismo, iluminação inadequada, presença policial ou outros fatores que impactem a percepção de segurança da região.	Com base nos reportes registrados, o sistema disponibilizará uma visão consolidada de cada bairro, contendo o mapa da região, sua classificação de segurança e a lista de ocorrências associadas. Essa classificação será calculada automaticamente a partir dos reportes e denúncias registrados na região, permitindo identificar áreas com maior ou menor incidência de ocorrências e auxiliando os usuários em seus deslocamentos e atividades cotidianas.	Para garantir a qualidade das informações disponibilizadas, a plataforma contará com mecanismos de denúncia de reportes e perfis que apresentem informações inadequadas, falsas ou maliciosas. Essas denúncias contribuirão para a confiabilidade do ambiente colaborativo e para a moderação do conteúdo disponibilizado aos usuários.		Além das contribuições da comunidade, a solução integrará informações provenientes de fontes externas confiáveis, como portais de notícias locais. As notícias serão associadas às regiões correspondentes sempre que possível, permitindo complementar os reportes dos usuários com informações públicas verificáveis. Dessa forma, a plataforma oferecerá uma visão mais abrangente da segurança urbana, combinando dados comunitários e fontes jornalísticas em um único ambiente.
+3.2 Mínimo Produto Viável (MVP):
+Com base nas funcionalidades apresentadas na seção anterior, foi elaborado um diagrama que representa visualmente os principais recursos que compõem o Produto Mínimo Viável (MVP) da plataforma. O diagrama organiza as funcionalidades essenciais necessárias para o desenvolvimento e a entrega da versão inicial do sistema, evidenciando seu escopo funcional e a relação entre seus principais componentes.
+Figura 9 - WBS / EAP - Funcionalidades do Mínimo Produto Viável
+Fonte: Elaborado pelos autores (2025)
+4. Prototipação do Software
+Este capítulo tem como objetivo apresentar a evolução do projeto de Interface do Usuário (UI) e da Experiência do Usuário (UX) para o aplicativo "Vigia". 	A fim de materializar e validar os requisitos funcionais e a proposta de valor da solução, o desenvolvimento da interface seguiu uma abordagem iterativa.
+4.1 Protótipo de Baixa Fidelidade
+O protótipo de baixa fidelidade foi desenvolvido com o objetivo de representar de forma inicial a estrutura da solução proposta, permitindo visualizar a disposição dos principais elementos da interface e o fluxo de navegação entre as telas. Nesta etapa, o foco não está na aparência visual do sistema, mas sim na organização das funcionalidades e na experiência de uso esperada pelos usuários.	A elaboração desse protótipo possibilitou validar conceitos definidos durante as etapas de pesquisa, construção das personas e mapas de empatia, além de auxiliar na identificação de melhorias antes do desenvolvimento de versões mais detalhadas da interface.
+Figura 10 -  Protótipo Baixa fidelidade
+Fonte: Elaborado pelos autores (2025)
+A Figura 1 apresenta a tela de cadastro do aplicativo, na qual o usuário pode informar seus dados pessoais, incluindo nome, e-mail, telefone, data de nascimento e senha para criação da conta. A Figura 2 exibe a interface de login, responsável por permitir o acesso à plataforma por meio das credenciais previamente cadastradas. Já a Figura 3 apresenta a tela inicial do sistema, que centraliza as principais funcionalidades disponibilizadas ao usuário, incluindo o mapa interativo, a área de reportes e o acesso ao perfil do usuário.
+Figura 11 -  Protótipo Baixa fidelidade
+Fonte: Elaborado pelos autores (2025)
+A Figura 1 ilustra a tela de perfil do usuário, exibindo seu nome, a opção de realizar denúncias e o histórico de reportes anteriores. A Figura 2 apresenta a funcionalidade de excluir os registros antigos e as configurações de perfil do usuário. Por fim, a Figura 3 exibe o mapa de reportes, acompanhado da ferramenta para classificar o nível de perigo do alerta e das opções de finalizá-lo ou retornar à tela inicial.
+Figura 12 -  Protótipo de Baixa fidelidade
+Fonte: Elaborado pelos autores (2025)
+A Figura 1 ilustra o perfil do usuário, apresentando as opções para editar informações cadastrais — como e-mail, telefone e foto —, alterar a senha ou excluir a conta. A Figura 2 exibe a classificação do bairro de acordo com os reportes recentes, indicando seu nível de segurança por meio de uma nota. Por fim, a Figura 3 representa um reporte realizado no referido bairro, disponibilizando a opção de denunciar publicações falsas ou incorretas.
+4.2 Protótipo de Média Fidelidade
+O protótipo de média fidelidade foi desenvolvido como uma evolução do protótipo de baixa fidelidade, incorporando maior nível de detalhamento visual e funcional às interfaces do sistema. Nesta etapa, além do refinamento das telas já existentes, foram introduzidas as interfaces destinadas aos administradores da plataforma, contemplando funcionalidades de gerenciamento e moderação. Também foram aprofundados diversos recursos do sistema, permitindo uma representação mais próxima da solução final e uma melhor visualização da interação entre usuários, administradores e funcionalidades da plataforma.
+As telas apresentadas a seguir representam as funcionalidades destinadas aos usuários da plataforma. O objetivo dessas telas é proporcionar uma experiência intuitiva e acessível, permitindo que os usuários participem ativamente da construção colaborativa das informações de segurança urbana.
+Figura 13 - Telas de Login do Usuário
+Fonte: Elaborado pelos autores (2025)
+Na Figura 13 são apresentadas as principais telas da aplicação, contemplando o fluxo inicial de utilização do sistema. À esquerda, encontra-se a Tela de Cadastro, responsável pelo registro de novos usuários, contendo campos para preenchimento de nome, e-mail ou telefone, senha, confirmação de senha e data de nascimento, além do botão Criar Conta para efetivação do cadastro. Ao centro, é exibida a Tela de Login, composta pelos campos de e-mail ou usuário e senha, permitindo que usuários previamente cadastrados acessem a plataforma por meio do botão Login. À direita, é apresentada a tela do Mapa Interativo, principal ambiente de navegação do sistema, onde os usuários podem visualizar os relatos georreferenciados de ocorrências em uma determinada região. A interface disponibiliza recursos como campo de pesquisa, acesso ao perfil do usuário, visualização dos reportes existentes e suas respectivas descrições, além do botão Reportar, utilizado para registrar novas denúncias ou ocorrências na plataforma.
+Figura 14 - Telas de Recuperação de Senha
+Fonte: Elaborado pelos autores (2025)
+Na Figura 14 é apresentado o fluxo de recuperação de acesso à plataforma por meio da funcionalidade de redefinição de senha. Inicialmente, o usuário acessa a tela de Login e seleciona a opção “Esqueceu a senha?”, sendo direcionado para a tela de recuperação. Nessa etapa, são solicitadas informações de identificação, como nome e e-mail, que serão utilizadas para validar a solicitação e enviar as instruções necessárias para a redefinição da senha.
+Após a confirmação dos dados, o sistema encaminha o usuário para a tela de Troca de Senha, na qual devem ser informados a nova senha e o respectivo campo de confirmação. Em seguida, ao acionar o botão “Trocar Senha”, o sistema realiza a validação das informações fornecidas e efetua a atualização das credenciais de acesso. Dessa forma, o fluxo ilustrado garante que usuários que tenham esquecido sua senha possam recuperar o acesso à plataforma de maneira segura e controlada.
+Figura 15 - Telas de Personalização, Recuperação de Senha e Desativação / Exclusão de Conta
+Fonte: Elaborado pelos autores (2025)
+Na Figura 15 é apresentado o fluxo de gerenciamento do perfil do usuário, contemplando as funcionalidades de visualização, edição e exclusão da conta. Inicialmente, o usuário acessa a tela de Perfil, na qual são exibidas suas informações pessoais, avaliações recebidas e o histórico de reportes realizados na plataforma, incluindo os respectivos endereços e descrições das ocorrências registradas.		A partir dessa tela, o usuário pode acessar o modo de edição do perfil, permitindo a atualização de informações cadastrais, como nome, e-mail, telefone e senha. Após a realização das alterações desejadas, os dados podem ser salvos por meio da opção correspondente, garantindo a atualização das informações armazenadas pelo sistema.	Além das funcionalidades de edição, o perfil disponibiliza opções para exclusão ou desativação da conta. Para apagar permanentemente a conta, o usuário deve informar e confirmar sua senha, além de validar a solicitação por meio do e-mail cadastrado. De forma semelhante, a funcionalidade de desativação exige a confirmação da senha e a validação via e-mail, permitindo que o acesso à conta seja suspenso sem a remoção definitiva dos dados. Dessa forma, o fluxo apresentado garante ao usuário controle sobre suas informações e sobre a permanência de sua conta na plataforma.
+Figura 16 - Telas de Criação de Reporte
+Fonte: Elaborado pelos autores (2025)	Na Figura 16 é apresentado o fluxo de registro de ocorrências na plataforma. Inicialmente, o usuário acessa o Mapa Interativo, onde pode visualizar os reportes já cadastrados, realizar pesquisas por localização e navegar pelas ocorrências registradas em uma determinada região. A interface também disponibiliza o acesso ao perfil do usuário e um painel contendo informações resumidas sobre os reportes existentes.	Ao selecionar a opção “Reportar”, o sistema direciona o usuário para a Tela de Reporte, destinada ao cadastro de uma nova ocorrência. Nessa tela, é exibida a localização da ocorrência no mapa, além de um campo para inserção da descrição dos fatos observados. Complementando o registro, o usuário pode atribuir uma classificação à ocorrência por meio de uma escala de avaliação de 1 a 5, permitindo indicar o nível de gravidade ou relevância do evento reportado.		Após o preenchimento das informações necessárias, o usuário deve selecionar a opção “Concluir” para finalizar o cadastro da ocorrência. Dessa forma, o sistema registra o reporte e o disponibiliza para consulta pelos demais usuários da plataforma, contribuindo para o monitoramento colaborativo e a disseminação de informações sobre situações de risco ou violência no ambiente escolar.
+Figura 17 - Telas de Exclusão de Reporte
+Fonte: Elaborado pelos autores (2025)
+Na Figura 17 é apresentada a funcionalidade de exclusão de reportes cadastrados pelo usuário. Inicialmente, o usuário acessa a tela de Perfil, onde são exibidas suas informações pessoais, avaliações recebidas e a lista de ocorrências registradas na plataforma. Cada reporte é apresentado juntamente com sua descrição e endereço.
+Ao selecionar a opção de exclusão associada a um determinado reporte, o sistema exibe uma janela de confirmação intitulada “Apagar Reporte”. Essa etapa tem como objetivo evitar exclusões acidentais, solicitando que o usuário confirme sua intenção antes que a ação seja efetivamente executada. A janela disponibiliza o botão “Confirmar” para prosseguir com a exclusão e um botão de fechamento (X), permitindo cancelar a operação e retornar à tela anterior.
+Após a confirmação, o sistema remove o reporte selecionado da plataforma, deixando de exibi-lo na lista de ocorrências do usuário e no mapa interativo. Dessa forma, a funcionalidade garante que os usuários possam gerenciar seus próprios registros de maneira segura e controlada.
+Figura 18 - Telas de Visualização de Bairro
+Fonte: Elaborado pelos autores (2025)		Na Figura 18 é apresentada a funcionalidade de visualização detalhada de informações de uma região específica por meio da tela de Overview do Bairro. Inicialmente, o usuário acessa o Mapa Interativo, onde pode consultar os reportes cadastrados e selecionar uma área de interesse para obter informações mais detalhadas sobre as ocorrências registradas naquela localidade.	Ao selecionar um bairro, o sistema direciona o usuário para a tela de Overview do Bairro, na qual são exibidos o nome da região e sua representação geográfica no mapa. Além disso, a interface apresenta uma classificação geral da localidade, permitindo que os usuários tenham uma percepção rápida sobre o nível de ocorrências reportadas na área analisada.	A tela também disponibiliza uma lista contendo os reportes associados ao bairro selecionado. Cada registro apresenta informações como descrição da ocorrência, endereço e respectiva classificação, possibilitando uma análise mais detalhada dos eventos cadastrados. Por meio dessa funcionalidade, os usuários podem acompanhar a situação de diferentes regiões.
+Figura 19 - Telas de Visualização de Reporte e Perfil
+Fonte: Elaborado pelos autores (2025)
+Na Figura 19 é apresentado o fluxo de navegação para a visualização detalhada de ocorrências e o acesso ao perfil dos usuários da plataforma. Inicialmente, o usuário interage com a tela de Mapa Interativo, que conta com uma barra de pesquisa, botões para reporte rápido e uma listagem lateral dividida por bairros que exibe os reportes e suas respectivas descrições.
+Ao selecionar um reporte específico, o usuário é direcionado para a tela de Overview Reporte. Nessa interface, são exibidos de forma detalhada o endereço do ocorrido, uma descrição completa do caso, um ícone de alerta, a identificação do usuário que realizou a publicação e uma escala de classificação (1-5). Há também botões de ação na parte inferior para retornar à tela anterior ("Voltar") ou sinalizar problemas ("Denunciar").
+Por fim, ao clicar no identificador do autor do reporte, o sistema encaminha o usuário para a tela de Perfil Usuário (Público). Essa interface apresenta o nome e a avaliação do perfil, seguidos por uma lista histórica de todos os "Reportes Feitos" por aquele usuário (contendo descrição e endereço)
+Figura 20 - Telas de Denúncia de Reporte
+Fonte: Elaborado pelos autores (2025)
+Na Figura 20 é apresentada a funcionalidade de denúncia de perfis ou reportes impróprios, O fluxo inicia-se na tela de Perfil Usuário (Público), onde é possível visualizar a foto, o nome e a avaliação geral de um determinado participante, bem como a lista de "Reportes Feitos" por ele, cada um contendo ícone de alerta, descrição e endereço. Nessa interface, o usuário possui botões dedicados para "Denunciar" tanto reportes individuais listados quanto o perfil como um todo (no canto inferior direito).
+Ao acionar qualquer uma dessas opções de denúncia, o sistema abre um pop-up ou direciona o usuário para a tela de Denuncia Perfil / Reporte. Essa interface de moderação solicita que o usuário informe o motivo da ação através do campo "Qual motivo da denuncia", disponibilizando uma caixa de texto ("Descrição") para o detalhamento do problema.
+Figura 21 - Telas de Recorrer Reporte Punido
+Fonte: Elaborado pelos autores (2025)
+Na Figura 21 é apresentada a funcionalidade que permite ao usuário gerenciar suas próprias publicações e contestar moderações por meio da tela de Perfil Usuário (Privado). Diferente da visão pública, esta interface de perfil pessoal exibe o nome do usuário, sua avaliação e uma lista intitulada "Seus Reportes". Nesta lista, o usuário pode acompanhar o status de suas postagens, incluindo reportes ativos (com descrição e endereço) e sinalizações de "Reporte Apagado" pela moderação do sistema. Na parte inferior, há botões para "Voltar" e "Editar Perfil".
+Caso o usuário tenha um reporte excluído e queira contestar a decisão, a interface disponibiliza um botão específico ("Recurso") ao lado do item afetado. Ao clicar nele, o sistema abre uma janela sobreposta (pop-up) ou direciona o usuário para a tela de Recorrer Punição.
+Essa nova interface, intitulada "Fazer Recurso", oferece uma caixa de texto ("Texto Recurso") para que o usuário redija sua justificativa ou defesa. A tela é concluída com um botão de fechar ("X") no canto superior direito, permitindo o cancelamento da ação, e o botão "Enviar" para submeter a contestação de volta para a análise dos administradores da plataforma.
+Figura 22 - Telas de Recorrer Punição de Perfil
+Fonte: Elaborado pelos autores (2025)		Na Figura 22 é apresentada a funcionalidade de contestação global quando a conta de um usuário sofre uma sanção na plataforma, detalhada por meio da tela de Perfil Usuário (Punido). Nessa interface, o usuário é notificado sobre sua situação por um aviso de destaque no topo que diz "O SEU PERFIL FOI PUNIDO", acompanhado de um link direto para "RECORRER". Abaixo, a tela mantém a estrutura de perfil pessoal com a foto, nome do usuário, botões inferiores ("Voltar" e "Editar Perfil") e a seção "Seus Reportes", que lista suas publicações com descrição, endereço e ícones de lixeira para gerenciamento.
+Ao clicar no link de contestação no topo da tela, o sistema direciona o usuário para a tela ou pop-up de Recorrer Punição. Nessa interface de reabilitação, sob o título "Fazer Recurso", é disponibilizado um campo de texto aberto ("Texto Recurso") para que o usuário redija sua justificativa ou pedido de revisão sobre a penalidade aplicada ao seu perfil.	A tela é finalizada com um botão de fechar ("X") no canto superior direito, que possibilita o cancelamento da operação, e o botão "Enviar", responsável por encaminhar a defesa diretamente para a equipe de administração do sistema.
+Figura 23 - Tela de Login do Administrador
+Fonte: Elaborado pelos autores (2025)		Na Figura 23 é apresentada a tela de login do administrador, semelhante à tela de login do usuário comum, contendo os campos Número ADM e Senha, além do botão Login. Ao submeter as credenciais, o sistema exibe um pop-up informando que o acesso está "Esperando Aprovação de Login", indicando que o acesso administrativo requer uma validação adicional antes de ser liberado. O pop-up também possui um botão de fechamento (X), permitindo que o usuário o encerre caso deseje cancelar a ação.
+Figura 24 - Painel de Controle do Administrador
+Fonte: Elaborado pelos autores (2025)	Na Figura 24 é apresentado o painel de controle do administrador, composto por um mapa na parte superior da tela e uma lista de denúncias recebidas na parte inferior. Essa lista exibe informações como usuário, descrição e tipo de ocorrência, além da opção de excluir cada registro. Ao clicar no mapa, o administrador é direcionado para a tela Mapa Admin, na qual os reportes são exibidos diretamente no mapa juntamente com um painel lateral que apresenta detalhes como bairro e descrição de cada ocorrência. Além disso, o botão "Filtrar Por" abre um pop-up contendo opções de filtragem por Usuário, Reporte ou Recurso, facilitando a organização e a visualização das denúncias recebidas.
+Figura 25 - Sequência de eventos para aplicação de punições pelo Administrador
+Fonte: Elaborado pelos autores (2025)	Na Figura 25 é apresentada a sequência de eventos para punir um usuário. É apresentada a tela de Perfil do Usuário na visão do administrador, que exibe informações como nome, avaliação e os reportes realizados pelo usuário, além da opção de gerenciar cada ocorrência. Ao clicar em "Gerenciar", é aberto um pop-up solicitando o motivo da punição e o período de duração, oferecendo as ações de Castigar ou Banir o usuário. 	Caso o administrador escolha a opção Banir, um pop-up de confirmação é exibido, questionando se deseja realmente banir o usuário, com as opções Não e Banir. Da mesma forma, ao selecionar a opção Castigar, outro pop-up de confirmação é apresentado com as opções Não e Castigar, garantindo que nenhuma ação punitiva seja executada sem uma confirmação prévia.
+Figura 26 - Tela de Recurso do Usuário na visão do Administrador
+Fonte: Elaborado pelos autores (2025)	Na Figura 26 é apresentada a tela de Recurso do Usuário na visão do administrador, que exibe informações como o nome do usuário, o tipo de recurso solicitado e a justificativa fornecida pelo próprio usuário. Na parte inferior da tela, o administrador dispõe das opções Voltar, Manter Punição e Remover Punição para realizar a análise do recurso.	Ao optar pela exclusão de uma denúncia ou recurso, o sistema exibe um pop-up de confirmação solicitando o motivo da exclusão. Nesse pop-up, o administrador pode escolher entre as opções Cancelar ou Confirmar, garantindo que a ação seja validada antes de sua execução.
+Figura 27 - Tela de Overview do Reporte
+Fonte: Elaborado pelos autores (2025)	Na Figura 27 é apresentada a tela de Overview do Reporte na visão do administrador, que exibe informações da ocorrência, como o usuário responsável pelo reporte, a avaliação atribuída em uma escala de 1 a 5, o endereço e a descrição detalhada da ocorrência. Na parte inferior da tela, estão disponíveis os botões Voltar e Gerenciar.
+Ao clicar em "Gerenciar", o sistema exibe um pop-up solicitando a justificativa da ação a ser realizada. Nesse pop-up, o administrador pode escolher entre as opções Excluir Reporte ou Excluir Reporte e Punir Usuário, permitindo que sejam adotadas as medidas mais adequadas de acordo com a situação analisada.
+5. Tecnologias candidatas
+Este capítulo detalha o processo de seleção da stack tecnológica que será utilizada para o desenvolvimento, testes, implantação e suporte do aplicativo "Vigia".
+A definição dessas ferramentas é fundamental para garantir que o projeto atenda aos seus requisitos funcionais e não-funcionais, como confiabilidade, escalabilidade, desempenho e custo.
+As escolhas foram guiadas por uma análise criteriosa baseada em critérios de mercado, requisitos técnicos específicos do projeto e pela adoção de um padrão arquitetural consistente. O resultado é um conjunto coeso de tecnologias que viabilizam a construção da solução proposta.
+Para o desenvolvimento da aplicação, optou-se por uma solução nativa em vez de uma aplicação web. Essa escolha foi motivada pela necessidade de oferecer acesso rápido e prático aos usuários, uma vez que o sistema será utilizado com frequência no dia a dia. Aplicações nativas proporcionam melhor integração com os recursos do dispositivo, maior desempenho e uma experiência de uso mais fluida, características essenciais para um aplicativo com proposta semelhante a plataformas como Google Maps e Waze.
+O ambiente operacional escolhido para a aplicação foi uma infraestrutura baseada em computação em nuvem. Essa escolha se justifica pela facilidade de implantação e gerenciamento dos serviços, além da capacidade de escalabilidade, permitindo que os recursos sejam ampliados ou reduzidos de acordo com as necessidades do sistema.
+5.1 Plataforma e Ambiente Operacional
+O aplicativo “Vigia” será desenvolvido para funcionar em uma plataforma principal: Android. A versão mobile será executada em dispositivos Android, garantindo portabilidade e acessibilidade aos usuários em situações de mobilidade.
+5.2 Linguagens de Programação e Tecnologia de Banco de Dados
+5.2.1 Back-End
+A tecnologia escolhida para o desenvolvimento do back-end do projeto é o Java, em conjunto com o framework Spring Boot. A escolha se justifica pela ampla adoção dessas tecnologias no mercado, pela robustez da linguagem e pela facilidade na construção de APIs REST, que serão responsáveis pela comunicação entre o aplicativo e o banco de dados.
+Além disso, o Java possui uma arquitetura orientada a objetos que favorece a organização, manutenção e escalabilidade do sistema. O Spring Boot oferece recursos que simplificam o desenvolvimento de aplicações corporativas, incluindo integração com banco de dados, gerenciamento de dependências e implementação de mecanismos de segurança. Essas características tornam a tecnologia adequada para um aplicativo voltado à segurança pública, como o “Vigia”, que exige confiabilidade, desempenho e estabilidade.
+5.2.2 Banco de Dados
+A tecnologia escolhida para o banco de dados do projeto “Vigia” será o MySQL. Trata-se de um sistema gerenciador de banco de dados relacional amplamente utilizado no mercado, reconhecido por sua confiabilidade, desempenho e facilidade de administração.
+Seu modelo relacional atende adequadamente às necessidades do projeto, permitindo armazenar e relacionar informações estruturadas, como usuários, ocorrências, localizações e evidências registradas. Além disso, por ser uma solução open source e gratuita, o MySQL se adequa ao orçamento do projeto acadêmico, oferecendo uma ampla comunidade de suporte e extensa documentação técnica, fatores que contribuem para a continuidade e manutenção do sistema ao longo de seu desenvolvimento.
+5.2.3 Front-End
+O desenvolvimento da interface do aplicativo será realizado utilizando React Native. A tecnologia foi escolhida por permitir a construção de aplicações móveis de forma eficiente utilizando JavaScript e a biblioteca React, além de possuir ampla adoção no mercado e uma grande comunidade de desenvolvedores.
+Entre suas principais vantagens estão a produtividade no desenvolvimento, a organização da interface em componentes reutilizáveis e a facilidade de integração com APIs REST. Além disso, sua extensa documentação e constante evolução tornam o React Native uma solução adequada para a construção da aplicação móvel “Vigia”.
+5.3 Ferramentas e ambiente para desenvolvimento e testes do software
+5.3.1 Ambientes de Desenvolvimento
+As IDEs escolhidas para o desenvolvimento do aplicativo foram o VS Code e o IntelliJ, devido à familiaridade da equipe com essas ferramentas e ao fato de ambas oferecerem um ambiente intuitivo, personalizável e com amplo suporte a plugins e extensões. Esses recursos garantem eficiência no fluxo de trabalho e facilitam a integração com as tecnologias utilizadas no projeto.
+A divisão das IDEs foi definida de forma estratégica: o VS Code será utilizado para o desenvolvimento do front-end em React, enquanto o IntelliJ será dedicado exclusivamente ao back-end em Java. Essa separação otimiza a produtividade, organiza melhor o processo de desenvolvimento e permite aproveitar ao máximo as especialidades de cada ferramenta.
+O projeto também utilizará o Android Studio para o desenvolvimento mobile do aplicativo “Vigia”, aproveitando seu ambiente completo e robusto para criação, testes e depuração de aplicações Android. A ferramenta permite integrar de forma eficiente o aplicativo mobile com os demais módulos do sistema.
+Com seus variados recursos, o Android Studio facilita a construção de interfaces responsivas e a implementação das funcionalidades necessárias, garantindo maior qualidade, agilidade e consistência no desenvolvimento da versão mobile do projeto.
+5.3.2 Versionamento de Código
+O controle de versão do projeto será realizado por meio do Git, utilizando o GitHub como plataforma de hospedagem do repositório. Essa abordagem permite registrar e acompanhar todas as alterações realizadas no código-fonte durante o desenvolvimento, garantindo maior organização e segurança no gerenciamento do projeto.
+A utilização do Git também facilita o trabalho colaborativo entre os integrantes da equipe, permitindo que diferentes funcionalidades sejam desenvolvidas simultaneamente sem comprometer a integridade do sistema. Além disso, o histórico de versões possibilita a recuperação de alterações anteriores e contribui para a rastreabilidade das modificações realizadas ao longo do desenvolvimento do aplicativo “Vigia”.
+5.3.3 Conteinerização
+O projeto utilizará Docker como ferramenta de conteinerização, com o objetivo de padronizar os ambientes de desenvolvimento, testes e implantação da aplicação. Por meio dos containers, todas as dependências necessárias para o funcionamento do sistema são agrupadas em um ambiente isolado e reproduzível, reduzindo problemas relacionados a incompatibilidades entre diferentes sistemas operacionais e configurações.
+A adoção do Docker também contribui para a portabilidade da solução, permitindo que o aplicativo seja executado de forma consistente em diferentes máquinas e servidores. Além disso, essa abordagem simplifica o processo de implantação e manutenção do sistema, tornando futuras atualizações mais seguras e eficientes.
+5.3.4 Arquitetura de Implantação
+A infraestrutura do sistema será baseada em um servidor Linux hospedado em nuvem, utilizando serviços como Contabo ou Hetnezer, responsável por executar os serviços necessários para o funcionamento da aplicação. Essa abordagem oferece um ambiente estável, seguro e amplamente utilizado em aplicações corporativas, além de apresentar baixo custo de operação para projetos acadêmicos.
+A implantação será realizada por meio de containers Docker, permitindo que os componentes do sistema sejam executados de forma isolada e organizada. Essa estratégia facilita a manutenção da aplicação, reduz a complexidade da configuração do ambiente e possibilita futuras expansões da infraestrutura sem a necessidade de alterações significativas na arquitetura do sistema.
+5.3.5 Segurança da Aplicação
+Considerando a natureza sensível das informações tratadas pelo aplicativo “Vigia”, serão adotados mecanismos de segurança voltados à proteção dos dados e ao controle de acesso dos usuários. A autenticação será realizada por meio de tokens JWT (JSON Web Token), permitindo que apenas usuários devidamente autenticados possam acessar os recursos protegidos da aplicação.
+Além disso, as senhas dos usuários serão armazenadas utilizando algoritmos de hash criptográfico, como o BCrypt, evitando o armazenamento de credenciais em texto simples no banco de dados. Essas medidas contribuem para aumentar a segurança da aplicação, reduzir riscos relacionados ao vazamento de informações e garantir maior proteção aos dados dos usuários.
+6. Desenho e Especificação de Software
+6.1 Requisitos do Sistema
+Nesta seção, são descritas as capacidades e condições que o sistema deve atender para satisfazer os objetivos do projeto e as necessidades dos usuários finais. A especificação dos requisitos serve como base para o desenvolvimento, testes e validação da solução proposta.
+6.1.1 Requisitos Funcionais
+Os requisitos funcionais definem as ações que o sistema deve ser capaz de executar, descrevendo o comportamento esperado da aplicação diante de entradas específicas.
+A seguir encontra-se a lista dos Requisitos Funcionais identificados para o sistema Vigia:
+Cadastro de Usuário:
+R01 – Cadastro de usuário: o sistema deve permitir o cadastro de novos usuários com nome completo, e-mail válido, senha segura (mínimo de 8 caracteres) e confirmação de senha. Prioridade: Alta. Rastreabilidade: UC001, CN001.
+R02 – Validação de e-mail único: o sistema deve garantir que cada usuário possua um e-mail único, impedindo duplicidade de cadastro. Prioridade: Alta. Rastreabilidade: UC001, CN001.
+R03 – Confirmação de e-mail: o sistema deve exigir a confirmação de e-mail por meio de um link enviado ao endereço cadastrado. Prioridade: Alta. Rastreabilidade: UC001, CN001.
+Login e Autenticação:
+R04 – Login com credenciais: o sistema deve permitir o login utilizando e-mail e senha. Prioridade: Alta. Rastreabilidade: UC001, CN001.
+R06 – Logout: o sistema deve permitir que o usuário realize logout, encerrando sua sessão. Prioridade: Alta. Rastreabilidade: UC001, CN001.Recuperação de Senha:
+R07 – Solicitação de recuperação: o sistema deve permitir a solicitação de recuperação de senha via e-mail cadastrado. Prioridade: Alta. Rastreabilidade: UC001, CN001.
+R08 – Link de redefinição: o sistema deve gerar um link único, com tempo de expiração, para redefinição de senha. Prioridade: Alta. Rastreabilidade: UC001, CN001.
+R09 – Validação de nova senha: o sistema deve validar a complexidade da nova senha no momento da redefinição. Prioridade: Alta. Rastreabilidade: UC001, CN001.
+R10 – Notificação de alteração: o sistema deve notificar o usuário por e-mail quando a senha for alterada com sucesso. Prioridade: Média. Rastreabilidade: UC001, CN001.
+Perfil do Usuário:
+R11 – Edição de perfil: usuários logados devem poder editar as informações do próprio perfil, como nome, foto e telefone. Prioridade: Alta. Rastreabilidade: UC005, CN005.
+R12 – Alteração de senha: o sistema deve permitir a alteração de senha, exigindo a senha atual para confirmação. Prioridade: Alta. Rastreabilidade: UC005, CN005.
+R13 – Histórico de reportes: o sistema deve manter e exibir o histórico de reportes do usuário em seu perfil. Prioridade: Média. Rastreabilidade: UC005, CN005.
+R15 – Avaliação automática de reputação: o sistema deve calcular automaticamente a reputação do usuário com base na quantidade de denúncias recebidas, nos reportes realizados e nas ações administrativas, sendo que quanto menos denúncias, maior a avaliação. Prioridade: Alta. Rastreabilidade: UC009, CN009, UC010, CN010.
+Gestão de Conta:
+R62 – Desativação de conta: o sistema deve permitir ao usuário desativar sua conta, tornando-a inativa sem excluir os dados, mediante confirmação por senha. Prioridade: Média. Rastreabilidade: UC001, CN001.
+R63 – Exclusão de conta: o sistema deve permitir ao usuário excluir permanentemente sua conta e os dados associados, mediante confirmação por senha. Prioridade: Alta. Rastreabilidade: UC001, CN001.
+Visualização do Mapa:
+R16 – Mapa interativo: o sistema deve exibir um mapa interativo da cidade de São Caetano do Sul. Prioridade: Alta. Rastreabilidade: UC004, CN004.
+R17 – Navegação no mapa: o mapa deve permitir zoom, pan e navegação fluida. Prioridade: Alta. Rastreabilidade: UC004, CN004.
+R18 – Agrupamento de reportes: o sistema deve agrupar reportes similares na mesma região geográfica. Prioridade: Média. Rastreabilidade: UC004, CN004.
+Categorização de Reporte:
+R19 – Classificação de segurança: o sistema deve permitir que o usuário classifique seus reportes como “Segurança” ou “Insegurança” no momento da criação. Prioridade: Alta. Rastreabilidade: UC006, CN006.
+R20 – Subcategorias pré-definidas: o sistema deve oferecer subcategorias pré-definidas, como ruas bem ou mal iluminadas, assaltos e presença policial. Prioridade: Alta. Rastreabilidade: UC006, CN006.Submissão de Reportes:
+R22 – Criação de reportes: usuários logados devem poder criar reportes contendo localização, categoria e descrição. Prioridade: Alta. Rastreabilidade: UC006, CN006.
+R23 – Registro de data e hora: o sistema deve capturar automaticamente a data e hora da submissão do reporte. Prioridade: Alta. Rastreabilidade: UC006, CN006.
+R25 – Associação ao autor: os reportes devem ser automaticamente associados ao usuário que os criou. Prioridade: Alta. Rastreabilidade: UC006, CN006.
+R26 – Publicar ou descartar: o sistema deve permitir ao usuário publicar ou descartar o reporte antes da submissão final. Prioridade: Alta. Rastreabilidade: UC006, CN006.
+Processamento de Reportes:
+R27 – Publicação instantânea: os reportes devem ser publicados instantaneamente após a confirmação do usuário. Prioridade: Alta. Rastreabilidade: UC006, CN006.
+R28 – Notificação de status: o sistema deve notificar o usuário sobre o status de publicação de seus reportes. Prioridade: Média. Rastreabilidade: UC006, CN006.
+Edição de Reportes:
+R29 – Edição única: o sistema deve permitir ao usuário editar um reporte publicado apenas uma vez. Prioridade: Média. Rastreabilidade: UC006, CN006.
+R30 – Exclusão de reporte: o sistema deve permitir ao usuário excluir seus próprios reportes. Prioridade: Média. Rastreabilidade: UC006, CN006.
+Integração com Notícias Externas:
+R31 – Integração com veículos de notícias: o sistema deve integrar-se com veículos de notícias confiáveis. Prioridade: Alta. Rastreabilidade: UC007, CN007.
+R32 – Georreferenciamento de notícias: o sistema deve georreferenciar automaticamente notícias quando houver informação de localização disponível. Prioridade: Alta. Rastreabilidade: UC007, CN007.
+Classificação de Bairro:
+R64 – Visão geral do bairro: o sistema deve exibir uma visão consolidada de cada bairro, contendo mapa, classificação de segurança e lista de reportes associados. Prioridade: Alta. Rastreabilidade: UC004, CN004.
+R65 – Classificação automática de bairro: o sistema deve calcular automaticamente a classificação de segurança dos bairros com base nos reportes e denúncias. Prioridade: Alta. Rastreabilidade: UC004, CN004.
+Filtro e Buscas:
+R41 – Filtros de reportes: o sistema deve permitir filtrar reportes por tipo, categoria, período e área geográfica. Prioridade: Alta. Rastreabilidade: UC004, CN004.
+R42 – Busca textual: o sistema deve permitir busca textual por descrições e endereços. Prioridade: Média. Rastreabilidade: UC004, CN004.
+Moderação e Denúncias:
+R43 – Denúncia de reportes: o sistema deve permitir que usuários denunciem reportes imprecisos ou maliciosos, exigindo justificativa. Prioridade: Alta. Rastreabilidade: UC002, CN002.
+R68 – Denúncia de perfis: o sistema deve permitir que usuários denunciem outros usuários, exigindo justificativa. Prioridade: Alta. Rastreabilidade: UC003, CN003.
+R44 – Suspensão temporária: administradores devem poder suspender usuários temporariamente mediante justificativa. Prioridade: Alta. Rastreabilidade: UC009, CN009, UC010, CN010.
+R44a – Banimento permanente: administradores devem poder banir usuários permanentemente mediante justificativa e confirmação. Prioridade: Alta. Rastreabilidade: UC009, CN009, UC010, CN010.
+R45 – Registro de denúncias: o sistema deve registrar todas as denúncias e associá-las aos usuários e conteúdos. Prioridade: Alta. Rastreabilidade: UC009, CN009, UC010, CN010.
+R61 – Gestão de reportes pelo administrador: administradores devem poder editar ou remover reportes inadequados, com registro da ação. Prioridade: Alta. Rastreabilidade: UC010, CN010.
+R66 – Justificativa obrigatória: o sistema deve exigir justificativa textual para todas as ações administrativas e denúncias. Prioridade: Alta. Rastreabilidade: UC008–UC012, CN008–CN012.
+Painel Administrativo:
+R69 – Painel administrativo: o sistema deve disponibilizar um painel administrativo com filtros para denúncias e recursos pendentes. Prioridade: Alta. Rastreabilidade: UC008, CN008.
+R67 – Aprovação de login de administrador: o acesso de administradores deve passar por processo de aprovação. Prioridade: Alta. Rastreabilidade: UC008, CN008.
+Punições e Recursos:
+R70 – Notificação de punição: o sistema deve notificar por e-mail usuários punidos, incluindo link para recurso. Prioridade: Alta. Rastreabilidade: UC009, CN009, UC010, CN010.
+R71 – Recurso de punição: o sistema deve permitir envio de recurso com justificativa por usuários punidos. Prioridade: Alta. Rastreabilidade: UC012, CN012.
+R72 – Análise de recursos: administradores devem poder aceitar ou rejeitar recursos com justificativa. Prioridade: Alta. Rastreabilidade: UC011, CN011.
+Navegação Baseada em Autenticação:
+R49 – Acesso sem login: usuários não autenticados podem visualizar o sistema, mas não criar conteúdo. Prioridade: Alta. Rastreabilidade: UC004, CN004.
+R50 – Redirecionamento para login: ao tentar criar conteúdo sem login, o sistema deve redirecionar para autenticação. Prioridade: Alta. Rastreabilidade: UC001–UC006.
+R51 – Menu adaptativo: o sistema deve adaptar o menu conforme o estado de autenticação. Prioridade: Média.
+R52 – Indicador de login: o sistema deve exibir claramente o estado de login do usuário. Prioridade: Baixa.
+Georreferenciamento:
+R53 – Posicionamento manual: o sistema deve posicionar reportes conforme localização informada manualmente. Prioridade: Alta. Rastreabilidade: UC006, CN006.
+R54 – Posicionamento automático: o sistema deve utilizar GPS para posicionamento automático de reportes. Prioridade: Alta. Rastreabilidade: UC006, CN006.
+R55 – Ajuste de localização: o sistema deve permitir ajuste manual da localização após criação do reporte. Prioridade: Média. Rastreabilidade: UC006, CN006.
+R56 – Permissão de localização: o sistema deve solicitar permissão para acesso à localização do usuário. Prioridade: Alta. Rastreabilidade: UC006, CN006.
+Visualização de Dados:
+R57 – Ícones por subcategoria: o sistema deve utilizar ícones distintos para cada tipo de reporte. Prioridade: Média. Rastreabilidade: UC004, CN004, UC006, CN006.
+R58 – Legenda do mapa: o sistema deve exibir legenda clara dos elementos do mapa. Prioridade: Média. Rastreabilidade: UC004, CN004.
+R59 – Informações ao dar zoom: o sistema deve exibir informações básicas dos reportes ao aplicar zoom. Prioridade: Média. Rastreabilidade: UC004, CN004.
+R60 – Detalhes do reporte: o sistema deve exibir informações completas do reporte ao ser selecionado. Prioridade: Alta. Rastreabilidade: UC004, CN004, UC006, CN006.
+6.1.2 Requisitos Não Funcionais
+Os requisitos não funcionais descrevem as qualidades e restrições do sistema, focando em aspectos como desempenho, usabilidade, confiabilidade e segurança.
+A seguir encontra-se a lista dos Requisitos Não Funcionais identificados
+para o Vigia:
+RNF01 – Desempenho: o carregamento inicial do mapa deve ser inferior a 3 segundos, garantindo um tempo de carregamento menor que 3s em conexões 4G.
+RNF02 – Desempenho: o sistema deve atualizar reportes em tempo real sem necessidade de recarregar a tela, utilizando atualização via WebSocket/SSE com latência inferior a 5s.
+RNF03 – Desempenho: buscas e filtros devem ter resposta em menos de 2 segundos para queries contendo até 10.000 registros.
+RNF04 – Desempenho: o consumo de memória do aplicativo não deve exceder 200MB em operação normal, considerando dispositivos com 3GB de RAM.
+RNF05 – Disponibilidade: o sistema deve estar disponível 24/7 com tempo de uptime superior a 99%, medido mensalmente.
+RNF06 – Confiabilidade: o sistema deve realizar backup automático de dados a cada 24 horas, com processo automatizado e verificação de integridade.
+RNF07 – Confiabilidade: o sistema deve ser capaz de se recuperar de falhas em até 4 horas, garantindo zero perda de dados submetidos e confirmados.
+RNF08 – Segurança: os dados dos usuários (localização e reportes) devem ser armazenados e transmitidos de forma criptografada, utilizando TLS 1.3 em trânsito e AES-256 em repouso.
+RNF09 – Segurança: o sistema deve prevenir ataques comuns, como SQL Injection, XSS e autenticação não autorizada, mantendo conformidade com o OWASP Top 10.
+RNF10 – Segurança: as senhas dos usuários devem ser armazenadas utilizando algoritmo de hash seguro com salt, como bcrypt ou Argon2, com salt único por usuário.
+RNF11 – Escalabilidade: o sistema deve suportar crescimento no número de usuários e reportes sem degradação perceptível, garantindo suporte a até 5.000 usuários simultâneos e 100.000 reportes.
+RNF12 – Escalabilidade: a arquitetura do backend deve permitir escalabilidade horizontal através de serviços desacoplados com possibilidade de replicação independente.
+RNF13 – Escalabilidade: o sistema de mapa deve suportar renderização eficiente de grande volume de reportes, mantendo fluidez superior a 30fps com até 10.000 marcadores agrupados.
+RNF14 – Usabilidade: o aplicativo deve ser intuitivo, permitindo que um usuário leigo consiga completar um reporte em até 3 minutos na primeira utilização, sem treinamento prévio.
+RNF15 – Usabilidade: o sistema deve fornecer feedback visual imediato para todas as ações do usuário (carregamento, sucesso, erro), exibido em até 200ms após a interação.
+RNF16 – Usabilidade: a interface deve seguir as diretrizes de Material Design para consistência com o ecossistema Android, em conformidade com as guidelines do Material Design 3 do Google.
+RNF18 – Acessibilidade: o sistema deve garantir contraste mínimo adequado entre texto e fundo, seguindo o padrão de contraste de 4.5:1 para texto normal (WCAG AA).
+RNF19 – Compatibilidade: o aplicativo deve ser compatível com dispositivos Android a partir da versão 11.0 (API 30 - Red Velvet Cake) até a versão mais recente.
+RNF20 – Compatibilidade: o aplicativo deve funcionar corretamente em diferentes tamanhos e resoluções de tela, de 5" a 7", com layouts responsivos para mdpi, hdpi, xhdpi e xxhdpi.
+RNF21 – Compatibilidade: o aplicativo deve funcionar em dispositivos com hardware GPS para geolocalização, sendo compatível com o GPS padrão do Android e possuindo fallback para localização por rede.
+RNF22 – Privacidade (LGPD): o sistema deve obter consentimento explícito do usuário antes de coletar dados de localização, exibindo a tela de consentimento antes do primeiro acesso e armazenando o registro do aceite.
+RNF23 – Privacidade (LGPD): o sistema deve permitir ao usuário solicitar a exclusão completa de seus dados pessoais, sendo a exclusão efetivada em até 72 horas com confirmação enviada por e-mail.
+RNF24 – Privacidade (LGPD): o sistema deve disponibilizar política de privacidade acessível dentro do aplicativo, através de link na tela de cadastro e nas configurações do perfil.
+RNF25 – Privacidade (LGPD): os dados de localização do usuário não devem ser compartilhados com terceiros sem consentimento, não sendo transmitidos a serviços externos além do provedor de mapas.
+RNF26 – Manutenibilidade: o código-fonte deve seguir padrões de arquitetura (MVC/MVVM) que facilitem a manutenção e evolução, mantendo uma cobertura de testes unitários igual ou superior a 60%.
+RNF27 – Manutenibilidade: o sistema deve possuir documentação técnica atualizada da API e da arquitetura, incluindo diagramas de arquitetura, modelos de dados e documentação da aplicação.
+RNF28 – Manutenibilidade: o sistema deve utilizar controle de versão e integração contínua, utilizando repositório Git com branch protection e pipeline CI/CD configurado.
+RNF29 – Portabilidade: a arquitetura do sistema deve permitir expansão para outras cidades além de São Caetano do Sul, através de dados geográficos parametrizados por cidade que permitam a adição de novas localidades sem alteração no código-fonte.
+RNF30 – Portabilidade: o sistema deve ser independente de provedor de infraestrutura específico, utilizando backend containerizado (Docker) compatível com diferentes provedores de cloud.
+RNF31 – Portabilidade: a base de código deve permitir futura migração para outras plataformas móveis ou frameworks, mantendo a camada de lógica de negócio desacoplada da camada de apresentação Android.
+6.2 Arquitetura do Sistema e Componentes de Software
+Esta seção detalha a organização estrutural da solução proposta, utilizando abordagens complementares para descrever desde o relacionamento do sistema com o ambiente externo até a sua organização interna de arquivos e módulos. A arquitetura é fundamentada no padrão MVC (Model-View-Controller), visando a separação de responsabilidades e a manutenibilidade do código.	Os diagramas expostos nesta seção incluem o Diagrama de Contexto (C4), Diagrama de Containers (C4), Diagrama de Componentes (UML), Diagrama de Casos de Uso (UML), Diagrama de Implementação (UML) e seus respectivos detalhamentos, Diagramas de Banco de Dados e seus respectivos scripts.	O desenvolvimento do sistema será totalmente desenvolvido baseado nos diagramas expostos nesta seção.		A modelagem arquitetural apresentada a seguir foi elaborada de forma hierárquica, permitindo uma compreensão gradual da solução proposta. Inicialmente, são apresentados os diagramas que fornecem uma visão ampla do sistema e de suas interações com usuários e sistemas externos. Em seguida, o detalhamento evolui para os componentes internos, regras de negócio, estruturas de dados e demais elementos que compõem a aplicação. Essa abordagem facilita o entendimento da arquitetura como um todo, possibilitando a identificação clara das responsabilidades de cada elemento e de como eles se relacionam para atender aos requisitos funcionais e não funcionais definidos para o projeto.
+A figura abaixo representa o Diagrama de Contexto do sistema, representando o maior nível de abstração, ele serve principalmente para exibir uma visão macro do sistema, destacando as interações com sistemas externos e usuários do sistema de forma simples.
+Figura 28 - Diagrama de Contexto (C4 MODEL)
+Fonte: Elaborado pelos autores (2026)
+Já o Diagrama de Containers a seguir, ilustra a arquitetura do sistema e seus principais elementos tecnológicos, dentro das escolhas feitas para o desenvolvimento e implementação do software.
+Figura 29 - Diagrama de Containers do Sistema
+Fonte: Elaborado pelos autores (2026)
+No que diz respeito à arquitetura da solução, a visão dos seus componentes funcionais e tecnológicos a serem implementados tanto no Front-End como no Back-End está ilustrado no Diagrama de Componentes abaixo.
+Figura 30 - Diagrama de Componentes do Sistema (UML)
+Fonte: Elaborado pelos autores (2026)
+O diagrama serve para mostrar como os componentes do sistema estão distribuídos fisicamente na infraestrutura, ou seja, em quais máquinas cada parte do software roda e como elas se comunicam entre si. É útil para documentar e comunicar a estrutura técnica do sistema durante o desenvolvimento ou apresentação do projeto.
+Figura 31 - Diagrama de implementação
+Fonte: Elaborado pelos autores (2026)
+6.3 Modelagem e Projeto Físico do Banco de Dados
+Para desenvolvimento da solução, é de suma importância que exista um banco de dados responsável por armazenar e recuperar as informações quando for solicitado. Entre algumas informações relevantes relacionadas ao nosso sistema podemos citar os dados dos usuários, informações relacionadas a um reporte de segurança, bem como sua situação em um dado momento, assim como também, as informações relevantes de uma denúncia, como o motivo e a localização.
+Pensando nisso, foram elaborados dois diagramas de banco de dados com as tabelas relevantes para o funcionamento do sistema, além de seus respectivos relacionamentos.
+6.3.1 Modelo Entidade Relacionamento (MER)
+Primeiramente, foi elaborado o Modelo Entidade Relacionamento (MER), o qual foram estabelecidas as entidades do nosso banco de dados, além de estabelecer quais relacionamentos existem entre essas entidades e suas cardinalidades. Um exemplo que podemos citar é a entidade Reporte, que possui os atributos de título, descrição e localização, a qual indica o local onde ocorreu a situação reportada, e tal entidade possui diversos relacionamentos, entre os quais podemos citar os relacionamentos com as entidades Usuário, Categoria e Bairro.	O Modelo Entidade Relacionamento (MER) é apresentado na figura abaixo (Figura 31)
+Figura 32 - Modelo Entidade Relacionamento (MER)
+Fonte: Elaborado pelos autores (2026)
+6.3.2 Diagrama Entidade Relacionamento (DER)
+A partir do MER, foi elaborado o Diagrama Entidade Relacionamento (DER) através da plataforma MySQL Workbench, o qual permitiu, através dele, a criação do script que irá criar o banco de dados do nosso sistema com todas as tabelas, atributos e chaves necessárias.		O Diagrama Entidade Relacionamento (DER) é apresentado na figura abaixo (Figura 32)
+Figura 33 - Diagrama Entidade Relacionamento (DER)
+Fonte: Elaborado pelos autores (2026)
+6.4 Especificação dos Casos de Usos
+O Diagrama de Casos de Uso a seguir, apresenta as funcionalidades que
+farão parte da solução do sistema, com as suas devidas interações com atores externos e internos do sistema.
+Figura 34 - Diagrama de Casos de Uso do Sistema (UML)
+Fonte: Elaborado pelos autores (2026)
+6.4.1 Documento dos Casos de Uso
+A especificação dos casos de uso serve para detalhar as regras de negócio e as interações entre os atores e o Vigia. Ela define o comportamento esperado do sistema, estabelecendo as condições necessárias para o início de uma ação e o resultado gerado após sua conclusão.
+Quadro 2 - Caso de Uso (Mantém usuário)
+Nome do caso de uso
+Mantém usuário
+Ator Principal
+Usuário
+Atores Secundários
+N/A
+Descrição (resumo)
+Permite que o usuário realize seu autocadastro, autenticação (login), recuperação de senha e gestão da sua conta, incluindo desativação ou exclusão definitiva da conta.
+Pré-Condições
+Para cadastro: O usuário deve possuir um e-mail válido ainda não registrado.
+Para desativação/exclusão: O usuário deve estar logado no sistema. Para recuperação de senha: o usuário deve possuir e-mail cadastrado
+Pós-Condições
+O estado da conta do usuário é atualizado no banco de dados (inativado) ou removido se excluído.
+Fluxo Principal (       )
+Ações do Ator
+Ações do Sistema
+Solicita a criação de uma nova conta.
+Valida se o e-mail informado já não está registrado no banco de dados.
+Informa os dados solicitados (como nome, e-mail válido e senha).
+Salva temporariamente os dados do usuário.
+Confirma o cadastro.
+Dispara um e-mail com o link de confirmação para o endereço fornecido.
+Acessa seu e-mail e clica no link de confirmação recebido.
+Ativa a conta do usuário após o clique no link.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+Acessa a tela de login.
+Valida as credenciais informadas contra o banco de dados.
+Informa suas credenciais (e-mail e senha).
+Permite o acesso do usuário ao sistema (concede a sessão de login).
+Solicita a entrada no sistema.
+Fluxo Alternativo II (        )
+Ações do Ator
+Ações do Sistema
+Solicita a recuperação de senha na tela de login.
+Verifica se o e-mail existe no sistema.
+Informa o e-mail cadastrado.
+Gera e envia um link único de recuperação com tempo de expiração.
+Acessa o link único recebido por e-mail.
+Valida a nova senha enviada pelo usuário e atualiza-a no banco de dados.
+Define uma nova senha e confirma.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+Acessa a área de gestão de conta (estando logado).
+Valida a autenticação e o pedido do usuário.
+Seleciona a opção de desativar ou excluir definitivamente a conta.
+Se desativação: Altera o status da conta para "Inativo" no banco de dados.
+Confirma a operação (geralmente reinserindo a senha por segurança).
+Se exclusão: Remove permanentemente os dados do usuário do banco de dados (conforme a pós-condição).
+Fonte: Elaborado pelos autores (2026)
+Quadro 3 - Especificação de Caso de Uso (Mantém Gerencia Denúncias)
+Nome do caso de uso
+Gerencia Denúncias
+Ator Principal
+Administrador
+Atores Secundários
+N/A
+Descrição (resumo)
+Painel central do administrador que dá acesso às funcionalidades de gerenciamento de denúncias de perfis, denúncias de reportes e recursos de usuários punidos.
+Pré-Condições
+Administrador com acesso aprovado.
+Pós-Condições
+Administrador utiliza o filtro do painel para gerenciar informação especifica.
+Fluxo Principal (       )
+Ações do Ator
+Ações do Sistema
+Acessa o painel central de gerenciamento de denúncias.
+Valida se o usuário logado possui permissões de Administrador (conforme pré-condição).
+Aplica filtros específicos (ex: por tipo de denúncia, data, status ou usuário) para localizar uma informação.
+Renderiza a interface do painel central com a listagem geral das ocorrências pendentes.
+Seleciona uma denúncia de perfil, denúncia de reporte ou recurso para análise.
+Processa os filtros aplicados e atualiza a listagem exibindo apenas as informações solicitadas (conforme pós-condição)
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+Avalia as evidências da denúncia selecionada (seja contra um perfil ou contra um reporte de ocorrência feito no app).
+Exibe os detalhes da denúncia, o histórico do usuário denunciado e as evidências atreladas.
+Aplica a ação cabível: Ignorar a denúncia (se for infundada) ou Punir o usuário/reporte infrator.
+Se a denúncia for ignorada: Atualiza o status da denúncia para "Arquivada/Resolvida".
+Se o administrador aplicar punição: Aplica a sanção correspondente ao usuário infrator (advertência, suspensão ou banimento) ou remove o reporte indevido do sistema.
+Fluxo Alternativo II (        )
+Ações do Ator
+Ações do Sistema
+Seleciona a aba ou filtro de "Recursos".
+Recupera e exibe a justificativa enviada pelo usuário junto ao motivo original da sua punição.
+Abre a contestação enviada pelo usuário que foi punido anteriormente.
+Se a punição for mantida: Atualiza o status do recurso para "Negado" e mantém as restrições do usuário.
+Analisa a justificativa do usuário e decide se Mantém a punição ou se Revoga a punição.
+Se a punição for revogada: Atualiza o status do recurso para "Aprovado", remove as restrições da conta do usuário e restabelece seu acesso.
+Fonte: Elaborado pelos autores (2026)
+Quadro 4 - Especificação de Caso de Uso (Denuncia reportes)
+Nome do caso de uso
+Denuncia reportes
+Ator Principal
+Usuário
+Atores Secundários
+N/A
+Descrição (resumo)
+Permite que o usuário denuncie reportes exibidos no mapa/perfis postados por outros usuários.
+Pré-Condições
+O usuário deve estar logado.O reporte deve existir no mapa interativo ou no perfil do usuário que o publicou.
+Pós-Condições
+A denúncia é registrada, vinculada ao reporte e ao autor, e alimenta o cálculo automático de reputação.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+Seleciona a opção de denunciar o reporte.
+Exibe um formulário de denúncia, solicitando a justificativa textual obrigatória.
+Insere a justificativa textual obrigatória detalhando o motivo da denúncia e confirma o envio.
+Valida o campo, registra a denúncia vinculando-a ao reporte e ao autor, atualiza os parâmetros de reputação e exibe mensagem de sucesso.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+Decide não prosseguir e clica em cancelar a operação.
+Encerra o formulário sem salvar as alterações e retorna o usuário à tela de visualização do mapa/perfil original.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+Tenta enviar a denúncia sem preencher a justificativa textual.
+Identifica a ausência do campo obrigatório, bloqueia o envio e exibe um alerta solicitando o preenchimento obrigatório.
+Fonte: Elaborado pelos autores (2026)
+Quadro 5 - Especificação de Caso de Uso (Denuncia Perfis)
+Nome do caso de uso
+Denuncia Perfis
+Ator Principal
+Usuário
+Atores Secundários
+N/A
+Descrição (resumo)
+Permite que os usuários denunciem o perfil de outros usuários afetando diretamente a reputação desses usuários no sistema.
+Pré-Condições
+O usuário deve estar logado e visualizando o perfil de outro usuário.
+Pós-Condições
+A denúncia é registrada e o score de reputação do perfil denunciado é recalculado automaticamente.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+O usuário acessa o perfil de outro usuário e seleciona a opção de denúncia.
+O sistema abre a interface de denúncia de perfil.
+O usuário escreve um motivo plausível para a denúncia.
+O sistema exibe o campo preenchido e habilita a submissão.
+O usuário confirma a denúncia do perfil.
+O sistema vincula a denúncia ao usuário denunciado e atualiza o score de reputação.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+O usuário cancela a denúncia saindo do pop-up.
+O sistema fecha a interface sem registrar nenhuma alteração.
+O usuário não loggado tenta acessar ou denunciar.
+O sistema redireciona automaticamente para a tela de login.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+O usuário tenta enviar a denúncia com o campo de justificativa em branco.
+O sistema impede o envio e sinaliza que a justificativa textual é de preenchimento obrigatório.
+Fonte: Elaborado pelos autores (2026)
+Quadro 6 - Especificação de Caso de Uso (Realiza Buscas no Mapa)
+Nome do caso de uso
+Realiza Buscas no Mapa
+Ator Principal
+Usuário
+Atores Secundários
+API de Integração (Open Source Map)
+Descrição (resumo)
+Permite localizar ocorrências através de mecanismos de buscas no mapa interativo do sistema.
+Pré-Condições
+API Open Source Map disponível. Usuários não logados podem visualizar o mapa, mas login é obrigatório para filtros avançados e busca.
+Pós-Condições
+O mapa exibe os reportes conforme a busca realizada, agrupando reportes similares na mesma região.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+O usuário acessa a tela do mapa interativo.
+O sistema carrega a base cartográfica através da API do Open Source Map.
+O usuário digita os termos na barra de pesquisa ou seleciona os filtros desejados.
+O sistema recebe os parâmetros de busca.
+O usuário confirma a pesquisa.
+O sistema processa os filtros, consulta a base e renderiza no mapa apenas os marcadores correspondentes.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+Usuário não logado tenta utilizar filtros ou fazer buscas textuais.
+O sistema bloqueia o uso dos filtros e exibe mensagem informando a necessidade de login.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+A API externa do Open Source Map fica indisponível durante o carregamento.
+O sistema exibe uma mensagem de falha na conexão cartográfica e orienta o usuário a tentar novamente mais tarde.
+Fonte: Elaborado pelos autores (2026)
+Quadro 7 - Especificação de Caso de Uso (Mantém Perfil)
+Nome do caso de uso
+Mantém Perfil
+Ator Principal
+Usuário
+Atores Secundários
+N/A
+Descrição (resumo)
+Gerenciamento das informações pessoais, foto, e-mail, telefone e senha.
+Pré-Condições
+Usuário deve estar devidamente autenticado e logado no sistema.
+Pós-Condições
+O perfil do usuário é atualizado e gravado em definitivo na base de dados.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+O usuário acessa a área de perfil da sua conta.
+O sistema exibe as informações cadastrais atuais do usuário.
+O usuário edita as suas informações pessoais (foto, nome, e-mail, telefone ou senha).
+O sistema apresenta os campos modificados em tempo real.
+O usuário clica no botão 'Salvar as alterações'.
+O sistema valida os dados, atualiza a base de dados e recarrega o novo perfil.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+O usuário visualiza a área de edição e sai sem alterar nada ou clica em cancelar.
+O sistema ignora as alterações parciais e restaura os dados anteriores.
+O usuário solicita alteração de senha.
+O sistema exige a digitação da senha atual como validação de segurança antes de permitir a alteração.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+O usuário tenta salvar um e-mail em formato inválido ou já existente no banco.
+O sistema exibe um alerta de erro de validação e não grava as alterações.
+Fonte: Elaborado pelos autores (2026)
+Quadro 8 - Especificação de Caso de Uso (Mantém Reportes)
+Nome do caso de uso
+Mantém Reportes
+Ator Principal
+Usuário
+Atores Secundários
+N/A
+Descrição (resumo)
+Permite ao usuário criar, editar (uma única vez) e excluir reportes no mapa interativo. A criação posiciona o reporte no mapa; a exclusão remove.
+Pré-Condições
+O usuário deve estar logado. Para criação, classificação e subcategoria são obrigatórias. Para exclusão/edição, o reporte deve pertencer ao usuário.
+Pós-Condições
+A publicação é adicionada, editada ou permanentemente removida do mapa interativo e do perfil do usuário.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+O usuário seleciona um reporte existente de sua autoria no mapa ou em seu perfil.
+O sistema exibe os detalhes do reporte e as opções de gerenciamento.
+O usuário seleciona a opção de excluir o reporte.
+O sistema solicita a confirmação de exclusão definitiva.
+O usuário confirma a exclusão.
+O sistema remove o reporte do mapa interativo, limpa o registro visível e atualiza o perfil.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+O usuário inicia a edição de um reporte próprio.
+O sistema abre o formulário permitindo a alteração dos campos (permitido apenas uma única vez).
+O usuário utiliza o GPS do celular ou clica manualmente para definir o local.
+O sistema captura as coordenadas geográficas para fixação correta do marcador.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+O usuário tenta editar ou excluir um reporte criado por outro usuário do sistema.
+O sistema identifica a quebra de permissão, bloqueia a ação e exibe mensagem de erro de autenticação.
+Fonte: Elaborado pelos autores (2026)
+Quadro 9 - Especificação de Caso de Uso (Criar reportes (API))
+Nome do caso de uso
+Criar Reportes (API)
+Ator Principal
+Usuário
+Atores Secundários
+APIs Externas (Instagram, Folha de São Caetano, Open Source Map)
+Descrição (resumo)
+Registro de novas ocorrências via interface manual ou através do consumo automático de APIs externas.
+Pré-Condições
+Integração ativa e configurada com as APIs externas de coleta e mapa georreferenciado.
+Pós-Condições
+Nova ocorrência gerada automaticamente, tratada e plotada no mapa interativo.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+O sistema executa a rotina automática de consulta às APIs externas (Folha de São Caetano, Instagram).
+O sistema localiza postagens e notícias relevantes recentes.
+O sistema identifica novos dados públicos que configuram ocorrências.
+O sistema extrai a descrição e a localização em texto da notícia.
+O sistema converte a localização textual em coordenadas geográficas.
+O sistema georreferencia o registro e salva o reporte automaticamente no mapa.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+A notícia externa capturada não possui qualquer informação ou metadado de localização.
+O sistema aborta o georreferenciamento automático daquela notícia específica.
+Uma das APIs externas apresenta indisponibilidade técnica.
+O sistema ignora temporariamente a fonte inativa e continua a execução normal com as demais APIs operantes.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+O dado recebido da API externa possui informações corrompidas ou sem estrutura legível.
+O sistema descarta o payload com erro, gera um log interno e aguarda o próximo ciclo de varredura.
+Fonte: Elaborado pelos autores (2026)
+Quadro 10 - Especificação de Caso de Uso (Gerencia Denuncias)
+Nome do caso de uso
+Gerencia Denúncias
+Ator Principal
+Administrador
+Atores Secundários
+N/A
+Descrição (resumo)
+O administrador acessa o painel de controle centralizado e seleciona as categorias específicas de informações desejadas para realizar a moderação.
+Pré-Condições
+O administrador deve possuir privilégios elevados de acesso e estar autenticado no painel administrativo.
+Pós-Condições
+A categoria selecionada é carregada em tela para triagem das pendências pela moderação.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+O administrador realiza o login e acessa o painel administrativo geral.
+O sistema autentica o perfil corporativo e exibe a Dashboard central.
+O administrador escolhe e clica na funcionalidade pretendida (Denúncias de Perfis, Denúncias de Reportes ou Recursos).
+O sistema renderiza a fila específica com todos os itens filtrados aguardando análise.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+O administrador acessa o painel principal, mas decide encerrar a sessão sem clicar em nenhum menu.
+O sistema encerra a sessão de forma segura e retorna à tela de login administrativo.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+O administrador tenta acessar o painel a partir de uma conta sem privilégios de moderação.
+O sistema bloqueia o acesso à página, registra uma tentativa não autorizada e exibe alerta de erro.
+Fonte: Elaborado pelos autores (2026)
+Quadro 11 - Especificação de Caso de Uso (Gerencia Denúncias Perfis)
+Nome do caso de uso
+Gerencia Denúncias Perfis
+Ator Principal
+Administrador
+Atores Secundários
+N/A
+Descrição (resumo)
+Permite ao administrador analisar denúncias recebidas em perfis de usuários, aceitar ou rejeitar as denúncias, e aplicar suspensões ou banimentos.
+Pré-Condições
+Administrador autenticado e existência de denúncias de perfis registradas no painel.
+Pós-Condições
+Denúncia moderada; se aceita, aplica-se a punição ao perfil infrator e envia-se um e-mail de notificação com link de recurso.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+O administrador aplica o filtro de denúncias de perfis no painel.
+O sistema lista todas as denúncias de perfis pendentes.
+O administrador seleciona e analisa detalhadamente o perfil denunciado e o motivo descrito.
+O sistema exibe o histórico de infrações do usuário.
+O administrador aceita a denúncia e escolhe a penalidade (suspensão temporária ou banimento permanente).
+O sistema registra a decisão, aplica a punição e dispara o e-mail de notificação automática contendo o link para recurso.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+O administrador avalia os fatos e conclui que a denúncia é improcedente, optando por rejeitá-la.
+O sistema arquiva a denúncia sem penalizar o usuário, exigindo a inserção de uma justificativa textual obrigatória.
+A punição escolhida é uma suspensão temporária.
+O sistema permite ao administrador configurar o tempo exato (60 min, 12h, 24h, 1 semana ou 1 mês).
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+O administrador tenta finalizar a moderação (aceitar/rejeitar) mantendo o campo de justificativa em branco.
+O sistema emite um alerta impeditivo avisando que a justificativa textual do administrador é estritamente obrigatória.
+Fonte: Elaborado pelos autores (2026)
+Quadro 12 - Especificação de Caso de Uso (Gerencia Denúncias Reportes)
+Nome do caso de uso
+Gerencia Denúncias Reportes
+Ator Principal
+Administrador
+Atores Secundários
+N/A
+Descrição (resumo)
+Permite ao administrador analisar denúncias recebidas de reportes plotados, decidir por aceitar ou rejeitar, remover o conteúdo inadequado e punir o autor.
+Pré-Condições
+Administrador autenticado no painel com denúncias de reportes aguardando triagem.
+Pós-Condições
+O reporte inadequado é deletado do mapa interativo e o usuário autor do reporte é devidamente penalizado.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+O administrador seleciona o filtro correspondente a denúncias de reportes no painel.
+O sistema exibe a lista de reportes denunciados.
+O administrador analisa o conteúdo do reporte, as coordenadas e o perfil do autor.
+O sistema disponibiliza os botões de ação e moderação.
+O administrador aceita a denúncia, remove o reporte e aplica a punição ao autor.
+O sistema oculta o reporte do mapa em tempo real, pune o autor e envia e-mail com link de recurso.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+O administrador rejeita a denúncia por falta de fundamentação legal ou factual.
+O sistema encerra o caso, mantém o reporte visível no mapa e arquiva o registro de denúncia.
+A punição ao autor não é considerada necessária pelo moderador, apenas a remoção do conteúdo.
+O sistema atualiza a nota de reputação do autor de forma automática e remove o reporte sem banir.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+O administrador envia o comando sem preencher a justificativa textual obrigatória no formulário.
+O sistema bloqueia a ação e indica graficamente o campo obrigatório não preenchido.
+Fonte: Elaborado pelos autores (2026)
+Quadro 13 - Especificação de Caso de Uso (Gerencia Recursos)
+Nome do caso de uso
+Gerenciar Recursos
+Ator Principal
+Administrador
+Atores Secundários
+N/A
+Descrição (resumo)
+Permite ao administrador analisar recursos e contestações formais enviados por usuários que foram punidos previamente.
+Pré-Condições
+Administrador logado e existência de recursos enviados pelos usuários em estado pendente.
+Pós-Condições
+O recurso é julgado; se aceito, a punição é revogada e o usuário é liberado; se rejeitado, a punição é mantida.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+O administrador clica no filtro de recursos pendentes no painel administrativo.
+O sistema apresenta a listagem de contestações enviadas.
+O administrador lê os argumentos do usuário e revisa o motivo da punição original.
+O sistema exibe a tela de julgamento de recurso.
+O administrador toma a decisão de aceitar ou rejeitar o recurso e preenche a justificativa.
+O sistema grava a decisão de moderação e notifica formalmente o usuário por e-mail.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+O administrador aceita o recurso e decide pela revogação imediata da punição aplicada.
+O sistema reativa o usuário, remove os bloqueios e envia um e-mail de liberação de conta.
+O administrador rejeita o recurso de contestação do usuário.
+O sistema mantém a punição inalterada e encerra o processo do protocolo.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+O sistema falha ao disparar o e-mail de notificação de julgamento ao usuário.
+O sistema registra a falha de entrega em segundo plano e realiza novas tentativas de reenvio automaticamente.
+Fonte: Elaborado pelos autores (2026)
+Quadro 14 - Especificação de Caso de Uso (Recorrer Recurso)
+Nome do caso de uso
+Recorrer Recurso
+Ator Principal
+Usuário
+Atores Secundários
+N/A
+Descrição (resumo)
+Permite ao usuário punido contestar formalmente a punição recebida utilizando o link único enviado em seu e-mail.
+Pré-Condições
+O usuário deve possuir uma punição ativa e ter recebido o e-mail oficial com o link de recurso.
+Pós-Condições
+O recurso é registrado com sucesso e posicionado na fila de triagem do painel do administrador.
+Fluxo Principal (        )
+Ações do Ator
+Ações do Sistema
+O usuário abre o e-mail de notificação de punição e clica no link para recorrer.
+O sistema valida o token do link e abre a página de formulário de recurso.
+O usuário digita textualmente os seus motivos e argumentos de defesa.
+O sistema armazena temporariamente os caracteres preenchidos.
+O usuário clica no botão de enviar recurso.
+O sistema valida as informações, salva o recurso e o insere no painel administrativo.
+Fluxo Alternativo I (        )
+Ações do Ator
+Ações do Sistema
+O usuário acessa a página do link, mas fecha o navegador ou clica em cancelar.
+O sistema descarta as informações digitadas e nenhum recurso é processado.
+O usuário clica no link após o prazo limite estipulado de contestação.
+O sistema exibe mensagem informando que o link expirou e impede a visualização do formulário.
+Fluxo de Exceção I (        )
+Ações do Ator
+Ações do Sistema
+O usuário tenta enviar o formulário mantendo o campo de texto de defesa completamente vazio.
+O sistema bloqueia a submissão e exige a digitação de uma justificativa de forma obrigatória.
+Fonte: Elaborado pelos autores (2026)
+CONCLUSÃO
+O desenvolvimento do projeto "Vigia" ao longo deste semestre consolidou-se como uma experiência acadêmica e prática enriquecedora, permitindo uma compreensão aprofundada sobre o panorama da segurança pública e os desafios enfrentados no município de São Caetano do Sul. Por meio de pesquisas documentais, análise de notícias e, fundamentalmente, da escuta ativa de moradores e frequentadores, foi possível mapear com clareza a percepção real de segurança e insegurança da comunidade local.
+Diante desse diagnóstico, a ideação do aplicativo demonstrou-se altamente viável e necessária, apresentando-se como uma ferramenta tecnológica colaborativa capaz de empoderar o cidadão ao democratizar o acesso a informações claras e acessíveis. Paralelamente ao impacto social, o projeto propiciou um significativo amadurecimento técnico para a equipe, que desenvolveu competências essenciais na elaboração de relatórios, criação de elementos visuais e no manuseio de novas tecnologias de desenvolvimento.
+Por fim, a evolução do projeto também se beneficiou da integração e sinergia entre os membros do grupo, inclusive com a incorporação de bagagens técnicas anteriores que aceleraram o atendimento às novas demandas. Em suma, o "Vigia" cumpre o seu propósito de conectar a tecnologia à resolução de problemas reais, oferecendo uma proposta sólida para a melhoria da qualidade de vida e da segurança na região estudada.
+REFERÊNCIAS
+São Caetano do Sul. São Caetano do Sul Registra Queda Significativa na Criminalidade Após Investimento em Segurança. São Paulo: São Caetano do Sul, 2024. acessado  07 maio de 2025. https://saocaetanodosul.net/2024/03/01/sao-caetano-do-sul-registra-queda-significativa-na-criminalidade-apos-investimento-em-seguranca/Mendes A. Padilla. Forças De Segurança De São Caetano Começam Ações Dentro Da Cidade. São Paulo: São Caetano do Sul, 2024. acessado  12 maio de 2025. https://despertasaocaetano.com.br/forcas-de-seguranca-de-sao-caetano-comecam-acoes-dentro-da-cidade/Rangel N. Marques. Análise do Impacto do Programa São Caetano Mais Segura na Segurança Pública. São Paulo: São Caetano do Sul, 2024. acessado  12 maio de 2025. https://www.em.com.br/emfoco/2025/03/20/cidade-mais-segura-de-sao-paulo-surpreende-e-vira-exemplo-para-o-brasil/.São Caetano do Sul. São Caetano é a cidade mais segura do Brasil. São Paulo: São Caetano do Sul, 2021. acessado  08 maio de 2025. https://saocaetanodosul.net/2024/01/13/analise-do-impacto-do-programa-sao-caetano-mais-segura-na-seguranca-publica/.
+APÊNDICE A - CRONOGRAMA DE ATIVIDADES
+Quadro 15 - Cronograma de Atividades do Projeto
+Data
+Atividades Realizadas
+Participantes
+18/02/2025
+Formação do grupo.
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando Domingues
+09/03/2025
+Definição do tema do projeto.
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando Domingues
+18/03/2025
+Idealização e criação do Double Diamond.
+Erick Teixeira CruzFernando Domingues
+28/03/2025
+Criação do 5W2H e do Canvas de Proposta de Valor.
+Erick Teixeira CruzFernando Domingues
+25/03/2025
+Discussão sobre o tema e primeiras avaliações do professor.
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando DominguesDaniela Longato - Professora
+04/04/2025
+Feedback da professora responsável.
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando DominguesDaniela Longato - Professora
+08/04/2025
+Criação do formulário de pesquisa sobre o projeto
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando Domingues
+08/04/2025
+Início das pesquisas de campo.
+20/04/2025
+Finalização da pesquisa de campo.
+26/04/2025
+Finalização do formulário.
+29/04/2025
+Segundo feedback da professora responsável.
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando DominguesDaniela Longato - Professora
+06/05/2025
+Disponibilização do formulário para o público responder.
+08/05/2025
+Coleta das respostas do formulário.
+13/05/2025
+Início da criação do relatório.
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando Domingues
+15/05/2025
+Criação do mapa de empatia e persona.
+Fabrício BucardiFernando Domingues
+20/05/2025
+Finalização do relatório do primeiro semestre.
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando Domingues
+26/08/2025
+Apresentação do projeto para o professor responsável.
+Fabrício BucardiMurilo MandelliFernando DominguesKauã NantesRovilson Freitas - Professor
+02/09/2025
+Definição final da ideação do projeto.
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando DominguesKauã NantesRovilson Freitas - Professor
+02/09/2025
+Idealização e criação do protótipo de baixa fidelidade
+Erick Teixeira CruzKauã Nantes
+30/09/2025
+Escolha das tecnologias e ambientes de operação/desenvolvimento.
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando DominguesKauã Nantes
+02/11/2025
+Ideação Geral do Banco de Dados
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando DominguesKauã Nantes
+23/11/2025
+Finalização do relatório do segundo semestre.
+Erick Teixeira CruzFabrício BucardiMurilo MandelliFernando DominguesKauã Nantes
+01/04/2026
+Criação e inclusão dos requisitos funcionais e não funcionais.
+Erick Teixeira Cruz
+Fernando Domingues
+Kauã Nantes
+Murilo Mandelli
+01/04/2026
+Ideação e criação da arquitetura do C4 Model do Sistema (Diagrama de Contexto, Contêineres e Componentes)
+Erick Teixeira Cruz
+01/04/2026
+Inclusão dos casos de uso do sistema que foram desenvolvidos.
+Erick Teixeira Cruz
+Fabrício Bucardi
+Fernando Domingues
+Murilo Mandelli
+04/06/2026
+Finalização do relatório do terceiro semestre
+Erick Teixeira Cruz
+Fabrício Bucardi
+Fernando Domingues
+Murilo MandelliKauã Nantes
+Fonte: Elaborado pelos autores (2025)
+APÊNDICE B - RELATÓRIO DE PARTICIPAÇÃO
+Quadro 16 - Lista de Papeis de Responsabilidades da Equipe do Projeto
+Participantes
+Responsabilidades
+Atividades Realizadas
+Erick Teixeira Cruz
+Relatório
+Elaboração dos métodos de Pesquisa
+Prototipação de Software
+Definição das Tecnologias de Desenvolvimento
+Proposta do Banco de Dados
+Desenho e Especificação de Software
+Líder do Projeto
+Double Diamond.
+Questionário da Pesquisa de Campo
+Canvas da Proposta de valor
+Canvas de Projeto
+Design do Protótipo de Baixa Fidelidade
+Suporte na Definição das Tecnologias
+Modelagem Geral do Banco de Dados
+Criação dos Requisitos Funcionais e Não Funcionais
+Ideação e Criação da arquitetura C4 Model do sistema
+Fernando Domingues
+Relatório
+Elaboração dos métodos de Pesquisa
+Definição das Tecnologias de Desenvolvimento
+Proposta do Banco de Dados
+Criação das Figuras
+Canvas de projeto
+Funcionalidades do Aplicativo
+Pesquisa de Soluções Similares
+Levantamento das Personas
+Mapa de Empatia
+Pesquisa de Tecnologias Candidatas
+5W2H
+Modelagem Geral do Banco de Dados
+Apoio na criação dos diagramas de caso de uso
+Murilo Mandelli
+Relatório
+Definição das Tecnologias
+Proposta do Banco de Dados
+Definição das Tecnologias de Desenvolvimento
+Descrição dos problemas a serem enfrentados
+Elaboração do MVP
+Suporte na Definição das Tecnologias
+Pesquisa Inicial do Projeto
+Especificação dos casos de uso
+Fabrício Bucardi
+Relatório
+Ideia Inicial do Projeto
+Pesquisa de CampoRelatório
+Definição das Tecnologias
+Proposta do Banco de Dados
+Levantamento das Personas
+Ideia base do projeto
+Descrição dos problemas a serem enfrentados
+Suporte na Definição das Tecnologias
+Pesquisa Inicial do Projeto
+Ideação e criação do MER, DER e Script do banco de dados
+Kauã Nantes
+Relatório
+Suporte na Definição das Tecnologias
+Proposta do Banco de Dados
+Protótipo de Baixa Fidelidade
+Modelagem Geral do Banco de Dados
+Canvas de Projeto
+Digitalização do Protótipo de Baixa Fidelidade
+Atualização e formatação do relatório
+Fonte: Elaborado pelos autores (2025)
+APÊNDICE C - PESQUISA
+O método de pesquisa é o conjunto de procedimentos utilizados para a coleta, análise e interpretação de dados com o objetivo de responder a uma questão ou resolver um problema específico. Neste projeto, utilizamos o método de pesquisa por meio de formulários, permitindo coletar informações diretamente dos usuários de forma prática e eficiente, contribuindo para a compreensão das necessidades e percepções sobre a segurança em São Caetano do Sul.
+Logo abaixo mostramos um breve resumo das perguntas que fizemos na nossa pesquisa de campo:
+Figura 35  - Pergunta 1 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 36 - Pergunta 2 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 37 - Pergunta 3 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 38 - Pergunta 4 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 39 - Pergunta 5 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 40 - Pergunta 6 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 41 - Pergunta 7 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 42 - Pergunta 8 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 43 - Pergunta 9 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 44 - Pergunta 10 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 45 - Pergunta 11 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 46 - Pergunta 12 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 47 - Pergunta 13 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 48 - Pergunta 14 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 49 - Pergunta 15 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 50 - Pergunta 16 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+Figura 51 - Pergunta 17 do formulário de pesquisa de campo
+Fonte: Elaborado pelos autores (2025)
+APÊNDICE D - Script de Criação
+O script de criação do banco de dados foi desenvolvido com o objetivo de implementar a estrutura necessária para o armazenamento e gerenciamento das informações utilizadas pela plataforma Vigia. Por meio dele, são definidas as tabelas, atributos, relacionamentos, chaves primárias, chaves estrangeiras e demais restrições responsáveis por garantir a integridade e a consistência dos dados.	O código-fonte completo do script de criação do banco de dados é apresentado neste apêndice, servindo como documentação técnica da estrutura persistente da solução proposta.
+CREATE DATABASE vigia;
+USE vigia;
+CREATE TABLE usuario (
+id INT NOT NULL AUTO_INCREMENT,
+nome VARCHAR(255) NOT NULL,
+email VARCHAR(255) NOT NULL,
+senha_hash VARCHAR(255) NOT NULL,
+dataNascimento DATE NOT NULL,
+telefone VARCHAR(255) NULL,
+status ENUM('ativo', 'suspenso', 'banido', 'deletado', 'inativo') NOT NULL,
+avaliacao DOUBLE NULL,
+avatar VARCHAR(255) NULL,
+data_inicio DATETIME NOT NULL,
+data_fim DATETIME NULL,
+ativo BOOL NOT NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE categoria (
+id INT NOT NULL AUTO_INCREMENT,
+tipoCategoria VARCHAR(255) NOT NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE bairro (
+id INT NOT NULL AUTO_INCREMENT,
+nome VARCHAR(255) NOT NULL,
+classificacaoSeguranca DOUBLE NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE noticia (
+id INT NOT NULL AUTO_INCREMENT,
+titulo VARCHAR(255) NOT NULL,
+conteudo TEXT NOT NULL,
+dataPublicacao DATETIME NOT NULL,
+latitude DOUBLE NULL,
+longitude DOUBLE NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE perfil_publico (
+id INT NOT NULL AUTO_INCREMENT,
+idUsuario INT NOT NULL,
+bio TEXT NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE historico (
+id INT NOT NULL AUTO_INCREMENT,
+idUsuario INT NOT NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE admin (
+id INT NOT NULL AUTO_INCREMENT,
+idUsuario INT NOT NULL,
+numeroAdmin VARCHAR(255) NOT NULL,
+statusAprovacao ENUM('aprovado', 'negado') NOT NULL,
+data_inicio DATETIME NOT NULL,
+data_fim DATETIME NULL,
+ativo BOOL NOT NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE subcategoria (
+id INT NOT NULL AUTO_INCREMENT,
+idCategoria INT NOT NULL,
+tipoSubcategoria VARCHAR(255) NOT NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE reporte (
+idReporte INT NOT NULL AUTO_INCREMENT,
+idUsuario INT NOT NULL,
+idCategoria INT NOT NULL,
+idSubcategoria INT NOT NULL,
+idBairro INT NOT NULL,
+titulo VARCHAR(255) NOT NULL,
+descricao TEXT NOT NULL,
+latitude DOUBLE NOT NULL,
+longitude DOUBLE NOT NULL,
+endereco VARCHAR(255) NULL,
+status ENUM('rascunho', 'publicado', 'excluido') NOT NULL,
+dataReporte DATETIME NOT NULL,
+PRIMARY KEY (idReporte)
+);
+CREATE TABLE noticia_rede_social (
+idNoticia INT NOT NULL,
+urlPost VARCHAR(255) NOT NULL,
+plataforma VARCHAR(255) NOT NULL,
+perfilOrigem VARCHAR(255) NOT NULL,
+PRIMARY KEY (idNoticia)
+);
+CREATE TABLE noticia_portal (
+idNoticia INT NOT NULL,
+urlMateria VARCHAR(255) NOT NULL,
+veiculo VARCHAR(255) NOT NULL,
+PRIMARY KEY (idNoticia)
+);
+CREATE TABLE denuncia_reporte (
+id INT NOT NULL AUTO_INCREMENT,
+idUsuarioDenunciante INT NOT NULL,
+idReporte INT NOT NULL,
+motivo VARCHAR(255) NOT NULL,
+descricao TEXT NULL,
+dataDenuncia DATETIME NOT NULL,
+status ENUM('pendente', 'arquivada', 'aceita', 'rejeitada') NOT NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE noticia_reporte (
+idNoticia INT NOT NULL,
+idReporte INT NOT NULL,
+PRIMARY KEY (idNoticia, idReporte)
+);
+CREATE TABLE acao_administrativa (
+id INT NOT NULL AUTO_INCREMENT,
+idAdmin INT NOT NULL,
+idUsuarioAlvo INT NOT NULL,
+tipoAcao ENUM('suspensao', 'ban', 'exclusaoReporte') NOT NULL,
+justificativa TEXT NOT NULL,
+duracao VARCHAR(255) NULL,
+dataHora DATETIME NOT NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE denuncia_perfil (
+id INT NOT NULL AUTO_INCREMENT,
+idUsuarioDenunciante INT NOT NULL,
+idUsuarioDenunciado INT NOT NULL,
+motivo VARCHAR(255) NOT NULL,
+descricao TEXT NULL,
+dataDenuncia DATETIME NOT NULL,
+status ENUM('pendente', 'arquivada', 'aceita', 'rejeitada') NOT NULL,
+PRIMARY KEY (id)
+);
+CREATE TABLE recurso (
+id INT NOT NULL AUTO_INCREMENT,
+idAcaoAdministrativa INT NOT NULL,
+idUsuario INT NOT NULL,
+status ENUM('pendente', 'aceito', 'rejeitado') NOT NULL,
+justificativaUser TEXT NOT NULL,
+justificativaAdmin TEXT NULL,
+dataRecurso DATETIME NOT NULL,
+dataDecisao DATETIME NULL,
+PRIMARY KEY (id)
+);
+ALTER TABLE admin ADD CONSTRAINT FK_usuario_TO_admin
+FOREIGN KEY (idUsuario) REFERENCES usuario (id);
+ALTER TABLE perfil_publico ADD CONSTRAINT FK_usuario_TO_perfil_publico
+FOREIGN KEY (idUsuario) REFERENCES usuario (id);
+ALTER TABLE historico ADD CONSTRAINT FK_usuario_TO_historico
+FOREIGN KEY (idUsuario) REFERENCES usuario (id);
+ALTER TABLE subcategoria ADD CONSTRAINT FK_categoria_TO_subcategoria
+FOREIGN KEY (idCategoria) REFERENCES categoria (id);
+ALTER TABLE reporte ADD CONSTRAINT FK_usuario_TO_reporte
+FOREIGN KEY (idUsuario) REFERENCES usuario (id);
+ALTER TABLE reporte ADD CONSTRAINT FK_categoria_TO_reporte
+FOREIGN KEY (idCategoria) REFERENCES categoria (id);
+ALTER TABLE reporte ADD CONSTRAINT FK_subcategoria_TO_reporte
+FOREIGN KEY (idSubcategoria) REFERENCES subcategoria (id);
+ALTER TABLE reporte ADD CONSTRAINT FK_bairro_TO_reporte
+FOREIGN KEY (idBairro) REFERENCES bairro (id);
+ALTER TABLE noticia_rede_social ADD CONSTRAINT FK_noticia_TO_noticia_rede_social
+FOREIGN KEY (idNoticia) REFERENCES noticia (id);
+ALTER TABLE noticia_portal ADD CONSTRAINT FK_noticia_TO_noticia_portal
+FOREIGN KEY (idNoticia) REFERENCES noticia (id);
+ALTER TABLE denuncia_reporte ADD CONSTRAINT FK_usuario_TO_denuncia_reporte
+FOREIGN KEY (idUsuarioDenunciante) REFERENCES usuario (id);
+ALTER TABLE denuncia_reporte ADD CONSTRAINT FK_reporte_TO_denuncia_reporte
+FOREIGN KEY (idReporte) REFERENCES reporte (idReporte);
+ALTER TABLE noticia_reporte ADD CONSTRAINT FK_noticia_TO_noticia_reporte
+FOREIGN KEY (idNoticia) REFERENCES noticia (id);
+ALTER TABLE noticia_reporte ADD CONSTRAINT FK_reporte_TO_noticia_reporte
+FOREIGN KEY (idReporte) REFERENCES reporte (idReporte);
+ALTER TABLE acao_administrativa ADD CONSTRAINT FK_admin_TO_acao_administrativa
+FOREIGN KEY (idAdmin) REFERENCES admin (id);
+ALTER TABLE acao_administrativa ADD CONSTRAINT FK_usuario_TO_acao_administrativa
+FOREIGN KEY (idUsuarioAlvo) REFERENCES usuario (id);
+ALTER TABLE denuncia_perfil ADD CONSTRAINT FK_usuario_TO_denuncia_perfil_denunciante
+FOREIGN KEY (idUsuarioDenunciante) REFERENCES usuario (id);
+ALTER TABLE denuncia_perfil ADD CONSTRAINT FK_usuario_TO_denuncia_perfil_denunciado
+FOREIGN KEY (idUsuarioDenunciado) REFERENCES usuario (id);
+ALTER TABLE recurso ADD CONSTRAINT FK_acao_administrativa_TO_recurso
+FOREIGN KEY (idAcaoAdministrativa) REFERENCES acao_administrativa (id);
+ALTER TABLE recurso ADD CONSTRAINT FK_usuario_TO_recurso
+FOREIGN KEY (idUsuario) REFERENCES usuario (id);

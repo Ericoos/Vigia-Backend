@@ -88,14 +88,15 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 {
   "idUsuario": 101,
   "nome": "Fernando Domingues",
-  "email": "fernando@email.com",
-  "avaliacao": 4.5,
-  "avatar": null
+  "email": "fernando@email.com"
 }
 ```
 
+> ⚠️ `avatar` e `avaliacao` **não** pertencem ao `Usuario` — ficam em `PerfilPublico` (a implementar, relação 1-1). Por isso não saem neste contrato.
+
 #### C. Camadas Envolvidas
-*   `model/Usuario.java` → `@Entity` com os atributos de `Pessoa` (id, nome, email, senha, dataNascimento, status) e os próprios (telefone, avaliacao, dataCadastro).
+*   `model/UsuarioBase.java` → `@MappedSuperclass` (molde): id, nome, email, senha, dataNascimento, status (`TipoUsuario` — **sem tabela própria**).
+*   `model/Usuario.java` → `@Entity extends UsuarioBase` com os próprios (telefone, dataCadastro).
 *   `repository/UsuarioRepository.java` → `JpaRepository<Usuario, Long>` com `Optional<Usuario> findByEmail(String email)`.
 *   `service/UsuarioService.java` → `cadastrar()`, `autenticar()`.
 *   `dto/` → `UsuarioRequest` (record), `LoginRequest` (record), `UsuarioResponse` (record).
@@ -105,7 +106,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 2.  **Validação de entrada** via Bean Validation: `@NotBlank` em nome, email e senha; `@Email` no email; `@Past` na data de nascimento.
 3.  **A senha nunca sai no JSON de resposta.** O `UsuarioResponse` simplesmente não a inclui.
 4.  **Login simplificado**: comparação direta de senha, sem hash e sem token. **Não é seguro** — declarar como tal na monografia.
-5.  `avaliacao` inicia em `0` e `dataCadastro` recebe a data atual, ambos definidos no Service, não vindos do cliente.
+5.  `dataCadastro` recebe a data atual, definido no Service, não vindo do cliente.
 
 ---
 
@@ -113,7 +114,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 > "Estou desenvolvendo o back-end em Spring Boot 4.1.1 (Java 21) do app de segurança comunitária 'Vigia'. Preciso implementar o cadastro e o login de usuários.
 >
 > Siga estas especificações:
-> 1. Crie a `@Entity` `Usuario` no pacote `model`, com: id (Long, `@GeneratedValue`), nome, email, senha, dataNascimento (LocalDate), telefone, avaliacao (double), dataCadastro (LocalDateTime) e status (enum ATIVO, SUSPENSO, BANIDO, DELETADO, INATIVO).
+> 1. Crie o molde `UsuarioBase` (`@MappedSuperclass`) em `model`, com: id (Long, `@GeneratedValue`), nome, email, senha, dataNascimento (LocalDate) e status (`TipoUsuario`). Crie `Usuario` (`@Entity extends UsuarioBase`) com telefone e dataCadastro (LocalDateTime).
 > 2. Crie `UsuarioRepository` estendendo `JpaRepository<Usuario, Long>` com o método derivado `findByEmail`.
 > 3. Crie os records `UsuarioRequest`, `LoginRequest` e `UsuarioResponse` no pacote `dto`. O `UsuarioResponse` **não** deve conter a senha.
 > 4. Crie `UsuarioService` com `cadastrar()` (rejeitando e-mail duplicado) e `autenticar()` (comparação direta de senha, sem Spring Security).
@@ -348,7 +349,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 
 #### D. Regras de Negócio e Validações
 1.  **O histórico do próprio usuário inclui todos os status** (publicado, rascunho, sob análise), diferente da listagem pública do Endpoint 2.
-2.  `avaliacao` é a reputação do usuário e vem da entidade `Usuario`. O selo textual ("Cidadão Protetor", "Colaborador Bronze") é decisão de apresentação do app — a API devolve só o número.
+2.  `avaliacao` é a reputação do usuário e vem da entidade `PerfilPublico` (relação 1-1 com `Usuario`), **não** do `Usuario`. Enquanto `PerfilPublico` não existir, `avaliacao` e `avatar` ficam fora dos contratos. O selo textual ("Cidadão Protetor", "Colaborador Bronze") é decisão de apresentação do app — a API devolve só o número.
 3.  A senha nunca aparece na resposta.
 4.  Usuário inexistente devolve `404`.
 

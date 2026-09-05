@@ -16,13 +16,14 @@ O back-end é uma **API REST em Spring Boot** que será consumida pelo app React
 
 ## 3. Modelo de Dados (Entidades a mapear)
 
-As entidades vêm do `DIAGRAMA_DE_CLASSES.drawio` e devem produzir tabelas compatíveis com o schema espelhado em `mockReports.json` e `mockBairros.json`. **Estado atual**: as entidades do MVP abaixo já existem como `@Entity` esqueleto no pacote `model` — só atributos e construtor padrão (`@NoArgsConstructor`), **sem métodos** (as regras de negócio ficam nos `@Service`, conforme AGENTS.md). Falta criar `Usuario`, que o `Reporte` já referencia — o código não compila até isso existir. A tabela abaixo é o planejamento do mapeamento.
+As entidades vêm do `DIAGRAMA_DE_CLASSES.drawio` e devem produzir tabelas compatíveis com o schema espelhado em `mockReports.json` e `mockBairros.json`. **Estado atual**: as entidades do MVP existem no pacote `model` — só atributos e construtor padrão (`@NoArgsConstructor`), **sem métodos** (as regras de negócio ficam nos `@Service`, conforme AGENTS.md). O usuário foi modelado com o molde `UsuarioBase` (`@MappedSuperclass`, sem tabela `pessoa`), e `Usuario` (com telefone, dataCadastro) já existe — o `Reporte` tem com o que se relacionar. A tabela abaixo é o planejamento do mapeamento.
 
 ### Entidades do MVP
 
 | Entidade | Atributos | Relacionamentos |
 |---|---|---|
-| **Usuario** | id, nome, email, senha, dataNascimento, telefone, avaliacao, dataCadastro, status | — |
+| **UsuarioBase** (molde, `@MappedSuperclass`) | id, nome, email, senha, dataNascimento, status | — (não vira tabela) |
+| **Usuario** | herda os campos de `UsuarioBase` + telefone, dataCadastro | — |
 | **Reporte** | id, titulo, descricao, latitude, longitude, endereco, avaliacaoGravidade, dataReporte, status | pertence a um Usuario, uma Subcategoria e um Bairro |
 | **Bairro** | id, nome, classificacaoSeguranca | possui vários Reportes |
 | **Categoria** | id, tipoCategoria ("Seguranca" ou "Inseguranca") | possui várias Subcategorias |
@@ -30,8 +31,10 @@ As entidades vêm do `DIAGRAMA_DE_CLASSES.drawio` e devem produzir tabelas compa
 
 ### Enums
 
-*   `StatusUsuario`: ATIVO, SUSPENSO, BANIDO, DELETADO, INATIVO.
+*   `TipoUsuario`: USUARIO_ATIVO, USUARIO_SUSPENSO, USUARIO_BANIDO, USUARIO_DELETADO, USUARIO_INATIVO (equivalente ao `StatusUsuario` do diagrama).
 *   `StatusReporte`: RASCUNHO, PUBLICADO, EXCLUIDO.
+
+> ⚠️ **Decisão desta sessão**: `avaliacao` e `avatar` não pertencem ao `Usuario` — vão para `PerfilPublico` (relação 1-1 com `Usuario`), que é entidade das fases seguintes. Atualizar o diagrama de classes.
 
 ### Como o mock vira modelo
 

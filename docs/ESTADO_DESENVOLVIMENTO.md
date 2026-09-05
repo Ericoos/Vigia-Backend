@@ -1,22 +1,23 @@
 # Estado Atual do Desenvolvimento - Back-End Vigia
 
 ## 📍 1. Onde Paramos (Ponto de Controle)
-- **Fase/Passo Atual**: **Fase 1** — fatia vertical de uma `@Entity` de ponta a ponta (Repository → Service → Controller). Fase 0 (passos 0.1 a 0.6) concluída. As entidades esqueleto já existem, mas a fatia vertical ainda não subiu.
-- **Últimas classes finalizadas**: entidades esqueleto do Murilo (`Reporte`, `Categoria`, `Subcategoria`, `Bairro` e o enum `StatusReporte`) vieram do remoto (commits `8f26aa1` e `7415eae`). **São só esqueleto**: atributos + `@NoArgsConstructor`, **sem métodos** — as regras de negócio vão para os `@Service`, conforme AGENTS.md.
-- **Bloqueio de compilação**: falta criar a entidade `Usuario`. O `Reporte` já referencia um `Usuario` que não existe — o código não compila até isso existir.
-- Estado local (05/09/2026): `main` em `b676dbb` (docs reorganizados + `application.properties` **já commitado e corrigido**).
+- **Fase/Passo Atual**: **Fase 1, Passo 1.1** — entidades de usuário modeladas (`UsuarioBase`, `TipoUsuario`, `Usuario`). Pendente: compilar/rodar, confirmar tabelas no `h2-console` e subir Repository → Service → Controller (Passos 1.2 a 1.4).
+- **Decisão de herança tomada**: `Pessoa` do diagrama virou o molde `UsuarioBase` com **`@MappedSuperclass`** (sem tabela própria), abandonando `@Inheritance(JOINED)`. `Usuario` é `@Entity` que herda os campos do molde. `PerfilPublico` é entidade de fase futura e vai receber `avaliacao` e `avatar` (relação 1-1 com `Usuario`).
+- Estado local (05/09/2026): `main` em `b676dbb` + entidades usuário modificadas localmente (commit pendente de aprovação).
 
 ## 🛠️ 2. Modificações Efetuadas nesta Sessão
-**Vindas do remoto — Murilo (`Murilovers06`), esqueleto:**
-- `8f26aa1` - `feat: cria entidade Reporte` → `src/main/java/com/uscs/vigia/model/Reporte.java` (idReporte, titulo, descricao, latitude, longitude, endereco, status, dataReporte; `@ManyToOne` para `Usuario` [ainda inexistente], `Categoria`, `Subcategoria` e `Bairro`).
-- `7415eae` - `feat: adiciona entidades Categoria, Subcategoria, Bairro e StatusReporte` → `Categoria.java` (tipoCategoria), `Subcategoria.java` (tipoSubcategoria + `@ManyToOne` categoria), `Bairro.java` (nome, classificacaoSeguranca) e `StatusReporte.java` (enum RASCUNHO/PUBLICADO/EXCLUIDO).
+**Código:**
+- `src/main/java/com/uscs/vigia/model/UsuarioBase.java` → molde `@MappedSuperclass` com `Long id`, nome, email, senha, `LocalDate dataNascimento`, `@Enumerated(STRING) TipoUsuario status`. (Rascunhos `Pessoa.java`/`UserType.java` substituídos pelo molde + enum.)
+- `src/main/java/com/uscs/vigia/model/TipoUsuario.java` → enum `USUARIO_ATIVO, USUARIO_SUSPENSO, USUARIO_BANIDO, USUARIO_DELETADO, USUARIO_INATIVO` (equivale ao `StatusUsuario` do diagrama).
+- `src/main/java/com/uscs/vigia/model/Usuario.java` → `@Entity extends UsuarioBase` com `telefone` e `dataCadastro`.
 
-**Locais (não commitadas):**
-- `src/main/java/com/uscs/vigia/model/Pessoa.java` e `UserType.java` → rascunhos incompletos (ex.: `protected enum status;` nem compila). Serão **descartados** ao implementar `Usuario` com herança `@Inheritance(JOINED)` (`Pessoa → Usuario/Admin`) — sem enum `UserType`.
-
-**Nesta rodada (docs):**
-- `docs/planejamento-desenvolvimento-vigia-backend.md` e `docs/guia-desenvolvimento.md` → seção de modelo de dados e ponto de controle corrigidos para refletirem que as entidades MVP já existem como esqueleto.
-- Este `ESTADO_DESENVOLVIMENTO.md` → atualizado com o ponto de controle acima.
+**Docs:**
+- `AGENTS.md` → regra 4 de tradução atualizada: herança usa `@MappedSuperclass`, não mais `@Inheritance(JOINED)`.
+- `docs/planejamento-desenvolvimento-vigia-backend.md` → modelo de dados reflete `UsuarioBase`/`Usuario` sem `avaliacao`; enum `TipoUsuario`; nota de decisão `avaliacao`/`avatar` → `PerfilPublico`.
+- `docs/guia-desenvolvimento.md` → regra 5 de herança e ponto de controle atualizados.
+- `docs/vigia-specs-endpoints.md` → Endpoint 1 (cadastro/login) sem `avaliacao`/`avatar`; camadas descrevem `UsuarioBase` (`@MappedSuperclass`) + `Usuario` com telefone/dataCadastro.
+- `docs/diagramas/` → **7 `.drawio` do TCC carregados** (antes a pasta estava vazia). O `DIAGRAMA DE COMPONENTES E CONTEINERS (C4 MODEL).drawio` veio vazio (10 linhas) — a baixar a versão corrigida.
+- `docs/relatorio-vigia.txt` → texto extraído do `RELATÓRIO VIGIA - CORREÇÃO.docx` (script SQL do Apêndice D: sem tabela `pessoa`; `usuario` com `avaliacao`; `perfil_publico` sem `avatar`).
 
 ## 📋 3. Estado das Dependências instaladas
 - **Nenhuma dependência nova nesta sessão.** Permanecem as do `pom.xml`: `spring-boot-starter-webmvc`, `spring-boot-h2console`, `spring-boot-starter-data-jpa`, `spring-boot-starter-validation`, `com.h2database:h2` (runtime), `org.projectlombok:lombok`, mais os starters de teste.
@@ -24,19 +25,19 @@
 - ⚠️ H2 é ponte temporária `MODE=MySQL`; o banco do projeto é **MySQL**, de outra pessoa da equipe, ainda não existe.
 
 ## 🚀 4. Próximos Passos Imediatos para a Próxima Sessão
-1. **Aguardando upload dos diagramas do TCC** em `docs/diagramas/` (pasta ainda vazia). Assim que os `.drawio` forem colocados: revisar se as entidades esqueleto correspondem ao diagrama de classes antes de evoluir.
-2. **Criar a entidade `Usuario`** (Fase 1, Passo 1.1): aplicar herança `@Inheritance(JOINED)` (`Pessoa → Usuario/Admin`); descartar `Pessoa.java` e `UserType.java`; confirmar que o projeto volta a compilar e que as tabelas aparecem no h2-console.
-3. Definir o que fazer com `avaliacaoGravidade` (mock/Tela 3 exigem, `Reporte` atual não tem — corrigir o diagrama).
-4. Subir a fatia vertical `Repository` → `Service` → `Controller` (Passos 1.2 a 1.4), com commit a cada camada que funcionar.
-5. **PENDÊNCIAS ABERTAS (não bloqueantes)**: (a) validar contrato de `vigia-specs-endpoints.md` com o front; (b) fórmula de `calcularClassificacao()` do bairro não definida; (c) credenciais do MySQL desconhecidas; (d) quem manda no schema (`ddl-auto` vs script SQL); (e) CORS não configurado.
+1. **Revisar `Usuario.java`** (digitação do usuário): campo `dataCadastro` está como `double` — o esperado é `LocalDateTime` (padrão do `Reporte.dataReporte` usa `OffsetDateTime`). Decidir o tipo junto com o usuário.
+2. **Compilar e validar o modelo de usuário**: rodar `./mvnw clean install`, conferir no `h2-console` que o schema tem as tabelas + enum (`USUARIO_ATIVO` etc.) e que **não** existe tabela `pessoa`.
+3. **Confirmar o diagrama C4** (veio vazio): pedir a versão corrigida ou reconstruir pelo `COMPONENTES UML.drawio`.
+4. **Subir a fatia vertical** `Repository` → `Service` → `Controller` do `Usuario` (Passos 1.2 a 1.4), com commit a cada camada que funcionar.
+5. **PENDÊNCIAS ABERTAS (não bloqueantes)**: (a) validar contrato de `vigia-specs-endpoints.md` com o front; (b) criar `PerfilPublico` e mover `avaliacao`/`avatar` para lá (atualizar diagrama); (c) fórmula de `calcularClassificacao()` do bairro não definida; (d) credenciais do MySQL desconhecidas; (e) quem manda no schema (`ddl-auto` vs script SQL do relatório); (f) CORS não configurado.
 
 ## 🧠 5. Contexto Técnico para o Próximo Chat
 - **Stack**: Java 21, Spring Boot 4.1.1, Maven (`./mvnw`), Spring Data JPA, Bean Validation, Lombok.
 - **Versionamento**: repo `https://github.com/Ericoos/Vigia-Backend.git`, branch `main`. Último commit local `b676dbb`. Colaboradores: `Ericoos` (docs/infra) e `Murilovers06` (entidades). **Commit/push só com aprovação explícita do usuário; mensagens em português.**
 - **Banco**: esquema gerado pelo Hibernate a partir das `@Entity` via `ddl-auto=update`; **nunca usar `nativeQuery`**; H2 modo arquivo `MODE=MySQL` até o MySQL da equipe existir.
 - **Arquitetura**: `controller` → `service` → `repository` → `model`; integrações externas em `integration`. `VigiaApplication.java` na raiz do pacote (varredura do `@SpringBootApplication`).
-- **Regras de tradução (AGENTS.md)**: regras de negócio no `@Service`, nunca na `@Entity`; FK vira `@ManyToOne` com referência de objeto; sem acentos em identificadores; herança com `@Inheritance(JOINED)`.
-- **Entidades esqueleto existentes**: `Reporte` (referencia `Usuario` — **a criar**), `Categoria`, `Subcategoria`, `Bairro`, enum `StatusReporte`. Enums previstos no diagrama: `StatusUsuario` (ATIVO, SUSPENSO, BANIDO, DELETADO, INATIVO) e `StatusReporte` (RASCUNHO, PUBLICADO, EXCLUIDO).
-- **Divergências conhecidas**: `avaliacaoGravidade` não consta em `Reporte` (existe no mock/Tela 3); campo `idReporte` usado como id; `Pessoa.java` e `UserType.java` são rascunhos inválidos a descartar; diagramas ainda não carregados em `docs/diagramas/`.
-- **Docs**: `docs/` contém `planejamento-desenvolvimento-vigia-backend.md` (plano), `vigia-specs-endpoints.md` (contrato da API), `guia-desenvolvimento.md` (onboarding), este `ESTADO_DESENVOLVIMENTO.md` e `diagramas/` (aguardando upload). `AGENTS.md` na raiz é a fonte das regras persistentes.
+- **Herança (regra 4 do AGENTS.md)**: `Pessoa` (diagrama) = `UsuarioBase` (molde `@MappedSuperclass`, sem tabela própria); `Usuario` e `Admin` são `@Entity` que copiam os campos. Nada de `@Inheritance(JOINED)`.
+- **Entidades existentes no `model`**: `Reporte` (referencia `Usuario`), `Categoria`, `Subcategoria`, `Bairro`, `StatusReporte`, `UsuarioBase` (molde), `TipoUsuario`, `Usuario`. Enums no diagrama: `StatusUsuario`/`TipoUsuario` (ATIVO/SUSPENSO/BANIDO/DELETADO/INATIVO) e `StatusReporte` (RASCUNHO/PUBLICADO/EXCLUIDO).
+- **Divergências conhecidas**: `avaliacaoGravidade` não consta em `Reporte` (existe no mock/Tela 3); campo `idReporte` usado como id; `avaliacao` no script SQL fica no `usuario`, mas o diagrama prevê `PerfilPublico` com `avatar` e o relatório traz `bio` — alinhar; `admin` no script SQL tem FK `idUsuario`, divergente do modelo de herança.
+- **Docs**: `docs/` contém `planejamento-desenvolvimento-vigia-backend.md` (plano), `vigia-specs-endpoints.md` (contrato da API), `guia-desenvolvimento.md` (onboarding), este `ESTADO_DESENVOLVIMENTO.md`, `diagramas/` (7 `.drawio`, C4 ainda vazio) e `relatorio-vigia.txt`. `AGENTS.md` na raiz é a fonte das regras persistentes.
 - **Comandos**: `./mvnw spring-boot:run` (rodar), `./mvnw clean install` (build).
