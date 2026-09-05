@@ -1,8 +1,8 @@
-# GUIA KAUA — Como trabalhar no Back-End do Vigia
+# Guia de Desenvolvimento — Back-End do Vigia
 
-Este guia é para você, que vai trabalhar no back-end (API REST) do aplicativo **Vigia**.
+Este guia é para quem for trabalhar no back-end (API REST) do aplicativo **Vigia**.
 Ele cobre desde pegar o projeto e rodar, até as regras que não podem ser quebradas.
-Leia o `CLAUDE.md` na raiz também — ele é lido por toda assistente de IA em toda sessão.
+Leia o `AGENTS.md` na raiz também — ele é lido por toda assistente de IA em toda sessão.
 
 ---
 
@@ -17,11 +17,11 @@ Coordenadas de referência: `lat -23.6182, lon -46.5645`.
 
 | Frente | Repositório |
 |---|---|
-| Back-end (API) — eu e você | este (`Ericoos/Vigia-Backend`) |
+| Back-end (API) | este (`Ericoos/Vigia-Backend`) |
 | Front-end (React Native + Expo) | separado (`FabricioBucardi/Vigia`) |
 | Banco de dados MySQL | ainda não iniciado |
 
-Nunca é compartilhado código entre repositórios — só o **contrato da API** (`docs/vigia-specs-endpoints.md`).
+Nunca é compartilhado código entre repositórios — só o **contrato da API** (`vigia-specs-endpoints.md`).
 
 ---
 
@@ -55,7 +55,7 @@ Nunca é compartilhado código entre repositórios — só o **contrato da API**
 ## 4. Rodando o projeto
 
 ```bash
-cd /home/erick/Documentos/ProjetoVigia/vigia
+cd Vigia-Backend
 ./mvnw spring-boot:run
 ```
 
@@ -89,7 +89,7 @@ vigia-api/
 │   └── integration/            # OpenStreetMap, notícias, redes sociais
 ├── src/main/resources/
 │   └── application.properties  # Configuração do banco
-└── CLAUDE.md                   # Regras persistentes para IA
+└── AGENTS.md                   # Regras persistentes para IA
 ```
 
 **`VigiaApplication.java` não pode sair da raiz do pacote.** `@SpringBootApplication` varre o próprio pacote e os subpacotes à procura de beans — se for movido, o Spring para de encontrar tudo.
@@ -124,16 +124,18 @@ Em português, concisas, refletindo o estilo do histórico.
 
 ## 8. Onde estamos agora (ponto de controle)
 
-- Fase 0 concluída: projeto gerado, pacotes criados, `CLAUDE.md` e `docs/` existem, repositório no GitHub com primeiro push, banco configurado (`application.properties`) e app rodando em 8080 com h2-console acessível.
+- Fase 0 concluída: projeto gerado, pacotes criados, `AGENTS.md` e `docs/` existem, repositório no GitHub com primeiro push, banco configurado (`application.properties`) e app rodando em 8080 com h2-console acessível.
 - **Próximo passo: Fase 1** — escrever a primeira `@Entity`, confirmar a tabela no h2-console, e subir Repository → Service → Controller, com commit a cada camada.
 - Pendências para o grupo resolverem: validar contrato com o front, definir fórmula de `calcularClassificacao()`, credenciais do MySQL, CORS.
 
 ---
 
-## 9. Documentos de referência (em `docs/`)
+## 9. Documentos de referência (na pasta `docs/`)
 
-- `planejamento-desenvolvimento-vigia-backend.md` — stack, estrutura, escopo, ordem de implementação
+- `planejamento-desenvolvimento-vigia-backend.md` — escopo, modelo de dados, ordem de implementação, protocolo de estado
 - `vigia-specs-endpoints.md` — especificação de cada endpoint (contrato JSON + prompts prontos)
+- `guia-desenvolvimento.md` — este guia de integração para quem entra no time
 - `ESTADO_DESENVOLVIMENTO.md` — onde paramos na última sessão
+- `diagramas/` — os `.drawio` do TCC
 
 Antes de implementar qualquer entidade ou endpoint, **consulte a spec correspondente**.

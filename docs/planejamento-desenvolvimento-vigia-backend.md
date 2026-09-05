@@ -8,46 +8,9 @@ O back-end é uma **API REST em Spring Boot** que será consumida pelo app React
 
 ---
 
-## 1. Stack Tecnológica e Padrões de Projeto
-
-*   **Linguagem**: Java 21.
-*   **Framework**: Spring Boot 4.1.1.
-*   **Build**: Maven, executado pelo wrapper (`./mvnw`).
-*   **Persistência**: Spring Data JPA (Hibernate), com esquema gerado a partir das `@Entity`.
-*   **Banco de Dados**: **MySQL** (oficial, sob responsabilidade de outro integrante). H2 em modo arquivo com `MODE=MySQL` serve de ponte temporária até o MySQL existir.
-*   **Integração de Mapa**: **OpenStreetMap / Nominatim** para geocodificação reversa (latitude e longitude → endereço e bairro). É a base do sistema.
-*   **Documentação da API**: springdoc-openapi (Swagger).
-*   **Padrões de projeto**: os que o próprio Spring aplica — Injeção de Dependência (construtores dos Services), Singleton (beans), Repository (Spring Data), Proxy (`@Transactional`) e DTO (separação entre domínio e contrato da API).
-
-> ⚠️ **Restrição decorrente da troca de banco**: nunca usar `nativeQuery`. Apenas métodos derivados do Spring Data ou JPQL, para que o código continue portável entre H2 e MySQL.
-
----
-
-## 2. Estrutura de Pastas Sugerida para o Projeto
-
-```text
-vigia-api/
-├── docs/                    # Documentação (planejamento, specs, estado, diagramas)
-├── src/
-│   ├── main/
-│   │   ├── java/com/uscs/vigia/
-│   │   │   ├── VigiaApplication.java   # Ponto de entrada (raiz do pacote)
-│   │   │   ├── controller/             # REST_CONTROLLERS — recebe HTTP, devolve JSON
-│   │   │   ├── service/                # REGRAS_NEGOCIO — regras de negócio
-│   │   │   ├── repository/             # REPOSITORIES — interfaces do Spring Data
-│   │   │   ├── model/                  # MODEL_BACKEND — as @Entity
-│   │   │   ├── dto/                    # Entrada e saída da API (record)
-│   │   │   ├── exception/              # Tratamento de erros
-│   │   │   └── integration/            # INTEGRAÇÕES EXTERNAS — OpenStreetMap, notícias
-│   │   └── resources/
-│   │       └── application.properties  # Configuração do banco
-│   └── test/
-├── CLAUDE.md                # Regras persistentes para IA (lido automaticamente na raiz)
-├── README.md
-└── pom.xml
-```
-
-Os nomes dos pacotes correspondem aos blocos do `DIAGRAMA_DE_PACOTES.drawio`, traduzidos para a convenção Java (minúsculo, inglês, sem underscore).
+> **Stack, estrutura de pastas e regras de tradução dos diagramas ficam no `AGENTS.md` da raiz** (documento de referência das regras persistentes). Este documento trata de *plano*: modelo de dados, escopo dos endpoints, fases de desenvolvimento e protocolo de estado.
+>
+> Estrutura da pasta `docs/` atual: `planejamento-desenvolvimento-vigia-backend.md` (este), `vigia-specs-endpoints.md`, `guia-desenvolvimento.md`, `ESTADO_DESENVOLVIMENTO.md` e `diagramas/` (os `.drawio` do TCC).
 
 ---
 
@@ -139,7 +102,7 @@ Spring Security e tokens JWT; integração com Instagram/Meta API e portais de n
 ### **Fase 0: Infraestrutura e Versionamento**
 *   **Passo 0.1**: Gerar o projeto em [start.spring.io](https://start.spring.io) — Maven, Java 21, Spring Boot 4.1.1, Jar, com Spring Web, Spring Data JPA, H2 Database, Lombok e Validation. ✅
 *   **Passo 0.2**: Criar os pacotes `controller`, `service`, `repository`, `model`, `dto`, `exception` e `integration`. ✅
-*   **Passo 0.3**: Criar `CLAUDE.md` na raiz e a pasta `docs/`. ✅
+*   **Passo 0.3**: Criar `AGENTS.md` na raiz e a pasta `docs/`. ✅
 *   **Passo 0.4**: Criar o repositório no GitHub (**separado** do front) e fazer o primeiro push. ✅
     - Repositório: `https://github.com/Ericoos/Vigia-Backend.git` (branch `main`).
     - O primeiro push foi feito localmente e depois houve merge da `LICENSE` criada no GitHub (`0abf4e0` Initial commit -> `1ddcac8` Estrutura Inicial do Backend -> `847da80` Merge da licensa do repositorio remoto).

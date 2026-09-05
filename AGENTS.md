@@ -88,7 +88,7 @@ vigia-api/
 │   │   └── resources/
 │   │       └── application.properties  # Configuração do banco
 │   └── test/
-├── CLAUDE.md                    # Este arquivo
+├── AGENTS.md                   # Este arquivo
 ├── README.md
 └── pom.xml
 ```
@@ -124,8 +124,9 @@ Fora do escopo do protótipo: sem Spring Security, sem hash de senha, sem token.
 
 ## 📂 Documentos de Referência (em `docs/`)
 
-- `planejamento-desenvolvimento-vigia-backend.md` → stack, estrutura, tradução dos diagramas, escopo, ordem de implementação
+- `planejamento-desenvolvimento-vigia-backend.md` → escopo, ordem de implementação e protocolo de estado (stack e estrutura ficam aqui neste arquivo)
 - `vigia-specs-endpoints.md` → especificação SDD de cada endpoint, com prompts prontos
+- `guia-desenvolvimento.md` → onboarding de novos integrantes (ambiente, como rodar, regras)
 - `ESTADO_DESENVOLVIMENTO.md` → onde paramos na última sessão
 - `diagramas/` → os `.drawio` do TCC
 
@@ -135,5 +136,5 @@ Fora do escopo do protótipo: sem Spring Security, sem hash de senha, sem token.
 
 - Gere/atualize `docs/ESTADO_DESENVOLVIMENTO.md` **a cada interação que adicione, altere ou remova algo do projeto** — não apenas no fim do dia.
 - Siga o template da Seção 6 do planejamento: ponto de controle, modificações, dependências, próximos passos, contexto técnico.
-- Reforce neste `CLAUDE.md` qualquer nova regra ou convenção persistente criada durante a sessão.
+- Reforce neste `AGENTS.md` qualquer nova regra ou convenção persistente criada durante a sessão.
 - Ao encerrar a sessão do dia, garanta que `docs/ESTADO_DESENVOLVIMENTO.md` esteja atualizado com o último estado.
