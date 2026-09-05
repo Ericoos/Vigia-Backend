@@ -16,7 +16,7 @@ O back-end é uma **API REST em Spring Boot** que será consumida pelo app React
 
 ## 3. Modelo de Dados (Entidades a mapear)
 
-As entidades vêm do `DIAGRAMA_DE_CLASSES.drawio` e devem produzir tabelas compatíveis com o schema espelhado em `mockReports.json` e `mockBairros.json`. Nada foi implementado ainda — a tabela abaixo é o planejamento do mapeamento.
+As entidades vêm do `DIAGRAMA_DE_CLASSES.drawio` e devem produzir tabelas compatíveis com o schema espelhado em `mockReports.json` e `mockBairros.json`. **Estado atual**: as entidades do MVP abaixo já existem como `@Entity` esqueleto no pacote `model` — só atributos e construtor padrão (`@NoArgsConstructor`), **sem métodos** (as regras de negócio ficam nos `@Service`, conforme AGENTS.md). Falta criar `Usuario`, que o `Reporte` já referencia — o código não compila até isso existir. A tabela abaixo é o planejamento do mapeamento.
 
 ### Entidades do MVP
 
@@ -123,7 +123,7 @@ Spring Security e tokens JWT; integração com Instagram/Meta API e portais de n
     Confirmar `Tomcat started on port 8080` e o acesso a `localhost:8080/h2-console`.
 
 ### **Fase 1: Fatia Vertical (uma entidade de ponta a ponta)**
-*   **Passo 1.1**: Escrever a primeira `@Entity` (Seção 3), rodar e confirmar a tabela no `h2-console`.
+*   **Passo 1.1**: Criar a entidade `Usuario` que falta para o projeto compilar (as demais do MVP já existem como esqueleto, Seção 3), rodar e confirmar as tabelas no `h2-console`.
 *   **Passo 1.2**: Criar o `Repository` — interface de uma linha estendendo `JpaRepository`. Rodar; nada muda visualmente, mas tem que continuar subindo.
 *   **Passo 1.3**: Criar o `Service` — classe `@Service` recebendo o Repository no construtor, com listar e salvar.
 *   **Passo 1.4**: Criar o `Controller` — `@RestController` com `GET` e `POST`. Testar o `GET` no navegador e o `POST` no Postman ou Insomnia.
