@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UsuarioBase {
+public abstract class UsuarioBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

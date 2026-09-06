@@ -30,7 +30,6 @@ public class Reporte {
 	private double latitude;
 	private double longitude;
 	private String endereco;
-	private Integer avaliacaoGravidade;
 
 	@Enumerated(EnumType.STRING)
 	private StatusReporte status;
