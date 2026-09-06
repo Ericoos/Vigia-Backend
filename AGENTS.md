@@ -118,6 +118,14 @@ O diagrama mostra `idBairro: int`; no código isso vira um atributo do tipo `Bai
 
 **4. Herança do diagrama (`Pessoa → Usuario/Admin`)** vira **`@MappedSuperclass`**, não `@Inheritance(JOINED)`. A `Pessoa` do diagrama é o molde `UsuarioBase` no código: define os campos comuns (id, nome, email, senha, dataNascimento, status) e **não gera tabela própria**. `Usuario` e `Admin` são `@Entity` independentes que copiam esses campos no schema gerado pelo Hibernate. A hierarquia `Noticia → NoticiaRedeSocial/NoticiaPortal` ainda não foi implementada — estratégia a definir quando entrar no escopo.
 
+## ⏳ Classificação de Bairro (regra de domínio)
+
+- O **peso** da subcategoria mora na enum `TipoSubcategoria`; a direção (SEGURANCA soma / INSEGURANCA subtrai) mora na enum `TipoCategoria`.
+- `calcularClassificacao()` fica no `BairroService` (regra de negócio). Nota parte de **5,0**, teto 5,0, piso 0, recalculada do zero (não acumula).
+- `Categoria`/`Subcategoria` são entidades alimentadas por **seed** a partir dos enums no boot — o Hibernate continua dono do schema.
+- Contribuição por reporte = `(peso da subcategoria × avaliacaoGravidade) ÷ 10` (uma casa decimal).
+- Lista de mudanças a aplicar no relatório/diagramas: ver `docs/mudancas-docs-relatorio.md`.
+
 ## 🔐 Autenticação
 
 Fora do escopo do protótipo: sem Spring Security, sem hash de senha, sem token. O login previsto é `POST /api/auth/login`, que valida e-mail e senha contra o banco e devolve o usuário. **Não é seguro para produção** e deve ser declarado como tal na monografia.
@@ -126,6 +134,7 @@ Fora do escopo do protótipo: sem Spring Security, sem hash de senha, sem token.
 
 - `planejamento-desenvolvimento-vigia-backend.md` → escopo, ordem de implementação e protocolo de estado (stack e estrutura ficam aqui neste arquivo)
 - `vigia-specs-endpoints.md` → especificação SDD de cada endpoint, com prompts prontos
+- `mudancas-docs-relatorio.md` → lista de mudanças na documentação do relatório e no que vamos implementar
 - `guia-desenvolvimento.md` → onboarding de novos integrantes (ambiente, como rodar, regras)
 - `ESTADO_DESENVOLVIMENTO.md` → onde paramos na última sessão
 - `diagramas/` → os `.drawio` do TCC

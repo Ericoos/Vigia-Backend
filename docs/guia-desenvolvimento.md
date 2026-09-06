@@ -112,7 +112,7 @@ vigia-api/
 
 ## 7. Fluxo de trabalho
 
-- O `README`/`docs/` descrevem o plano fase a fase: **Fase 0** (infra — concluída), **Fase 1** (primeira entidade de ponta a ponta), **Fase 2** (DTOs, erros, Swagger, CORS), **Fase 3** (domínio completo + integrações), **Fase 4** (entrega).
+- O `README`/`docs/` descrevem o plano fase a fase: **Fase 0** (infra — concluída), **Fase 1** (primeira entidade de ponta a ponta), **Fase 2** (DTOs, erros, Swagger), **Fase 3** (domínio completo + integrações), **Fase 4** (entrega).
 - A cada passo: **escreve → roda → confirma → entendendo → avança**. Um commit por camada que funcionar.
 - Todo compromisso (commit/push) precisa de **aprovação explícita** — nada de commitar sozinho.
 - A cada interação que alterar o projeto, **atualize `docs/ESTADO_DESENVOLVIMENTO.md`** para registrar onde paramos.
@@ -127,7 +127,7 @@ Em português, concisas, refletindo o estilo do histórico.
 - Fase 0 concluída: projeto gerado, pacotes criados, `AGENTS.md` e `docs/` existem, repositório no GitHub com primeiro push, banco configurado (`application.properties`) e app rodando em 8080 com h2-console acessível.
 - Entidades esqueleto do Murilo já existem no `model`: `Reporte`, `Categoria`, `Subcategoria`, `Bairro` e o enum `StatusReporte` — só atributos e construtor padrão (`@NoArgsConstructor`), **sem métodos**.
 - **Próximo passo: Fase 1** — confirmar tabelas no h2-console e subir Repository → Service → Controller, com commit a cada camada. A herança de usuário já foi resolvida: `UsuarioBase` (`@MappedSuperclass`) é o molde de `Usuario` e `Admin` (sem tabela `pessoa`).
-- Pendências para o grupo resolverem: validar contrato com o front, definir fórmula de `calcularClassificacao()`, credenciais do MySQL, CORS.
+- Pendências para o grupo resolverem: validar contrato com o front, definir a **tabela de pesos** da classificação do bairro (os demais parâmetros da fórmula já estão definidos — ver `mudancas-docs-relatorio.md`) e credenciais do MySQL.
 
 ---
 
@@ -135,6 +135,7 @@ Em português, concisas, refletindo o estilo do histórico.
 
 - `planejamento-desenvolvimento-vigia-backend.md` — escopo, modelo de dados, ordem de implementação, protocolo de estado
 - `vigia-specs-endpoints.md` — especificação de cada endpoint (contrato JSON + prompts prontos)
+- `mudancas-docs-relatorio.md` — lista de mudanças na documentação do relatório e no que vamos implementar
 - `guia-desenvolvimento.md` — este guia de integração para quem entra no time
 - `ESTADO_DESENVOLVIMENTO.md` — onde paramos na última sessão
 - `diagramas/` — os `.drawio` do TCC

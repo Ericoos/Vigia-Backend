@@ -296,7 +296,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 
 #### D. Regras de Negócio e Validações
 1.  **`calcularClassificacao()` é regra de negócio e mora no Service**, nunca na `@Entity` `Bairro`. É o exemplo mais direto da camada `REGRAS_NEGOCIO` do diagrama de pacotes.
-2.  A nota é derivada das `avaliacaoGravidade` dos reportes do bairro — reportes de "Segurança" elevam a nota, os de "Insegurança" reduzem. **A fórmula exata ainda precisa ser definida com o grupo.**
+2.  A nota é derivada das `avaliacaoGravidade` dos reportes do bairro, ponderadas pelo **peso** da subcategoria (na enum `TipoSubcategoria`) — reportes de "Segurança" elevam a nota, os de "Insegurança" reduzem. Fórmula: nota parte de **5,0** (teto 5,0, piso 0), contribuição por reporte = `(peso da subcategoria × avaliacaoGravidade) ÷ 10`. **Pendente: a tabela de pesos** (ver `mudancas-docs-relatorio.md`).
 3.  `totalSeguranca` e `totalInseguranca` são contadores derivados, não colunas do banco.
 4.  `GET /api/bairros/{id}` inexistente devolve `404`.
 
@@ -312,7 +312,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 > 4. Crie o record `BairroDetalheResponse` com nome, classificacaoSeguranca, totalSeguranca, totalInseguranca e a lista de reportes daquele bairro.
 > 5. Crie `BairroController` com `GET /api/bairros` e `GET /api/bairros/{id}`, devolvendo 404 para bairro inexistente.
 >
-> Antes de escrever o cálculo, me pergunte qual fórmula usar — ela ainda não foi definida pelo grupo."
+> Antes de escrever o cálculo, confirme a **tabela de pesos** das subcategorias — os demais parâmetros já estão definidos (partir de 5,0, teto 5,0, piso 0, contribuição `(peso × gravidade) ÷ 10`, Segurança soma / Insegurança subtrai)."
 
 ---
 
@@ -334,8 +334,6 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
   "idUsuario": 101,
   "nome": "Fernando Domingues",
   "email": "fernando@email.com",
-  "avatar": null,
-  "avaliacao": 4.5,
   "dataCadastro": "2026-08-01T09:00:00Z",
   "totalReportes": 7
 }
@@ -349,7 +347,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 
 #### D. Regras de Negócio e Validações
 1.  **O histórico do próprio usuário inclui todos os status** (publicado, rascunho, sob análise), diferente da listagem pública do Endpoint 2.
-2.  `avaliacao` é a reputação do usuário e vem da entidade `PerfilPublico` (relação 1-1 com `Usuario`), **não** do `Usuario`. Enquanto `PerfilPublico` não existir, `avaliacao` e `avatar` ficam fora dos contratos. O selo textual ("Cidadão Protetor", "Colaborador Bronze") é decisão de apresentação do app — a API devolve só o número.
+2.  **Corte do MVP**: `avatar` e `avaliacao` ficam fora dos contratos — dependem de `PerfilPublico` (relação 1-1 com `Usuario`), entidade fora do escopo. O selo textual ("Cidadão Protetor", "Colaborador Bronze") é decisão de apresentação do app.
 3.  A senha nunca aparece na resposta.
 4.  Usuário inexistente devolve `404`.
 
@@ -359,7 +357,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 > "Preciso dos endpoints de perfil da API do Vigia, que alimentam a tela de perfil do cidadão.
 >
 > Siga estas especificações:
-> 1. Crie `GET /api/usuarios/{id}` devolvendo nome, email, avatar, avaliacao, dataCadastro e totalReportes (contador derivado, não coluna do banco).
+> 1. Crie `GET /api/usuarios/{id}` devolvendo nome, email, dataCadastro e totalReportes (contador derivado, não coluna do banco). `avatar` e `avaliacao` ficam fora do MVP.
 > 2. Crie `GET /api/usuarios/{id}/reportes` devolvendo o histórico do usuário no mesmo formato da listagem pública, mas **incluindo** os status rascunho e sob análise.
 > 3. Garanta que a senha nunca apareça em nenhuma resposta.
 > 4. Devolva 404 para usuário inexistente, usando o `@RestControllerAdvice` do pacote `exception`.
@@ -426,8 +424,9 @@ Uso interno, chamado por `ReporteService.criar()`. Opcionalmente exposto para o 
 
 1. **Validar tudo com o front-end.** Nada aqui foi acordado ainda.
 2. **`avaliacaoGravidade`**: existe em `mockReports.json`, na Tela 3 (R19/R22) e neste contrato, mas **não existe** na classe `Reporte` do diagrama de classes. Corrigir o diagrama.
-3. **Fórmula de `calcularClassificacao()`** do bairro não definida.
-4. **CORS**: liberar a origem do app no backend, senão toda requisição falha.
-5. **`localhost` não funciona no celular.** O app precisará do IP da máquina na rede local (`192.168.x.x`).
-6. **Coordenadas fora de São Caetano do Sul**: rejeitar ou aceitar?
-7. **Códigos de requisito** (R01, R04, R11, R13, R16, R17, R19, R20, R22, R60, R64) foram herdados de `vigia-specs-telas.md`. Conferir com o relatório se há requisitos exclusivos de back-end ainda não mapeados aqui.
+3. **Fórmula de `calcularClassificacao()`** do bairro definida em parte: nota parte de **5,0** (teto 5,0, piso 0), contribuição por reporte = `(peso da subcategoria × avaliacaoGravidade) ÷ 10`, `SEGURANCA` soma e `INSEGURANCA` subtrai. **Pendente**: a tabela de pesos (`mudancas-docs-relatorio.md`).
+4. **`localhost` não funciona no celular.** O app precisará do IP da máquina na rede local (`192.168.x.x`).
+5. **Coordenadas fora de São Caetano do Sul**: **decidido** — aceitar; sem bairro reconhecido, cai no registro genérico (nunca quebra o reporte).
+6. **Códigos de requisito** (R01, R04, R11, R13, R16, R17, R19, R20, R22, R60, R64) foram herdados de `vigia-specs-telas.md`. Conferir com o relatório se há requisitos exclusivos de back-end ainda não mapeados aqui.
+
+> **Corte do MVP**: os itens de CORS foram removidos do contrato — o app é React Native (não passa por navegador), logo CORS não se aplica.

@@ -10,7 +10,7 @@ O back-end é uma **API REST em Spring Boot** que será consumida pelo app React
 
 > **Stack, estrutura de pastas e regras de tradução dos diagramas ficam no `AGENTS.md` da raiz** (documento de referência das regras persistentes). Este documento trata de *plano*: modelo de dados, escopo dos endpoints, fases de desenvolvimento e protocolo de estado.
 >
-> Estrutura da pasta `docs/` atual: `planejamento-desenvolvimento-vigia-backend.md` (este), `vigia-specs-endpoints.md`, `guia-desenvolvimento.md`, `ESTADO_DESENVOLVIMENTO.md` e `diagramas/` (os `.drawio` do TCC).
+> Estrutura da pasta `docs/` atual: `planejamento-desenvolvimento-vigia-backend.md` (este), `vigia-specs-endpoints.md`, `guia-desenvolvimento.md`, `ESTADO_DESENVOLVIMENTO.md`, `mudancas-docs-relatorio.md` (lista de mudanças na documentação do relatório e no que vamos implementar) e `diagramas/` (os `.drawio` do TCC).
 
 ---
 
@@ -33,6 +33,8 @@ As entidades vêm do `DIAGRAMA_DE_CLASSES.drawio` e devem produzir tabelas compa
 
 *   `TipoUsuario`: USUARIO_ATIVO, USUARIO_SUSPENSO, USUARIO_BANIDO, USUARIO_DELETADO, USUARIO_INATIVO (equivalente ao `StatusUsuario` do diagrama).
 *   `StatusReporte`: RASCUNHO, PUBLICADO, EXCLUIDO.
+*   `TipoCategoria`: SEGURANCA, INSEGURANCA.
+*   `TipoSubcategoria`: cada constante carrega um **peso** e um método que recebe a `avaliacaoGravidade` do reporte. As tabelas `Categoria`/`Subcategoria` são entidades alimentadas por **seed** a partir desses enums no boot.
 
 > ⚠️ **Decisão desta sessão**: `avaliacao` e `avatar` não pertencem ao `Usuario` — vão para `PerfilPublico` (relação 1-1 com `Usuario`), que é entidade das fases seguintes. Atualizar o diagrama de classes.
 
@@ -52,7 +54,7 @@ As entidades vêm do `DIAGRAMA_DE_CLASSES.drawio` e devem produzir tabelas compa
 
 ### Entidades das fases seguintes
 
-Ainda não modeladas, presentes no diagrama de classes: `Admin`, `PerfilPublico`, `Historico`, `Denuncia`, `AcaoAdministrativa`, `Recurso`, `Noticia`, `NoticiaRedeSocial`, `NoticiaPortal`, `NoticiaReporte`.
+Fora do escopo do MVP (não modelar agora): `Admin`, `PerfilPublico`, `Historico`, `Denuncia`, `AcaoAdministrativa`, `Recurso`, `Noticia`, `NoticiaRedeSocial`, `NoticiaPortal`, `NoticiaReporte`.
 
 ---
 
@@ -82,11 +84,11 @@ Cada endpoint atende a uma tela de `vigia-specs-telas.md`. A especificação det
 *   **Atende**: Tela 4 (Detalhe do Bairro) — R64, R17.
 *   `GET /api/bairros` devolve o formato de `mockBairros.json`.
 *   `GET /api/bairros/{id}` acrescenta contadores de segurança e insegurança e a lista de reportes do bairro.
-*   *Regra*: `calcularClassificacao()` é regra de negócio e mora no **Service**, nunca na `@Entity`. **A fórmula ainda precisa ser definida pela equipe.**
+*   *Regra*: `calcularClassificacao()` é regra de negócio e mora no **Service**, nunca na `@Entity`. Fórmula definida em parte: nota parte de **5,0** (teto 5,0, piso 0), contribuição por reporte = `(peso da subcategoria × avaliacaoGravidade) ÷ 10`, `SEGURANCA` soma e `INSEGURANCA` subtrai. **Pendente**: a tabela de pesos das subcategorias (`docs/mudancas-docs-relatorio.md`).
 
 ### Endpoint 5: Perfil e Histórico (`/api/usuarios/{id}`)
 *   **Atende**: Tela 5 (Perfil do Cidadão) — R11, R13.
-*   `GET /api/usuarios/{id}` devolve nome, email, avatar, avaliacao, dataCadastro e totalReportes.
+*   `GET /api/usuarios/{id}` devolve nome, email, dataCadastro e totalReportes. (`avatar` e `avaliacao` ficam fora do MVP — vêm de `PerfilPublico`.)
 *   `GET /api/usuarios/{id}/reportes` devolve o histórico do próprio usuário, **incluindo** rascunhos e reportes sob moderação.
 *   *Regra*: a senha nunca aparece em nenhuma resposta.
 
@@ -143,8 +145,8 @@ Spring Security e tokens JWT; integração com Instagram/Meta API e portais de n
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
     </dependency>
     ```
-*   **Passo 2.4**: Configurar CORS liberando a origem do app.
-*   **Passo 2.5**: Completar o CRUD com `PUT` e `DELETE`.
+*   **Passo 2.4**: ~~Configurar CORS~~ — **cortado do MVP**: o app é React Native (não é navegador), portanto CORS de navegador não se aplica. 
+*   **Passo 2.5**: ~~Completar o CRUD com `PUT` e `DELETE`~~ — **cortado do MVP**: o app não edita nem apaga reportes.
 
 ### **Fase 3: Domínio Completo e Integrações**
 *   **Passo 3.1**: Implementar as demais entidades da Seção 3 e seus endpoints (Seção 4).
@@ -173,7 +175,7 @@ Spring Security e tokens JWT; integração com Instagram/Meta API e portais de n
 | 3 | Combinar se e quando a integração front-back acontece (o plano do front marca como "Passo 3.3 — Opcional") | back + front |
 | 4 | Validar `vigia-specs-endpoints.md` com o front | back + front |
 | 5 | `avaliacaoGravidade` existe no mock e na Tela 3, mas não na classe `Reporte` do diagrama | back + front |
-| 6 | Definir a fórmula de `calcularClassificacao()` do bairro | equipe |
+| 6 | Definir a **tabela de pesos** das subcategorias da classificação do bairro (demais parâmetros já definidos — ver `mudancas-docs-relatorio.md`) | equipe |
 | 7 | Obter host, porta, nome do banco, usuário e senha do MySQL | back + banco |
 | 8 | Definir quem manda no schema: as `@Entity` via `ddl-auto` ou um script SQL. **Duas fontes de verdade vão conflitar** | back + banco |
 

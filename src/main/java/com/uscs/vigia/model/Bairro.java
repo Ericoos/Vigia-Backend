@@ -20,5 +20,5 @@ public class Bairro {
 	private Long id;
 
 	private String nome;
-	private double classificacaoSeguranca;
+	private Double classificacaoSeguranca;
 }
