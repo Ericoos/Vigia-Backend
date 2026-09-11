@@ -26,7 +26,7 @@ Este arquivo é lido em toda sessão de desenvolvimento. Leia e siga rigorosamen
 
 - **App**: Vigia — plataforma colaborativa de segurança urbana de São Caetano do Sul (MVP de TCC).
 - **Este repositório**: a API REST consumida pelo app mobile. Só devolve JSON.
-- **Domínio**: usuários publicam relatos georreferenciados (reportes) classificados por categoria e bairro, avaliam reportes e perfis de outros usuários, e podem denunciar conteúdo. Administradores moderam, aplicam punições e registram ações. Usuários punidos podem entrar com recurso.
+- **Foco atual**: módulo de **Reporte** — o app cria um reporte georreferenciado, a API recebe, valida e armazena no banco, e devolve a listagem para os pins do mapa.
 - **Coordenadas de referência**: São Caetano do Sul — `lat -23.6182, lon -46.5645`.
 
 ### Divisão de trabalho
@@ -39,11 +39,18 @@ Este arquivo é lido em toda sessão de desenvolvimento. Leia e siga rigorosamen
 
 Nunca compartilhamos código entre os repositórios — só o contrato da API.
 
+### Fora do foco atual (decisões de escopo)
+
+- **Autenticação**: ainda **não** será colocada.
+- **Geocodificação/OpenStreetMap**: já feita no **front** — não é responsabilidade do back.
+- **Classificação de segurança do bairro**: lógica praticamente pronta, mas o foco vem **depois**.
+- **Não implementar agora**: cadastro/login e módulo de usuário, perfil e histórico, denúncias, painel administrativo.
+- `avaliacaoGravidade` foi **removida** do `Reporte` — não deve voltar ao código.
+
 ## 🛠️ Stack
 
 - **Java 21**, **Spring Boot 4.1.1**, **Maven** (`./mvnw`)
 - Spring Web, Spring Data JPA, Validation, Lombok
-- **OpenStreetMap / Nominatim** para geocodificação reversa
 
 ### Banco de dados
 
@@ -59,16 +66,6 @@ Isso não afeta o código, porque o esquema é gerado pelo Hibernate a partir da
 - Use `MODE=MySQL` na URL do H2, para desenvolver contra o mesmo dialeto.
 - Prefira o H2 em modo arquivo ao modo memória, para os dados não sumirem a cada reinício.
 
-## 🗺️ OpenStreetMap
-
-**É a base do sistema — sem mapa não há aplicativo.** No back-end, o papel dele é a geocodificação reversa: converter latitude e longitude no `endereco` legível e no bairro do reporte, via Nominatim.
-
-- Fica no pacote `integration` (`INTEGRAÇÕES EXTERNAS` do diagrama de pacotes).
-- O Nominatim **exige cabeçalho `User-Agent`** identificando a aplicação; sem ele, bloqueia.
-- Limite de aproximadamente **1 requisição por segundo** na instância pública.
-- **A falha da integração nunca pode impedir o reporte de ser salvo.** Em caso de erro, gravar `endereco` como nulo e registrar em log.
-- O bairro vem como texto livre e precisa ser casado com a tabela `Bairro`. Bairro não encontrado cai num registro genérico, nunca quebra a requisição.
-
 ## 📁 Estrutura de Pastas
 
 ```
@@ -83,8 +80,7 @@ vigia-api/
 │   │   │   ├── repository/             # Interfaces do Spring Data
 │   │   │   ├── model/                  # As @Entity
 │   │   │   ├── dto/                    # Entrada e saída da API (usar record)
-│   │   │   ├── exception/              # Tratamento de erros
-│   │   │   └── integration/            # OpenStreetMap, notícias, redes sociais
+│   │   │   └── exception/              # Tratamento de erros
 │   │   └── resources/
 │   │       └── application.properties  # Configuração do banco
 │   └── test/
@@ -103,38 +99,30 @@ vigia-api/
 | `REGRAS_NEGOCIO` | `service` |
 | `REPOSITORIES` | `repository` |
 | `MODEL_BACKEND` | `model` |
-| `INTEGRAÇÕES EXTERNAS` | `integration` |
+| `DTO` / `EXCEPTION` | `dto` / `exception` (a adicionar ao diagrama) |
 
 ## 📐 Regras de Tradução do Diagrama de Classes para o Código
 
 **1. Os métodos das classes do diagrama NÃO vão para as `@Entity`.**
-`criarReporte()`, `suspenderUsuario()`, `calcularClassificacao()` e os demais viram métodos no `@Service`. As `@Entity` ficam só com atributos, getters e setters. Isso é a camada `REGRAS_NEGOCIO` do diagrama de pacotes fazendo o trabalho dela.
+`criarReporte()` e os demais viram métodos no `@Service`. As `@Entity` ficam só com atributos, getters e setters. Isso é a camada `REGRAS_NEGOCIO` do diagrama de pacotes fazendo o trabalho dela.
 
 **2. Chaves estrangeiras viram referências de objeto, não `int`.**
-O diagrama mostra `idBairro: int`; no código isso vira um atributo do tipo `Bairro` anotado com `@ManyToOne`, e o Hibernate cria a coluna e a foreign key sozinho. Vale para `Reporte`, `Subcategoria`, `Denuncia`, `AcaoAdministrativa`, `Recurso` e `NoticiaReporte`.
+O diagrama mostra `idSubcategoria: int`; no código isso vira um atributo do tipo `Subcategoria` anotado com `@ManyToOne`, e o Hibernate cria a coluna e a foreign key sozinho. Vale para `Reporte` e as entidades que ele referencia.
 
 **3. Sem acentos nem cedilha em identificadores Java.**
 `endereço` no diagrama vira `endereco` no código. Vale para atributos, métodos, classes e pacotes.
 
-**4. Herança do diagrama (`Pessoa → Usuario/Admin`)** vira **`@MappedSuperclass`**, não `@Inheritance(JOINED)`. A `Pessoa` do diagrama é o molde `UsuarioBase` no código: define os campos comuns (id, nome, email, senha, dataNascimento, status) e **não gera tabela própria**. `Usuario` e `Admin` são `@Entity` independentes que copiam esses campos no schema gerado pelo Hibernate. A hierarquia `Noticia → NoticiaRedeSocial/NoticiaPortal` ainda não foi implementada — estratégia a definir quando entrar no escopo.
+**4. Herança (`Pessoa → Usuario/Admin`) vira `@MappedSuperclass`.**
+A `Pessoa` do diagrama é o molde `UsuarioBase` no código, sem tabela própria. Já está implementado; o módulo de usuário está **fora do foco atual**, mas o molde permanece no código.
 
-## ⏳ Classificação de Bairro (regra de domínio)
-
-- O **peso** da subcategoria mora na enum `TipoSubcategoria`; a direção (SEGURANCA soma / INSEGURANCA subtrai) mora na enum `TipoCategoria`.
-- `calcularClassificacao()` fica no `BairroService` (regra de negócio). Nota parte de **5,0**, teto 5,0, piso 0, recalculada do zero (não acumula).
-- `Categoria`/`Subcategoria` são entidades alimentadas por **seed** a partir dos enums no boot — o Hibernate continua dono do schema.
-- Contribuição por reporte = `(peso da subcategoria × avaliacaoGravidade) ÷ 10` (uma casa decimal).
-- Lista de mudanças a aplicar no relatório/diagramas: ver `docs/mudancas-docs-relatorio.md`.
-
-## 🔐 Autenticação
-
-Fora do escopo do protótipo: sem Spring Security, sem hash de senha, sem token. O login previsto é `POST /api/auth/login`, que valida e-mail e senha contra o banco e devolve o usuário. **Não é seguro para produção** e deve ser declarado como tal na monografia.
+**5. A entidade não aparece no contrato da API.**
+Entrada e saída usam **DTOs (records)** no pacote `dto`; a conversão DTO ↔ entidade acontece no `@Service`.
 
 ## 📂 Documentos de Referência (em `docs/`)
 
-- `planejamento-desenvolvimento-vigia-backend.md` → escopo, ordem de implementação e protocolo de estado (stack e estrutura ficam aqui neste arquivo)
-- `vigia-specs-endpoints.md` → especificação SDD de cada endpoint, com prompts prontos
-- `mudancas-docs-relatorio.md` → lista de mudanças na documentação do relatório e no que vamos implementar
+- `planejamento-desenvolvimento-vigia-backend.md` → escopo, fases atuais e futuras, modelo de dados do reporte, protocolo de estado
+- `vigia-specs-endpoints.md` → contratos dos endpoints de reporte (padrão de DTOs + prompts prontos)
+- `mudancas-docs-relatorio.md` → mudanças na documentação do relatório e no que vamos implementar
 - `guia-desenvolvimento.md` → onboarding de novos integrantes (ambiente, como rodar, regras)
 - `ESTADO_DESENVOLVIMENTO.md` → onde paramos na última sessão
 - `diagramas/` → os `.drawio` do TCC
@@ -144,6 +132,6 @@ Fora do escopo do protótipo: sem Spring Security, sem hash de senha, sem token.
 ## 📋 Protocolo de Sincronização de Estado
 
 - Gere/atualize `docs/ESTADO_DESENVOLVIMENTO.md` **a cada interação que adicione, altere ou remova algo do projeto** — não apenas no fim do dia.
-- Siga o template da Seção 6 do planejamento: ponto de controle, modificações, dependências, próximos passos, contexto técnico.
+- Siga o template da Seção 5 do planejamento: ponto de controle, modificações, dependências, próximos passos, contexto técnico.
 - Reforce neste `AGENTS.md` qualquer nova regra ou convenção persistente criada durante a sessão.
 - Ao encerrar a sessão do dia, garanta que `docs/ESTADO_DESENVOLVIMENTO.md` esteja atualizado com o último estado.

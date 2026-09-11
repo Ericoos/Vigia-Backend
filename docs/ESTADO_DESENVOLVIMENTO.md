@@ -1,63 +1,58 @@
 # Estado Atual do Desenvolvimento - Back-End Vigia
 
 ## 📍 1. Onde Paramos (Ponto de Controle)
-- **Fase/Passo Atual**: **Fase 1 completa** — fatia vertical (Repository → Service → Controller) existente para **todas as 5 entidades do MVP**: `Reporte` (`GET`/`POST /api/reportes`, POST `201`), `Categoria` (`GET /api/categorias`), `Subcategoria` (`GET /api/subcategorias`), `Bairro` (`GET /api/bairros`) e `Usuario` (`GET`/`POST /api/usuarios`, POST `201`). **Pendente: rodar/testar os endpoints** e iniciar a Fase 2.
-- **Sessão (06/09/2026) — Erico**: subiu a fatia vertical de `Bairro` e `Usuario` (Repository + Service + Controller; `POST` com `@ResponseStatus(HttpStatus.CREATED)` nos dois). `UsuarioController` segue o padrão do projeto (`@RequiredArgsConstructor` + campo `final`). Compilando sem erros.
-- **Sessão (06/09/2026) — Murilo (Reporte/Categoria/Subcategoria)**: adicionado `ReporteController` (`GET`/`POST` `/api/reportes`); estrutura completa de `Categoria` e `Subcategoria` (Repository + Service + Controller, GETs); `CategoriaService` padronizado no estilo do `ReporteService` (retorna entidade, sem `salvar` — criação por seed); ajustes em `Categoria` (`@OneToMany` EAGER de subcategorias) e em `Subcategoria` (`@JsonProperty WRITE_ONLY` na referência a `Categoria`, para evitar recursão no JSON mantendo a leitura no POST).
-- **Decisão de herança tomada**: `Pessoa` do diagrama virou o molde `UsuarioBase` com **`@MappedSuperclass`** (sem tabela própria), abandonando `@Inheritance(JOINED)`. `Usuario` é `@Entity` que herda os campos do molde. `PerfilPublico` é entidade de fase futura e vai receber `avaliacao` e `avatar` (relação 1-1 com `Usuario`).
-- **Classificação do bairro (definida)**: os enums `TipoCategoria`/`TipoSubcategoria` (com pesos) foram finalizados e a tabela de pesos das subcategorias ficou definida — ver `docs/mudancas-docs-relatorio.md`. `calcularClassificacao()` no `BairroService` fica para a Fase 3.
+- **Fase/Passo Atual**: **Fase 1 completa** — fatia vertical (Repository → Service → Controller) existente para **todas as 5 entidades do MVP**: `Reporte` (`GET`/`POST /api/reportes`, POST `201`), `Categoria` (`GET /api/categorias`), `Subcategoria` (`GET /api/subcategorias`), `Bairro` (`GET /api/bairros`) e `Usuario` (`GET`/`POST /api/usuarios`, POST `201`). **Foco atual (o único que importa agora)**: módulo **Reporte** — que vai ser finalizado, receber DTOs e se conectar ao front (Fases 2, 3 e 4). Pendente: rodar/validar e iniciar a Fase 2.
+- **Sessão (06/09/2026) — Erico**: subiu a fatia vertical de `Bairro` e `Usuario` (Repository + Service + Controller; POST com `@ResponseStatus(HttpStatus.CREATED)`). `dataCadastro` do `Usuario` já em `LocalDateTime`. Compilando sem erros.
+- **Sessão (06/09/2026) — Murilo (Reporte/Categoria/Subcategoria)**: `ReporteController` (`GET`/`POST /api/reportes`); estrutura de `Categoria`/`Subcategoria` (Repository + Service + Controller, GETs); `Categoria` com `@OneToMany` EAGER de subcategorias; `Subcategoria` com `@JsonProperty WRITE_ONLY` na referência a `Categoria` (evita recursão no JSON mantendo a leitura no POST).
+- **Decisões de escopo (10/09/2026)**: módulo **somente de Reporte**. **Autenticação ainda não será colocada**; **geocodificação/OpenStreetMap já feita no front** (não é do back — `endereco`/`bairro` ficam nulos); **classificação de bairro quase pronta** (pesos definidos, focar depois); usuário/perfil/histórico/denúncias/admin fora; `avaliacaoGravidade` foi **removida**.
+- **Decisão de herança tomada**: `Pessoa` do diagrama virou o molde `UsuarioBase` com `@MappedSuperclass` (sem tabela própria). `Usuario` é `@Entity` que herda os campos do molde.
+- **Classificação do bairro (definida)**: enums `TipoCategoria`/`TipoSubcategoria` (com pesos) finalizados e tabela de pesos definida — ver `docs/mudancas-docs-relatorio.md`. `calcularClassificacao()` no `BairroService` fica para depois.
 
 ## 🛠️ 2. Modificações Efetuadas nesta Sessão
-**Código:**
-- `src/main/java/com/uscs/vigia/model/Reporte.java` → `@Entity` do Reporte (`idReporte`, titulo, descricao, latitude, longitude, endereco, `@Enumerated StatusReporte status`, `OffsetDateTime dataReporte`; `@ManyToOne` usuario/categoria/subcategoria/bairro). Commit `8f26aa1`.
-- `src/main/java/com/uscs/vigia/model/StatusReporte.java`, `Categoria.java`, `Subcategoria.java`, `Bairro.java` → entidades de apoio do Reporte (Commit `7415eae`).
-- `src/main/java/com/uscs/vigia/repository/ReporteRepository.java` → `JpaRepository<Reporte, Long>` (Commit `66d0bf7`).
-- `src/main/java/com/uscs/vigia/service/ReporteService.java` → `listar()`/`salvar()` delegando ao repository (Commit `9d66b38`).
-- `src/main/java/com/uscs/vigia/controller/ReporteController.java` → `GET`/`POST /api/reportes` (POST devolve `201 Created`).
-- `src/main/java/com/uscs/vigia/repository/CategoriaRepository.java` e `SubcategoriaRepository.java` → interfaces `JpaRepository`.
-- `src/main/java/com/uscs/vigia/service/CategoriaService.java` e `SubcategoriaService.java` → padrão do `ReporteService` (listar apenas; criação fica com seed no boot).
-- `src/main/java/com/uscs/vigia/controller/CategoriaController.java` e `SubcategoriaController.java` → `GET /api/categorias` e `GET /api/subcategorias`.
-- `src/main/java/com/uscs/vigia/model/Categoria.java` → adicionada coleção `subcategorias` com `@OneToMany(mappedBy = "categoria", fetch = EAGER)` (aninhamento no `GET /api/categorias`).
-- `src/main/java/com/uscs/vigia/model/Subcategoria.java` → `@JsonProperty(access = WRITE_ONLY)` na referência `categoria` (evita recursão/repetição no JSON, ainda aceita `categoria` na entrada).
-- `src/main/java/com/uscs/vigia/repository/BairroRepository.java` e `UsuarioRepository.java` → interfaces `JpaRepository` (fatia do `Bairro`/`Usuario`, commit `6b274f8`).
-- `src/main/java/com/uscs/vigia/controller/BairroController.java` → `GET /api/bairros` (só leitura — bairros vêm da geocodificação).
-- `src/main/java/com/uscs/vigia/controller/UsuarioController.java` → `GET`/`POST /api/usuarios` com `@ResponseStatus(HttpStatus.CREATED)` no POST.
-- `src/main/java/com/uscs/vigia/model/UsuarioBase.java` → molde `@MappedSuperclass` com `Long id`, nome, email, senha, `LocalDate dataNascimento`, `@Enumerated(STRING) TipoUsuario status`. (Rascunhos `Pessoa.java`/`UserType.java` substituídos pelo molde + enum.)
-- `src/main/java/com/uscs/vigia/model/TipoUsuario.java` → enum `USUARIO_ATIVO, USUARIO_SUSPENSO, USUARIO_BANIDO, USUARIO_DELETADO, USUARIO_INATIVO` (equivale ao `StatusUsuario` do diagrama).
-- `src/main/java/com/uscs/vigia/model/Usuario.java` → `@Entity extends UsuarioBase` com `telefone` e `dataCadastro`.
+**Código (sessões anteriores — não mexer):**
+- `model/Reporte.java` → `@Entity` do Reporte (`idReporte`, titulo, descricao, latitude, longitude, endereco, `@Enumerated StatusReporte status`, `OffsetDateTime dataReporte`; `@ManyToOne` usuario/categoria/subcategoria/bairro).
+- `model/StatusReporte.java`, `Categoria.java`, `Subcategoria.java`, `Bairro.java` → entidades de apoio do Reporte.
+- `model/TipoSubcategoria.java` → enum com os pesos das subcategorias (no momento **não usado** em cálculo).
+- `repository/ReporteRepository.java` → `JpaRepository<Reporte, Long>` (sem métodos customizados).
+- `service/ReporteService.java` → `listar()`/`salvar()` delegando ao repository.
+- `controller/ReporteController.java` → `GET`/`POST /api/reportes` (aceita a **entidade bruta**, sem validação; `status`/`dataReporte` ficam nulos).
+- `repository/CategoriaRepository.java`/`SubcategoriaRepository.java`/`BairroRepository.java`/`UsuarioRepository.java` e os `Service`/`Controller` correspondentes → fatias de Categoria, Subcategoria, Bairro e Usuario.
+- `model/UsuarioBase.java` (molde `@MappedSuperclass`), `TipoUsuario.java`, `Usuario.java` (com `telefone` e `dataCadastro` em `LocalDateTime`).
 
-**Docs:**
-- `AGENTS.md` → regra 4 de tradução atualizada: herança usa `@MappedSuperclass`, não mais `@Inheritance(JOINED)`.
-- `docs/planejamento-desenvolvimento-vigia-backend.md` → modelo de dados reflete `UsuarioBase`/`Usuario` sem `avaliacao`; enum `TipoUsuario`; nota de decisão `avaliacao`/`avatar` → `PerfilPublico`.
-- `docs/guia-desenvolvimento.md` → regra 5 de herança e ponto de controle atualizados.
-- `docs/vigia-specs-endpoints.md` → Endpoint 1 (cadastro/login) sem `avaliacao`/`avatar`; camadas descrevem `UsuarioBase` (`@MappedSuperclass`) + `Usuario` com telefone/dataCadastro.
-- `docs/diagramas/` → **7 `.drawio` do TCC carregados** (antes a pasta estava vazia). O `DIAGRAMA DE COMPONENTES E CONTEINERS (C4 MODEL).drawio` veio vazio (10 linhas) — a baixar a versão corrigida.
-- `docs/relatorio-vigia.txt` → texto extraído do `RELATÓRIO VIGIA - CORREÇÃO.docx` (script SQL do Apêndice D: sem tabela `pessoa`; `usuario` com `avaliacao`; `perfil_publico` sem `avatar`).
-- **Simplificação de escopo (09/2026)**: CORS, PUT/DELETE, `avatar`/`avaliacao` e as "entidades das fases seguintes" foram marcados como **fora do MVP** (CORS não se aplica a React Native; `avatar`/`avaliacao` dependem de `PerfilPublico`; o app não edita nem apaga reportes). Coordenadas fora de SCS: decidido aceitar. Docs tocados: `planejamento-...`, `vigia-specs-endpoints.md`, `guia-desenvolvimento.md`.
-- **Classificação do bairro (06/09/2026)**: fórmula decidida em parte — `calcularClassificacao()` no Service, nota parte de **5,0** (teto 5,0, piso 0), contribuição por reporte = `(peso da subcategoria × avaliacaoGravidade) ÷ 10`, `SEGURANCA` soma / `INSEGURANCA` subtrai, presença policial é fator positivo. `Categoria`/`Subcategoria` continuam como `@Entity` alimentadas por seed dos enums (`TipoCategoria`, `TipoSubcategoria` com peso). Diagrama de pacotes: só faltam `DTO` e `EXCEPTION` (`REPOSITORIES` já existe). **Criado** `docs/mudancas-docs-relatorio.md` (lista de mudanças no relatório/diagramas + o que implementar) e **atualizados** `planejamento-...`, `vigia-specs-endpoints.md`, `guia-desenvolvimento.md`, `AGENTS.md` e este arquivo. **Pendente para a próxima sessão: tabela de pesos das subcategorias.**
+**Docs (nesta sessão — 10/09/2026):**
+- `AGENTS.md` → enxugado para o foco em Reporte (removidos OpenStreetMap/Autenticação/Classificação de Bairro).
+- `docs/planejamento-desenvolvimento-vigia-backend.md` → reescrito: só o módulo Reporte, fases 2/3/4 futuras.
+- `docs/vigia-specs-endpoints.md` → reescrito: só endpoints de reporte (contratos + prompts prontos). O guia de DTOs foi removido — explicado em conversa.
+- `docs/guia-desenvolvimento.md` → regras e ponto de controle atualizados.
+- `docs/mudancas-docs-relatorio.md` → enxugado para mudanças relacionadas a reporte.
+- `docs/ESTADO_DESENVOLVIMENTO.md` → este arquivo, mesclado com o estado do remoto (Fase 1 das 5 entidades).
 
 ## 📋 3. Estado das Dependências instaladas
-- **Nenhuma dependência nova nesta sessão.** Permanecem as do `pom.xml`: `spring-boot-starter-webmvc`, `spring-boot-h2console`, `spring-boot-starter-data-jpa`, `spring-boot-starter-validation`, `com.h2database:h2` (runtime), `org.projectlombok:lombok`, mais os starters de teste.
-- **Ainda NÃO adicionadas** (fases futuras): `mysql-connector-j` (quando o MySQL existir), `springdoc-openapi-starter-webmvc-ui` (Swagger, Fase 2), Spring Security (fora do escopo).
+- Permanecem as do `pom.xml`: `spring-boot-starter-webmvc`, `spring-boot-h2console`, `spring-boot-starter-data-jpa`, `spring-boot-starter-validation`, `com.h2database:h2` (runtime), `org.projectlombok:lombok`, mais os starters de teste.
+- **Não adicionadas** (fora do foco agora): `mysql-connector-j`, Swagger, Spring Security.
 - ⚠️ H2 é ponte temporária `MODE=MySQL`; o banco do projeto é **MySQL**, de outra pessoa da equipe, ainda não existe.
 
 ## 🚀 4. Próximos Passos Imediatos para a Próxima Sessão
-0. **Rodar e validar os endpoints das 5 fatias** (`./mvnw spring-boot:run`): GETs de `/api/reportes`, `/api/categorias`, `/api/subcategorias`, `/api/bairros`, `/api/usuarios`; POST de `/api/reportes` e `/api/usuarios`. Conferir tabelas no `h2-console` (e que **não** existe tabela `pessoa`).
-1. **Cadastro/login do `Usuario` (Endpoint 1 da spec)**: `findByEmail` no `UsuarioRepository`; `cadastrar()` (rejeita e-mail duplicado) e `autenticar()` no Service; `AuthController` com `POST /api/auth/login`. Senha nunca sai no JSON (DTO sem senha).
-2. **Fase 2**: DTOs (`record`) com Bean Validation, `@RestControllerAdvice` no `exception`, Swagger, e **seed** de `Categoria`/`Subcategoria` a partir dos enums no boot (hoje os GETs devolvem lista vazia até existir seed).
-3. **Fase 3**: geocodificação reversa (Nominatim) em `integration` — o `salvar` do Reporte preenche `endereco`/`bairro` —, `calcularClassificacao()` no `BairroService` e navegação pelos bairros.
-4. **Confirmar o diagrama C4** (veio vazio): pedir a versão corrigida ou reconstruir pelo `COMPONENTES UML.drawio`.
-5. **PENDÊNCIAS ABERTAS (não bloqueantes)**: (a) validar contrato de `vigia-specs-endpoints.md` com o front; (b) criar `PerfilPublico` e mover `avaliacao`/`avatar` para lá (atualizar diagrama); (c) credenciais do MySQL desconhecidas; (d) quem manda no schema (`ddl-auto` vs script SQL do relatório); (e) CORS não configurado (fora do MVP); (f) aplicar no `RELATÓRIO...docx` e nos `.drawio` as mudanças listadas em `mudancas-docs-relatorio.md` (parceria com o grupo).
+0. **Rodar e validar os endpoints** (`./mvnw spring-boot:run`): GETs de `/api/reportes`, `/api/categorias`, `/api/subcategorias`, `/api/bairros`, `/api/usuarios`; POST de `/api/reportes` e `/api/usuarios`. Conferir tabelas no `h2-console` (e que **não** existe tabela `pessoa`).
+1. **Fase 2 — Finalizar classe e métodos do `Reporte`**:
+   - `ReporteService.criar()` (monta entidade, `status=PUBLICADO`, `dataReporte=agora`, salva).
+   - `POST /api/reportes` com validação de entrada (`titulo`/`descricao` @NotBlank, `latitude`/`longitude` @NotNull).
+   - `GET /api/reportes` filtrando só `PUBLICADO`.
+   - `GET /api/reportes/{id}` com `404`.
+2. **Fase 3 — DTOs**: `ReporteRequest`, `ReporteResponse`, Bean Validation e `@RestControllerAdvice` (explicação de DTOs é repassada em conversa). Criar os pacotes `dto` e `exception`.
+3. **Garantir `Categoria`/`Subcategoria` com registros** (seed ou dados no H2) para o `idSubcategoria` do POST existir.
+4. **Fase 4 — Integração com o front-end**: alinhar contrato, receber/validar/armazenar reportes do app, testar ponta a ponta, combinar URL base (IP da máquina, não `localhost`).
+5. **Cadastro/login do `Usuario`**: **fora de foco** (autenticação ainda não será colocada). Apenas o GET/POST da fatia existente.
 
 ## 🧠 5. Contexto Técnico para o Próximo Chat
 - **Stack**: Java 21, Spring Boot 4.1.1, Maven (`./mvnw`), Spring Data JPA, Bean Validation, Lombok.
-- **Versionamento**: repo `https://github.com/Ericoos/Vigia-Backend.git`, branch `main`. Último commit `6b274f8` (fatia vertical de `Bairro` e `Usuario`). Colaboradores: `Ericoos` (docs/infra) e `Murilovers06` (entidades/reportes). **Commit/push só com aprovação explícita do usuário; mensagens em português.**
-- **Banco**: esquema gerado pelo Hibernate a partir das `@Entity` via `ddl-auto=update`; **nunca usar `nativeQuery`**; H2 modo arquivo `MODE=MySQL` até o MySQL da equipe existir.
-- **Arquitetura**: `controller` → `service` → `repository` → `model`; integrações externas em `integration`. `VigiaApplication.java` na raiz do pacote (varredura do `@SpringBootApplication`). **Padrão de fatia**: repositório é interface vazia (métodos vêm do `JpaRepository`); entidade de leitura (Categoria/Subcategoria/Bairro) tem só `listar()`/`@GetMapping`; entidade criada pelo app (Usuario/Reporte) tem `salvar()`/`@PostMapping` com `@ResponseStatus(HttpStatus.CREATED)`.
-- **Herança (regra 4 do AGENTS.md)**: `Pessoa` (diagrama) = `UsuarioBase` (molde `@MappedSuperclass`, sem tabela própria); `Usuario` e `Admin` são `@Entity` que copiam os campos. Nada de `@Inheritance(JOINED)`.
-- **Entidades existentes no `model`**: `Reporte` (referencia `Usuario`), `Categoria` (com `@OneToMany` de subcategorias), `Subcategoria`, `Bairro`, `StatusReporte`, `UsuarioBase` (molde), `TipoUsuario`, `Usuario`, enums `TipoCategoria`/`TipoSubcategoria` (com pesos). Enums no diagrama: `StatusUsuario`/`TipoUsuario` (ATIVO/SUSPENSO/BANIDO/DELETADO/INATIVO) e `StatusReporte` (RASCUNHO/PUBLICADO/EXCLUIDO).
-- **Fatias prontas (Fase 1)**: `Reporte` (`GET`/`POST /api/reportes`), `Categoria` (`GET /api/categorias`), `Subcategoria` (`GET /api/subcategorias`), `Bairro` (`GET /api/bairros`), `Usuario` (`GET`/`POST /api/usuarios`). `dataCadastro` do `Usuario` já em `LocalDateTime`.
-- **Divergências conhecidas**: `avaliacaoGravidade` não consta em `Reporte` (existe no mock/Tela 3); campo `idReporte` usado como id; `avaliacao` no script SQL fica no `usuario`, mas o diagrama prevê `PerfilPublico` com `avatar` e o relatório traz `bio` — alinhar; `admin` no script SQL tem FK `idUsuario`, divergente do modelo de herança.
-- **Classificação do bairro**: `calcularClassificacao()` no `BairroService`; base 5,0 (teto 5,0, piso 0), contribuição `(peso × gravidade) ÷ 10`; peso na enum `TipoSubcategoria`, direção na enum `TipoCategoria` (SEGURANCA soma / INSEGURANCA subtrai); `Categoria`/`Subcategoria` com seed dos enums. **Diagrama de pacotes**: falta só `DTO` e `EXCEPTION` (e aplicar as mudanças listadas em `mudancas-docs-relatorio.md`).
-- **Docs**: `docs/` contém `planejamento-desenvolvimento-vigia-backend.md` (plano), `vigia-specs-endpoints.md` (contrato da API), `guia-desenvolvimento.md` (onboarding), `mudancas-docs-relatorio.md` (mudanças no relatório + implementação — **novo**), este `ESTADO_DESENVOLVIMENTO.md`, `diagramas/` (7 `.drawio`, C4 ainda vazio) e `relatorio-vigia.txt`. `AGENTS.md` na raiz é a fonte das regras persistentes (nova seção `⏳ Classificação de Bairro`).
+- **Versionamento**: repo `https://github.com/Ericoos/Vigia-Backend.git`, branch `main`. **Commit/push só com aprovação explícita do usuário; mensagens em português.**
+- **Banco**: esquema gerado pelo Hibernate a partir das `@Entity` via `ddl-auto=update`; **nunca `nativeQuery`**; H2 modo arquivo `MODE=MySQL` até o MySQL da equipe existir.
+- **Arquitetura**: `controller` (recebe DTO) → `service` (regras + conversão DTO ↔ entidade) → `repository` → `model`. `VigiaApplication.java` na raiz do pacote. **A entidade não é exposta no contrato da API.**
+- **Fluxo-alvo do reporte**: app envia `POST /api/reportes` (JSON) → Controller recebe `ReporteRequest` → Service valida/deriva/armazena → banco → `GET /api/reportes` devolve só `PUBLICADO` para os pins do mapa.
+- **Entidades existentes no `model`**: `Reporte`, `StatusReporte` (RASCUNHO/PUBLICADO/EXCLUIDO), `Categoria`, `Subcategoria`, `Bairro`, `TipoSubcategoria` (com pesos). Módulo usuário (fora de foco): `UsuarioBase` (molde `@MappedSuperclass`), `TipoUsuario`, `Usuario`.
+- **Fatias prontas (Fase 1)**: `Reporte`, `Categoria`, `Subcategoria`, `Bairro`, `Usuario`.
+- **Decisões**: `avaliacaoGravidade` removida; pesos de `TipoSubcategoria` definidos mas **não** usados em cálculo por enquanto; geocodificação já feita no front (`endereco`/`bairro` ficam nulos no back); `usuario` do reporte é opcional para o POST.
+- **Pacotes ainda a criar**: `dto`, `exception`. Sem seed de `Categoria`/`Subcategoria`.
+- **Docs**: `docs/` contém `planejamento-desenvolvimento-vigia-backend.md`, `vigia-specs-endpoints.md`, `guia-desenvolvimento.md`, `mudancas-docs-relatorio.md`, este `ESTADO_DESENVOLVIMENTO.md`, `diagramas/` (7 `.drawio`) e `relatorio-vigia.txt`. `AGENTS.md` na raiz é a fonte das regras persistentes.
 - **Comandos**: `./mvnw spring-boot:run` (rodar), `./mvnw clean install` (build).

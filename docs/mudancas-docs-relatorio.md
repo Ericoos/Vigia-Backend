@@ -4,35 +4,33 @@ Documento de controle do que precisa mudar na documentação do relatório (`.do
 
 ---
 
-## 1. Mudanças na documentação do relatório (requisitos, diagramas, etc.)
+## 1. Mudanças na documentação do relatório
 
-1. **Requisitos (§3.2)**: a classificação de segurança está descrita como "calculada automaticamente a partir dos **reportes e denúncias** registrados na região". Trocar para "calculada automaticamente a partir das **categorias e subcategorias dos reportes** registrados na região" — denúncia é outro conceito e a fórmula usa só reportes.
-2. **Modelo de dados (§6) / Diagrama de classes**: registrar os enums `TipoUsuario`, `StatusReporte`, `TipoCategoria` e `TipoSubcategoria`.
-3. **Diagrama de classes**: incluir `avaliacaoGravidade` na classe `Reporte` (existe no mock, na Tela 3 e no contrato, mas não na classe do diagrama).
-4. **Diagrama de pacotes**: adicionar `DTO` e `EXCEPTION` na `CAMADA_BACKEND`. `REPOSITORIES` já existe no diagrama e representa o pacote `repository` do código (camada de acesso a dados) — **não** é o banco, que está representado como `BANCO_MYSQL` na `CAMADA_DADOS`.
-5. **Relatório**: descrever que `Categoria`/`Subcategoria` são tabelas alimentadas por seed dos enums, e documentar a fórmula da classificação do bairro (Seção 2).
-
----
-
-## 2. O que vamos implementar
-
-1. **Enums no pacote `model`**:
-   - `TipoCategoria`: `SEGURANCA`, `INSEGURANCA`.
-   - `TipoSubcategoria`: cada constante tem um **peso** e um método que recebe a `avaliacaoGravidade` do reporte.
-   - Subcategorias previstas (proposta, a confirmar): `ASSALTO_ROUBO`, `FURTO`, `VANDALISMO`, `ILUMINACAO_PUBLICA`, `OUTROS`, `PRESENCA_POLICIAL`, `AREA_MOVIMENTADA`, `CAMERAS`, `FATOR_POSITIVO`.
-
-2. **`Categoria` e `Subcategoria` continuam como `@Entity`/tabelas**, alimentadas por **seed a partir dos enums** no boot do app — o Hibernate continua dono do schema.
-
-3. **`calcularClassificacao()` no `BairroService`** (regra de negócio, nunca na `@Entity`):
-   - Nota parte de **5,0**, com teto **5,0** e piso **0**, recalculada do zero (não acumula).
-   - Contribuição por reporte = `(peso da subcategoria × avaliacaoGravidade) ÷ 10` (uma casa decimal).
-   - `SEGURANCA` soma na nota; `INSEGURANCA` subtrai. Presença policial é fator **positivo**.
-
-4. **`avaliacaoGravidade`**: já presente em `mockReports.json`, na Tela 3 e nos contratos; deve existir no `Reporte` do código (alteração de código somente com autorização).
+1. **Modelo de dados (§6) / Diagrama de classes**: registrar o enum `StatusReporte` (`RASCUNHO`, `PUBLICADO`, `EXCLUIDO`) usado no `Reporte`.
+2. **`avaliacaoGravidade`**: o campo foi **removido** da classe `Reporte` no código — o diagrama deve refletir a ausência (ou ser alinhado com o grupo antes de voltar).
+3. **Diagrama de pacotes**: adicionar os pacotes `DTO` e `EXCEPTION` na `CAMADA_BACKEND` — existem só no código, ainda não constam no diagrama.
+4. **Documentar DTOs**: descrever no relatório que a API usa DTOs (records) no contrato — a entidade não é exposta.
+5. **Relatório**: descrever o fluxo do módulo Reporte — o app cria o reporte, a API recebe, valida e armazena, e a listagem alimenta o mapa.
 
 ---
 
-## 3. Pendências para fechar (próxima sessão)
+## 2. O que vamos implementar (módulo Reporte)
 
-- **Tabela de pesos** das subcategorias — ainda não definida.
-- Confirmar a lista final de subcategorias de `SEGURANCA`.
+1. **Finalizar a classe e os métodos de `Reporte`** (Fase 2):
+   - `ReporteService.criar()` — monta a entidade, define `status = PUBLICADO` e `dataReporte = agora`, salva.
+   - `POST /api/reportes` com Bean Validation (`titulo`/`descricao` obrigatórios, coordenadas obrigatórias).
+   - `GET /api/reportes` retornando só `PUBLICADO`; `GET /api/reportes/{id}` com `404`.
+2. **DTOs** (Fase 3):
+   - `ReporteRequest` e `ReporteResponse` como `record` no pacote `dto`.
+   - `@RestControllerAdvice` no pacote `exception` com o formato padrão de erro.
+3. **Integração com o front-end** (Fase 4):
+   - Alinhar o contrato com o app.
+   - Receber os reportes do app, validar e armazenar; testar ponta a ponta.
+
+---
+
+## 3. Fora do foco (não implementar agora)
+
+- Usuário/cadastro/autenticação (ainda não será colocada); perfil e histórico; denúncias; painel administrativo.
+- Geocodificação (OpenStreetMap): já feita no **front**, não é do back.
+- Classificação de segurança do bairro: lógica quase pronta, focar depois.

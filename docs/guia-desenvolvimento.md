@@ -1,8 +1,6 @@
 # Guia de Desenvolvimento — Back-End do Vigia
 
-Este guia é para quem for trabalhar no back-end (API REST) do aplicativo **Vigia**.
-Ele cobre desde pegar o projeto e rodar, até as regras que não podem ser quebradas.
-Leia o `AGENTS.md` na raiz também — ele é lido por toda assistente de IA em toda sessão.
+Este guia é para quem for trabalhar no back-end (API REST) do aplicativo **Vigia**. Ele cobre desde pegar o projeto e rodar, até as regras que não podem ser quebradas. Leia o `AGENTS.md` na raiz também — ele é lido por toda assistente de IA em toda sessão.
 
 ---
 
@@ -10,6 +8,8 @@ Leia o `AGENTS.md` na raiz também — ele é lido por toda assistente de IA em 
 
 Plataforma colaborativa de segurança urbana de São Caetano do Sul (MVP de TCC).
 Este repositório é a **API REST** consumida pelo app mobile. Só devolve JSON.
+
+**Foco atual**: módulo de **Reporte** — o app cria um reporte, a API recebe, valida e armazena, e devolve a listagem para os pins do mapa.
 
 Coordenadas de referência: `lat -23.6182, lon -46.5645`.
 
@@ -80,13 +80,12 @@ vigia-api/
 ├── docs/                        # Documentação
 ├── src/main/java/com/uscs/vigia/
 │   ├── VigiaApplication.java   # Ponto de entrada — raiz do pacote
-│   ├── controller/             # Recebe HTTP, devolve JSON
-│   ├── service/                # Regras de negócio
+│   ├── controller/             # Recebe HTTP, recebe DTOs e devolve JSON
+│   ├── service/                # Regras de negócio e conversão DTO ↔ entidade
 │   ├── repository/             # Interfaces do Spring Data
 │   ├── model/                  # As @Entity
 │   ├── dto/                    # Entrada e saída da API (records)
-│   ├── exception/              # Tratamento de erros
-│   └── integration/            # OpenStreetMap, notícias, redes sociais
+│   └── exception/              # Tratamento de erros (@RestControllerAdvice)
 ├── src/main/resources/
 │   └── application.properties  # Configuração do banco
 └── AGENTS.md                   # Regras persistentes para IA
@@ -99,21 +98,18 @@ vigia-api/
 ## 6. Regras que não podem ser quebradas
 
 1. **Nunca use `nativeQuery`.** O banco final é MySQL e o código precisa continuar portável. Use métodos derivados do Spring Data ou JPQL.
-2. **Chave estrangeira vira referência de objeto**, nunca `int`. Ex.: `idBairro` vira um campo `Bairro` com `@ManyToOne`.
-3. **Métodos de regra de negócio vão para o `@Service`**, nunca para as `@Entity`. Ex.: `criarReporte()`, `suspenderUsuario()`, `calcularClassificacao()`.
+2. **Chave estrangeira vira referência de objeto**, nunca `int`. Ex.: `idSubcategoria` vira um campo `Subcategoria` com `@ManyToOne`.
+3. **Métodos de regra de negócio vão para o `@Service`**, nunca para as `@Entity`. Ex.: `criarReporte()`.
 4. **Sem acentos nem cedilha em identificadores Java.** `endereço` vira `endereco`.
-5. **Herança** usa `@MappedSuperclass` (molde sem tabela própria, ex.: `UsuarioBase`), não `@Inheritance(JOINED)`.
-6. **A senha nunca aparece em nenhuma resposta da API.**
-7. **A falha da integração (OpenStreetMap/Nominatim) nunca pode impedir um reporte de ser salvo.**
-8. **Sem SQL escrito à mão.** O schema é gerado pelo Hibernate a partir das `@Entity` (`ddl-auto=update`).
-9. **Autenticação é simplificada** — sem Spring Security, sem hash, sem token. Declarada como insegura na monografia.
+5. **A entidade não aparece no contrato da API.** Entrada e saída usam **DTOs** (records no pacote `dto`); a conversão DTO ↔ entidade acontece no `@Service`.
+6. **Sem SQL escrito à mão.** O schema é gerado pelo Hibernate a partir das `@Entity` (`ddl-auto=update`).
 
 ---
 
 ## 7. Fluxo de trabalho
 
-- O `README`/`docs/` descrevem o plano fase a fase: **Fase 0** (infra — concluída), **Fase 1** (primeira entidade de ponta a ponta), **Fase 2** (DTOs, erros, Swagger), **Fase 3** (domínio completo + integrações), **Fase 4** (entrega).
-- A cada passo: **escreve → roda → confirma → entendendo → avança**. Um commit por camada que funcionar.
+- O plano fase a fase está em `docs/planejamento-desenvolvimento-vigia-backend.md`: **Fase 0** (infra — ✅), **Fase 1** (fatia vertical do Reporte — ✅), **Fase 2** (finalizar classe e métodos do `Reporte`), **Fase 3** (DTOs + validação), **Fase 4** (integração com o front-end).
+- A cada passo: **escreve → roda → confirma → entende → avança**. Um commit por camada que funcionar.
 - Todo compromisso (commit/push) precisa de **aprovação explícita** — nada de commitar sozinho.
 - A cada interação que alterar o projeto, **atualize `docs/ESTADO_DESENVOLVIMENTO.md`** para registrar onde paramos.
 
@@ -124,18 +120,19 @@ Em português, concisas, refletindo o estilo do histórico.
 
 ## 8. Onde estamos agora (ponto de controle)
 
-- Fase 0 concluída: projeto gerado, pacotes criados, `AGENTS.md` e `docs/` existem, repositório no GitHub com primeiro push, banco configurado (`application.properties`) e app rodando em 8080 com h2-console acessível.
-- Entidades esqueleto do Murilo já existem no `model`: `Reporte`, `Categoria`, `Subcategoria`, `Bairro` e o enum `StatusReporte` — só atributos e construtor padrão (`@NoArgsConstructor`), **sem métodos**.
-- **Próximo passo: Fase 1** — confirmar tabelas no h2-console e subir Repository → Service → Controller, com commit a cada camada. A herança de usuário já foi resolvida: `UsuarioBase` (`@MappedSuperclass`) é o molde de `Usuario` e `Admin` (sem tabela `pessoa`).
-- Pendências para o grupo resolverem: validar contrato com o front, definir a **tabela de pesos** da classificação do bairro (os demais parâmetros da fórmula já estão definidos — ver `mudancas-docs-relatorio.md`) e credenciais do MySQL.
+- Fase 0 concluída: projeto gerado, pacotes criados, `AGENTS.md` e `docs/` existem, repositório no GitHub, banco configurado e app rodando em 8080 com h2-console acessível.
+- Fase 1 concluída para o `Reporte`: entidade, `StatusReporte`, `ReporteRepository`, `ReporteService` (`listar`/`salvar`) e `ReporteController` (`GET`/`POST /api/reportes` — cru, sem validação).
+- Apoio modelado: `Categoria`, `Subcategoria`, `Bairro`.
+- **Próximo passo: Fase 2** — finalizar a classe e os métodos de `Reporte` (Service `criar()`, validação, só `PUBLICADO` na listagem, `GET /{id}`). Depois DTOs (Fase 3) e integração com o front (Fase 4).
+- `avaliacaoGravidade` foi **removida** — não está mais no escopo.
 
 ---
 
 ## 9. Documentos de referência (na pasta `docs/`)
 
-- `planejamento-desenvolvimento-vigia-backend.md` — escopo, modelo de dados, ordem de implementação, protocolo de estado
-- `vigia-specs-endpoints.md` — especificação de cada endpoint (contrato JSON + prompts prontos)
-- `mudancas-docs-relatorio.md` — lista de mudanças na documentação do relatório e no que vamos implementar
+- `planejamento-desenvolvimento-vigia-backend.md` — escopo, fases e modelo de dados do reporte
+- `vigia-specs-endpoints.md` — especificação dos endpoints de reporte (contrato JSON + padrão de DTOs + prompts prontos)
+- `mudancas-docs-relatorio.md` — lista de mudanças na documentação do relatório
 - `guia-desenvolvimento.md` — este guia de integração para quem entra no time
 - `ESTADO_DESENVOLVIMENTO.md` — onde paramos na última sessão
 - `diagramas/` — os `.drawio` do TCC
