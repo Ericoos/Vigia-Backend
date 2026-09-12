@@ -13,9 +13,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoriaService {
 
-	private final CategoriaRepository repository;
+	private final CategoriaRepository categoriaRepository;
 
 	public List<Categoria> listar() {
-		return repository.findAll();
+		return categoriaRepository.findAll();
 	}
 }

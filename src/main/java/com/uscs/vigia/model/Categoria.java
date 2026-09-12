@@ -3,12 +3,7 @@ package com.uscs.vigia.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +19,13 @@ public class Categoria {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String tipoCategoria;
+    @Enumerated(EnumType.STRING)
+	private TipoCategoria tipoCategoria;
 
 	@OneToMany(mappedBy = "categoria", fetch = FetchType.EAGER)
 	private List<Subcategoria> subcategorias = new ArrayList<>();
+
+    public Categoria(TipoCategoria tipoCategoria) {
+        this.tipoCategoria = tipoCategoria;
+    }
 }

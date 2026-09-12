@@ -20,16 +20,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReporteController {
 
-	private final ReporteService service;
+	private final ReporteService reporteService;
 
 	@GetMapping
 	public List<Reporte> listar() {
-		return service.listar();
+		return reporteService.listar();
 	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Reporte salvar(@RequestBody Reporte reporte) {
-		return service.salvar(reporte);
+		return reporteService.salvar(reporte);
 	}
 }

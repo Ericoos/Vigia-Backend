@@ -16,10 +16,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SubcategoriaController {
 
-	private final SubcategoriaService service;
+	private final SubcategoriaService subcategoriaService;
 
 	@GetMapping
 	public List<Subcategoria> listar() {
-		return service.listar();
+		return subcategoriaService.listar();
 	}
 }

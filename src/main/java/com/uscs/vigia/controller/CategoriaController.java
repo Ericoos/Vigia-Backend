@@ -3,6 +3,7 @@ package com.uscs.vigia.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,10 +17,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoriaController {
 
-	private final CategoriaService service;
+	private final CategoriaService categoriaService;
 
 	@GetMapping
 	public List<Categoria> listar() {
-		return service.listar();
+		return categoriaService.listar();
 	}
+
 }
