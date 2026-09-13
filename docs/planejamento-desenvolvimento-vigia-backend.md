@@ -9,21 +9,24 @@ Este documento orienta o desenvolvimento do back-end do **Vigia** com **foco ape
 ## 1. O que já está pronto (não mexer)
 
 - **Fase 0** concluída: projeto gerado (Java 21, Spring Boot 4.1.1, Maven), pacotes criados, `docs/` e `AGENTS.md` existem, repositório no GitHub, banco H2 configurado e app rodando em 8080.
-- **Fase 1** concluída para o `Reporte` — fatia vertical de ponta a ponta:
-  - `model/Reporte` (`@Entity`) e o enum `StatusReporte` (`RASCUNHO`, `PUBLICADO`, `EXCLUIDO`)
-  - `repository/ReporteRepository` (`JpaRepository<Reporte, Long>`)
-  - `service/ReporteService` com `listar()` e `salvar()`
-  - `controller/ReporteController` com `GET /api/reportes` e `POST /api/reportes` (aceita a entidade bruta, sem validação)
-- Apoio já modelado no `model`: `Categoria`, `Subcategoria`, `Bairro`.
+- **Fase 1** concluída para o `Reporte` — fatia vertical de ponta a ponta (entidade, repository, service, controller cru).
+- **Fase 2 concluída** — regras de negócio do Reporte implementadas:
+  - `ReporteService.criar()` (busca cat/sub, valida sub contra cat, `status = PUBLICADO`, `dataReporte = agora` em `America/Sao_Paulo`), `listar()` (só PUBLICADO), `listarPorId()` (404).
+  - `ReporteRepository.findAllByStatus(StatusReporte)`.
+  - Seed de `Categoria`/`Subcategoria` no boot (`config/DataSeeder.java`).
+- **Fase 3 concluída** — DTOs e erros padronizados:
+  - `dto/ReporteRequest` e `dto/ReporteResponse` (records; a entidade não aparece no contrato).
+  - Bean Validation no request; `exception/GlobalExceptionHandler` (`@RestControllerAdvice`) com o formato padrão de erro (400/404).
+- Fases 2 e 3 correspondem às **tarefas 2 a 9** do checklist da entrega naive v1 (`tarefas-vigia-naive-v1.md`) — todas concluídas.
 
 ## 2. Modelo de dados do Reporte
 
 | Entidade | Campos | Observações |
 |---|---|---|
-| **Reporte** | `idReporte`, `titulo`, `descricao`, `latitude`, `longitude`, `endereco`, `status`, `dataReporte` | `status` inicia em `PUBLICADO` e `dataReporte` = agora, definidos no Service. `usuario` é opcional (módulo de usuário fora de foco). |
+| **Reporte** | `idReporte`, `titulo`, `descricao`, `latitude`, `longitude`, `endereco`, `status`, `dataReporte` | `status = PUBLICADO` e `dataReporte = agora` definidos no Service. `usuario` é opcional (módulo de usuário fora de foco). |
 | **StatusReporte** | enum `RASCUNHO`, `PUBLICADO`, `EXCLUIDO` | a listagem pública mostra só `PUBLICADO` |
-| **Subcategoria** | `id`, `tipoSubCategoria`, `categoria` | referenciada pelo reporte |
-| **Categoria** | `id`, `tipoCategoria`, `subcategorias` | derivada da subcategoria no Service |
+| **Subcategoria** | `id`, `tipoSubCategoria` (enum), `categoria` | referenciada pelo reporte; tipo com `@Enumerated(STRING)` |
+| **Categoria** | `id`, `tipoCategoria` (enum), `subcategorias` | derivada da subcategoria no Service; tipo com `@Enumerated(STRING)` |
 | **Bairro** | `id`, `nome` | preenchido em fase futura, sem foco agora |
 
 > `avaliacaoGravidade` foi **removida** — não existe mais na classe `Reporte`.
@@ -39,19 +42,19 @@ Contratos detalhados, com JSON de exemplo e prompts prontos, em `docs/vigia-spec
 
 ## 4. Fases de Desenvolvimento
 
-### Fase 2: Finalizar a classe e os métodos de `Reporte`
-1. `ReporteService.criar()` — recebe os dados, monta a entidade, define `status = PUBLICADO` e `dataReporte = agora`, salva no banco.
+### Fase 2: Finalizar a classe e os métodos de `Reporte` — ✅ concluída
+1. `ReporteService.criar()` — recebe os dados, monta a entidade, define `status = PUBLICADO` e `dataReporte = agora` (`America/Sao_Paulo`), salva no banco.
 2. `POST /api/reportes` — validar entrada: `titulo` e `descricao` obrigatórios, `latitude`/`longitude` obrigatórias.
 3. `GET /api/reportes` — retornar apenas reportes com status `PUBLICADO`.
 4. `GET /api/reportes/{id}` — detalhe, com `404` quando não existir.
 
-### Fase 3: Organizar DTOs
+### Fase 3: Organizar DTOs — ✅ concluída
 1. Definir o padrão de DTOs com a equipe: `reporteRequest` de entrada e `ReporteResponse` de saída (a explicação de o que são e como fazer é repassada em conversa, não está na spec).
 2. Criar `ReporteRequest` (entrada) e `ReporteResponse` (saída) no pacote `dto`, como `record`.
 3. Aplicar Bean Validation nos DTOs de entrada.
 4. Criar `@RestControllerAdvice` no pacote `exception` produzindo o formato padrão de erro.
 
-### Fase 4: Conexão com o front-end
+### Fase 4: Conexão com o front-end — ⏳ pendente (é a **Tarefa 10** do checklist naive v1)
 1. Alinhar o contrato da API com o app (React Native) — o que o app envia e o que recebe.
 2. Receber os reportes enviados pelo app, validar e armazenar.
 3. Testar o fluxo ponta a ponta (emulador/celular → API → banco).

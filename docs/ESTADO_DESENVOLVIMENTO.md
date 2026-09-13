@@ -1,65 +1,63 @@
 # Estado Atual do Desenvolvimento - Back-End Vigia
 
 ## 📍 1. Onde Paramos (Ponto de Controle)
-- **Fase/Passo Atual**: **Fase 1 completa** — fatia vertical (Repository → Service → Controller) existente para **todas as 5 entidades do MVP**: `Reporte` (`GET`/`POST /api/reportes`, POST `201`), `Categoria` (`GET /api/categorias`), `Subcategoria` (`GET /api/subcategorias`), `Bairro` (`GET /api/bairros`) e `Usuario` (`GET`/`POST /api/usuarios`, POST `201`). **Foco atual (o único que importa agora)**: módulo **Reporte** — que vai ser finalizado, receber DTOs e se conectar ao front (Fases 2, 3 e 4). Pendente: rodar/validar e iniciar a Fase 2.
-- **Sessão (06/09/2026) — Erico**: subiu a fatia vertical de `Bairro` e `Usuario` (Repository + Service + Controller; POST com `@ResponseStatus(HttpStatus.CREATED)`). `dataCadastro` do `Usuario` já em `LocalDateTime`. Compilando sem erros.
-- **Sessão (06/09/2026) — Murilo (Reporte/Categoria/Subcategoria)**: `ReporteController` (`GET`/`POST /api/reportes`); estrutura de `Categoria`/`Subcategoria` (Repository + Service + Controller, GETs); `Categoria` com `@OneToMany` EAGER de subcategorias; `Subcategoria` com `@JsonProperty WRITE_ONLY` na referência a `Categoria` (evita recursão no JSON mantendo a leitura no POST).
-- **Decisões de escopo (10/09/2026)**: módulo **somente de Reporte**. **Autenticação ainda não será colocada**; **geocodificação/OpenStreetMap já feita no front** (não é do back — `endereco`/`bairro` ficam nulos); **classificação de bairro quase pronta** (pesos definidos, focar depois); usuário/perfil/histórico/denúncias/admin fora; `avaliacaoGravidade` foi **removida**.
-- **Decisões do fluxo do Reporte (10/09/2026)**: o app envia `POST /api/reportes` com `titulo`, `descricao`, `latitude`, `longitude`, `idCategoria`, `idSubcategoria`. A **subcategoria é validada contra a categoria** (a categoria define as subs válidas; desalinhadas → 400). **O servidor controla**: `idReporte`, `status=PUBLICADO` e `dataReporte` (**horário de São Caetano do Sul** — `America/Sao_Paulo`, `OffsetDateTime.now(ZoneId...)`). `usuario`, `endereco` e `bairro` ficam nulos. Seed de `Categoria`/`Subcategoria` **ainda não existe** (só as classes e enums). `StatusReporte` fica `RASCUNHO/PUBLICADO/EXCLUIDO` (novo valor de enum fica para depois).
-- **Decisão de herança tomada**: `Pessoa` do diagrama virou o molde `UsuarioBase` com `@MappedSuperclass` (sem tabela própria). `Usuario` é `@Entity` que herda os campos do molde.
-- **Classificação do bairro (definida)**: enums `TipoCategoria`/`TipoSubcategoria` (com pesos) finalizados e tabela de pesos definida — ver `docs/mudancas-docs-relatorio.md`. `calcularClassificacao()` no `BairroService` fica para depois.
+- **Fase/Passo Atual**: **Fases 2 e 3 concluídas** — o **módulo Reporte do backend está funcional de ponta a ponta** (entrega naive v1). As **tarefas 1 a 9** do checklist `C:\Users\teric\Desktop\tarefas-vigia-naive-v1.md` estão **concluídas e testadas**. Falta apenas a **Tarefa 10 — integração com o app** (contrato via IP da rede + teste ponta a ponta), que o time fará depois.
+- **Sessão (13/09/2026)**: concluídas as tarefas restantes do backend:
+  - **Tarefa 2** — fuso `spring.jackson.time-zone=America/Sao_Paulo` no `application.properties` + `OffsetDateTime.now(ZoneId.of("America/Sao_Paulo"))` na criação.
+  - **Tarefa 3** — `findAllByStatus(StatusReporte)` no `ReporteRepository`.
+  - **Tarefa 4** — seed de `Categoria`/`Subcategoria` no boot (`config/DataSeeder.java`).
+  - **Tarefa 5** — regras de negócio no `ReporteService` (`criar`, `listar` só PUBLICADO, `listarPorId`).
+  - **Tarefa 9** — erros padronizados (`exception/GlobalExceptionHandler` + `ResourceNotFoundException`).
+- **Tarefas 6 e 7** (DTOs `ReporteRequest`/`ReporteResponse`) vieram via commit do time.
+- **Decisões de escopo mantidas (10/09/2026)**: módulo **somente de Reporte**. Autenticação fora; geocodificação já feita no front (`endereco`/`bairro` nulos); usuário/perfil/histórico/denúncias/admin fora; `avaliacaoGravidade` removida.
+- **Fluxo do Reporte (funcionando)**: app envia `POST /api/reportes` com `titulo`, `descricao`, `latitude`, `longitude`, `idCategoria`, `idSubcategoria`. O servidor valida a subcontra a categoria (desalinhadas → `400`), define `idReporte` (banco), `status=PUBLICADO` e `dataReporte` no horário de São Caetano do Sul (`America/Sao_Paulo`, `-03:00`). Seed já popula as tabelas no boot.
 
 ## 🛠️ 2. Modificações Efetuadas nesta Sessão
-**Código (sessões anteriores — não mexer):**
-- `model/Reporte.java` → `@Entity` do Reporte (`idReporte`, titulo, descricao, latitude, longitude, endereco, `@Enumerated StatusReporte status`, `OffsetDateTime dataReporte`; `@ManyToOne` usuario/categoria/subcategoria/bairro).
-- `model/StatusReporte.java`, `Categoria.java`, `Subcategoria.java`, `Bairro.java` → entidades de apoio do Reporte.
-- `model/TipoSubcategoria.java` → enum com os pesos das subcategorias (no momento **não usado** em cálculo).
-- `repository/ReporteRepository.java` → `JpaRepository<Reporte, Long>` (sem métodos customizados).
-- `service/ReporteService.java` → `listar()`/`salvar()` delegando ao repository.
-- `controller/ReporteController.java` → `GET`/`POST /api/reportes` (aceita a **entidade bruta**, sem validação; `status`/`dataReporte` ficam nulos).
-- `repository/CategoriaRepository.java`/`SubcategoriaRepository.java`/`BairroRepository.java`/`UsuarioRepository.java` e os `Service`/`Controller` correspondentes → fatias de Categoria, Subcategoria, Bairro e Usuario.
-- `model/UsuarioBase.java` (molde `@MappedSuperclass`), `TipoUsuario.java`, `Usuario.java` (com `telefone` e `dataCadastro` em `LocalDateTime`).
+**Código (módulo Reporte — funcional):**
+- `config/DataSeeder.java` → **novo**: `@Component` + `CommandLineRunner`; cria as 2 categorias e as subs no boot se as tabelas estiverem vazias.
+- `dto/ReporteRequest.java` e `dto/ReporteResponse.java` → **novos** (records; via time). Request com Bean Validation (`@NotBlank` titulo/descricao, `@NotNull`+`@DecimalMin/Max` nas coordenadas e ids); Response sem expor a entidade.
+- `exception/GlobalExceptionHandler.java` e `exception/ResourceNotFoundException.java` → **novos**: `@RestControllerAdvice` devolvendo **sempre o mesmo body** (`timestamp`, `status`, `erro`, `mensagem`, `caminho`). `ResourceNotFoundException` → 404; `IllegalArgumentException` → 400; `MethodArgumentNotValidException` → 400.
+- `service/ReporteService.java` → regras: `criar(ReporteRequest)` `@Transactional` (busca cat/sub, valida sub contra cat, `status=PUBLICADO`, `dataReporte` `America/Sao_Paulo`); `listar()` devolve só `PUBLICADO` em DTO; `listarPorId(id)` com 404; conversor `toResponse`.
+- `controller/ReporteController.java` → `POST` recebe `@Valid ReporteRequest` e devolve `201`; `GET` devolve `List<ReporteResponse>`; novo `GET /{id}`.
+- `repository/ReporteRepository.java` → método novo `findAllByStatus(StatusReporte)`.
+- `model/Categoria.java`, `model/Subcategoria.java` → tipos usam **enum** com `@Enumerated(EnumType.STRING)` (antes o H2 guardava ordinal 0/1) e ganharam construtores (`Categoria(TipoCategoria)` / `Subcategoria(TipoSubCategoria, Categoria)`), mantendo `@NoArgsConstructor` (JPA).
+- `src/main/resources/application.properties` → adicionado `spring.jackson.time-zone=America/Sao_Paulo`.
+- Dados de teste do H2 foram apagados (`data/`) e o seed re-populou as tabelas (categorias id 1-2, subs id 1-10).
 
-**Docs (nesta sessão — 10/09/2026):**
-- `AGENTS.md` → enxugado para o foco em Reporte (removidos OpenStreetMap/Autenticação/Classificação de Bairro).
-- `docs/planejamento-desenvolvimento-vigia-backend.md` → reescrito: só o módulo Reporte, fases 2/3/4 futuras.
-- `docs/vigia-specs-endpoints.md` → reescrito: só endpoints de reporte (contratos + prompts prontos). O guia de DTOs foi removido — explicado em conversa.
-- `docs/guia-desenvolvimento.md` → regras e ponto de controle atualizados.
-- `docs/mudancas-docs-relatorio.md` → enxugado para mudanças relacionadas a reporte.
-- `docs/ESTADO_DESENVOLVIMENTO.md` → este arquivo, mesclado com o estado do remoto (Fase 1 das 5 entidades) e atualizado com as decisões de fluxo/payload/data de hoje.
-- `C:\Users\teric\Desktop\tarefas-vigia-naive-v1.md` → checklist das **11 tarefas** da entrega naive v1 (fora do repo, só para transcrição no Trello).
+**Docs (nesta sessão — 13/09/2026):**
+- `docs/ESTADO_DESENVOLVIMENTO.md` → este arquivo, atualizado para o estado final do backend.
+- `docs/planejamento-desenvolvimento-vigia-backend.md` → Fases 2 e 3 marcadas como concluídas.
+- `docs/vigia-specs-endpoints.md` → contrato corrigido para o que o código realmente faz (payload com `idCategoria`+`idSubcategoria`; seed existe; enums no JSON).
+- `docs/guia-desenvolvimento.md` → ponto de controle atualizado.
+- `docs/mudancas-docs-relatorio.md` → itens de Fase 2/3 marcados como implementados.
+- `C:\Users\teric\Desktop\tarefas-vigia-naive-v1.md` → tarefas 1-9 ✅, tarefa 10 (front) pendente.
 
 ## 📋 3. Estado das Dependências instaladas
-- Permanecem as do `pom.xml`: `spring-boot-starter-webmvc`, `spring-boot-h2console`, `spring-boot-starter-data-jpa`, `spring-boot-starter-validation`, `com.h2database:h2` (runtime), `org.projectlombok:lombok`, mais os starters de teste.
-- **Não adicionadas** (fora do foco agora): `mysql-connector-j`, Swagger, Spring Security.
+- Permanecem as do `pom.xml`: Spring Web, Spring Data JPA, Bean Validation, H2 (runtime), Lombok, starters de teste.
+- **Não adicionadas**: `mysql-connector-j`, Swagger, Spring Security.
 - ⚠️ H2 é ponte temporária `MODE=MySQL`; o banco do projeto é **MySQL**, de outra pessoa da equipe, ainda não existe.
 
 ## 🚀 4. Próximos Passos Imediatos para a Próxima Sessão
-Seguir as **11 tarefas** do checklist na área de trabalho (`tarefas-vigia-naive-v1.md`) — uma por classe/camada:
-
-1. Validar o estado atual (rodar, testar endpoints, h2-console).
-2. `model/Reporte` — `usuario` opcional (`@ManyToOne(optional = true)`), sem métodos.
-3. Configurar data/hora: `dataReporte` com `OffsetDateTime.now(ZoneId.of("America/Sao_Paulo"))`.
-4. `repository/ReporteRepository` — `findAllByStatus(StatusReporte)`.
-5. Seed de `Categoria`/`Subcategoria` no boot (hoje as tabelas estão vazias).
-6. `service/ReporteService` — `criar()` (buscar cat/sub pelos ids, validar sub contra cat, `status=PUBLICADO`, `dataReporte=agora`, `@Transactional`), `listar()` (só PUBLICADO), `buscarPorId()` (404).
-7. `dto/ReporteRequest` — record + Bean Validation (`@NotBlank`, `@NotNull`, `@Min`/`@Max` nas coordenadas).
-8. `dto/ReporteResponse` — record de saída.
-9. `controller/ReporteController` — `POST` (201), `GET` (só PUBLICADO), `GET /{id}` (404).
-10. `exception/GlobalExceptionHandler` (`@RestControllerAdvice`) — formato padrão de erro, 400/404.
-11. Integração com o front — contrato, URL base (IP da rede), teste ponta a ponta com pin no mapa.
+1. **Tarefa 10 — integração com o app (ponta a ponta)**:
+   - Alinhar o contrato com o front (payload do POST + JSON da lista/reporte).
+   - Liberar conexões de fora: `server.address=0.0.0.0` no `application.properties`; descobrir o IP do PC (`ipconfig`) e testar `http://IP:8080/api/reportes` no celular.
+   - Emular o app pelo Postman enquanto o front não estiver pronto (GET categorias → POST reporte → GET lista → GET detalhe).
+2. **Depois (fora da entrega naive v1)**: classificação de segurança do bairro (pesos já definidos nos enums), autenticação, editar/excluir reporte, denúncias, migração H2 → MySQL.
 
 **Cadastro/login do `Usuario`**: fora de foco (autenticação ainda não será colocada).
 
 ## 🧠 5. Contexto Técnico para o Próximo Chat
-- **Stack**: Java 21, Spring Boot 4.1.1, Maven (`./mvnw`), Spring Data JPA, Bean Validation, Lombok.
+- **Stack**: Java 21, Spring Boot 4.1.1, Maven (`.\mvnw.cmd` no PowerShell), Spring Data JPA, Bean Validation, Lombok.
 - **Versionamento**: repo `https://github.com/Ericoos/Vigia-Backend.git`, branch `main`. **Commit/push só com aprovação explícita do usuário; mensagens em português.**
-- **Banco**: esquema gerado pelo Hibernate a partir das `@Entity` via `ddl-auto=update`; **nunca `nativeQuery`**; H2 modo arquivo `MODE=MySQL` até o MySQL da equipe existir.
-- **Arquitetura**: `controller` (recebe DTO) → `service` (regras + conversão DTO ↔ entidade) → `repository` → `model`. `VigiaApplication.java` na raiz do pacote. **A entidade não é exposta no contrato da API.**
-- **Fluxo-alvo do reporte**: app envia `POST /api/reportes` (JSON) → Controller recebe `ReporteRequest` → Service valida/deriva/armazena → banco → `GET /api/reportes` devolve só `PUBLICADO` para os pins do mapa.
-- **Entidades existentes no `model`**: `Reporte`, `StatusReporte` (RASCUNHO/PUBLICADO/EXCLUIDO), `Categoria`, `Subcategoria`, `Bairro`, `TipoSubcategoria` (com pesos). Módulo usuário (fora de foco): `UsuarioBase` (molde `@MappedSuperclass`), `TipoUsuario`, `Usuario`.
-- **Fatias prontas (Fase 1)**: `Reporte`, `Categoria`, `Subcategoria`, `Bairro`, `Usuario`.
-- **Decisões**: `avaliacaoGravidade` removida; pesos de `TipoSubcategoria` definidos mas **não** usados em cálculo por enquanto; geocodificação já feita no front (`endereco`/`bairro` ficam nulos no back); `usuario` do reporte é opcional para o POST; **`dataReporte` no horário de São Caetano do Sul** (`America/Sao_Paulo`); **subcategoria validada contra a categoria** (app envia `idCategoria` + `idSubcategoria`).
-- **Pacotes ainda a criar**: `dto`, `exception`. Sem seed de `Categoria`/`Subcategoria`.
-- **Docs**: `docs/` contém `planejamento-desenvolvimento-vigia-backend.md`, `vigia-specs-endpoints.md`, `guia-desenvolvimento.md`, `mudancas-docs-relatorio.md`, este `ESTADO_DESENVOLVIMENTO.md`, `diagramas/` (7 `.drawio`) e `relatorio-vigia.txt`. `AGENTS.md` na raiz é a fonte das regras persistentes.
-- **Comandos**: `./mvnw spring-boot:run` (rodar), `./mvnw clean install` (build).
+- **Banco**: esquema gerado pelo Hibernate a partir das `@Entity` via `ddl-auto=update`; **nunca `nativeQuery`**; H2 modo arquivo `jdbc:h2:file:./data/vigia;MODE=MySQL` até o MySQL existir. Console: `http://localhost:8080/h2-console`, user `sa`, senha vazia.
+- **Arquitetura**: `controller` (recebe DTO) → `service` (regras + conversão DTO ↔ entidade) → `repository` → `model`. **Entidade nunca aparece no contrato da API** (regra do `AGENTS.md`).
+- **Módulo Reporte — endpoints prontos**:
+  - `GET /api/reportes` → lista só `PUBLICADO` em `ReporteResponse`.
+  - `GET /api/reportes/{id}` → detalhe; `404` se não existir.
+  - `POST /api/reportes` → recebe `ReporteRequest` validado; `201`; sub desalinhada da categoria → `400`; ids inexistentes → `404`.
+  - `GET /api/categorias` → 2 categorias com subs aninhadas (seed no boot).
+- **Seed (`config/DataSeeder.java`)**: IDFICA somente se as tabelas estiverem vazias. **SEGURANCA** → ILUMINACAO_BOA, AREA_MOVIMENTADA, PRESENCA_POLICIAL, COMERCIO_ATIVO, CAMERAS. **INSEGURANCA** → ILUMINACAO_RUIM, ROUBO, FURTO, VANDALISMO, ACIDENTE. Total: 2 categorias, 10 subs.
+- **Modelo**: `Reporte` (`@ManyToOne` para usuario/categoria/subcategoria/bairro — usuário não é tocado); `Categoria.tipoCategoria` = enum `TipoCategoria`; `Subcategoria.tipoSubCategoria` = enum `TipoSubcategoria` (com `peso`); `StatusReporte` (RASCUNHO/PUBLICADO/EXCLUIDO). `TipoCategoria` tem `calculaClassificacao(sub)` (pesos definidos, uso futuro).
+- **Erros padronizados** (`exception/`): `ResourceNotFoundException` → 404; `IllegalArgumentException` → 400; `MethodArgumentNotValidException` → 400. Body: `timestamp`, `status`, `erro`, `mensagem`, `caminho`.
+- **Comandos**: `.\mvnw.cmd spring-boot:run` (rodar — sobe e roda o seed), `.\mvnw.cmd compile` (compilar).
+- **Docs**: `docs/` contém `planejamento-desenvolvimento-vigia-backend.md`, `vigia-specs-endpoints.md`, `guia-desenvolvimento.md`, `mudancas-docs-relatorio.md`, este `ESTADO_DESENVOLVIMENTO.md` e `diagramas/`. `AGENTS.md` na raiz é a fonte das regras persistentes. Checklist da entrega: `C:\Users\teric\Desktop\tarefas-vigia-naive-v1.md`.

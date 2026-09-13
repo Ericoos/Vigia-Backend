@@ -85,7 +85,8 @@ vigia-api/
 │   ├── repository/             # Interfaces do Spring Data
 │   ├── model/                  # As @Entity
 │   ├── dto/                    # Entrada e saída da API (records)
-│   └── exception/              # Tratamento de erros (@RestControllerAdvice)
+│   ├── exception/              # Tratamento de erros (@RestControllerAdvice)
+│   └── config/                 # Configurações sob demanda (ex.: seed)
 ├── src/main/resources/
 │   └── application.properties  # Configuração do banco
 └── AGENTS.md                   # Regras persistentes para IA
@@ -108,7 +109,7 @@ vigia-api/
 
 ## 7. Fluxo de trabalho
 
-- O plano fase a fase está em `docs/planejamento-desenvolvimento-vigia-backend.md`: **Fase 0** (infra — ✅), **Fase 1** (fatia vertical do Reporte — ✅), **Fase 2** (finalizar classe e métodos do `Reporte`), **Fase 3** (DTOs + validação), **Fase 4** (integração com o front-end).
+- O plano fase a fase está em `docs/planejamento-desenvolvimento-vigia-backend.md`: **Fase 0** (infra — ✅), **Fase 1** (fatia vertical do Reporte — ✅), **Fase 2** (regras de criar/listar — ✅), **Fase 3** (DTOs + validação — ✅), **Fase 4** (integração com o front-end — ⏳ pendente).
 - A cada passo: **escreve → roda → confirma → entende → avança**. Um commit por camada que funcionar.
 - Todo compromisso (commit/push) precisa de **aprovação explícita** — nada de commitar sozinho.
 - A cada interação que alterar o projeto, **atualize `docs/ESTADO_DESENVOLVIMENTO.md`** para registrar onde paramos.
@@ -120,10 +121,12 @@ Em português, concisas, refletindo o estilo do histórico.
 
 ## 8. Onde estamos agora (ponto de controle)
 
-- Fase 0 concluída: projeto gerado, pacotes criados, `AGENTS.md` e `docs/` existem, repositório no GitHub, banco configurado e app rodando em 8080 com h2-console acessível.
-- Fase 1 concluída para o `Reporte`: entidade, `StatusReporte`, `ReporteRepository`, `ReporteService` (`listar`/`salvar`) e `ReporteController` (`GET`/`POST /api/reportes` — cru, sem validação).
-- Apoio modelado: `Categoria`, `Subcategoria`, `Bairro`.
-- **Próximo passo: Fase 2** — finalizar a classe e os métodos de `Reporte` (Service `criar()`, validação, só `PUBLICADO` na listagem, `GET /{id}`). Depois DTOs (Fase 3) e integração com o front (Fase 4).
+- **Backend do módulo Reporte concluído (naive v1)**: Fases 0 a 3 ✅.
+  - Regras de negócio no `ReporteService` (`criar`, `listar` só PUBLICADO, `listarPorId`).
+  - DTOs (`ReporteRequest`/`ReporteResponse`), Bean Validation e erros padronizados (`@RestControllerAdvice`).
+  - Seed de `Categoria`/`Subcategoria` no boot (`config/DataSeeder`).
+  - Fuso `America/Sao_Paulo` configurado (`application.properties` + criação do reporte).
+- **Próximo passo: Fase 4** — integração com o front (contrato via IP da rede + teste ponta a ponta). É a **Tarefa 10** do checklist `tarefas-vigia-naive-v1.md`.
 - `avaliacaoGravidade` foi **removida** — não está mais no escopo.
 
 ---

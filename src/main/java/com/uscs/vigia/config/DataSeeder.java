@@ -30,17 +30,18 @@ public class DataSeeder implements CommandLineRunner {
 
         categoriaRepository.saveAll(List.of(seguranca, inseguranca));
 
-        Subcategoria iluminacao = new Subcategoria(TipoSubcategoria.ILUMINACAO_PUBLICA, seguranca);
+        Subcategoria iluminacaoBoa = new Subcategoria(TipoSubcategoria.ILUMINACAO_BOA, seguranca);
         Subcategoria areaMovimentada = new Subcategoria(TipoSubcategoria.AREA_MOVIMENTADA, seguranca);
         Subcategoria presencaPolicial = new Subcategoria(TipoSubcategoria.PRESENCA_POLICIAL, seguranca);
         Subcategoria comercioAtivo = new Subcategoria(TipoSubcategoria.COMERCIO_ATIVO, seguranca);
         Subcategoria cameras = new Subcategoria(TipoSubcategoria.CAMERAS, seguranca);
 
+        Subcategoria iluminacaoRuim = new Subcategoria(TipoSubcategoria.ILUMINACAO_RUIM, inseguranca);
         Subcategoria roubo = new Subcategoria(TipoSubcategoria.ROUBO, inseguranca);
         Subcategoria furto = new Subcategoria(TipoSubcategoria.FURTO, inseguranca);
         Subcategoria vandalismo = new Subcategoria(TipoSubcategoria.VANDALISMO, inseguranca);
         Subcategoria acidente = new Subcategoria(TipoSubcategoria.ACIDENTE, inseguranca);
 
-        subcategoriaRepository.saveAll(List.of(iluminacao, areaMovimentada, presencaPolicial, comercioAtivo, cameras, roubo, furto, vandalismo, acidente));
+        subcategoriaRepository.saveAll(List.of(iluminacaoBoa, areaMovimentada, presencaPolicial, comercioAtivo, cameras, iluminacaoRuim, roubo, furto, vandalismo, acidente));
     }
 }

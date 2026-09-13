@@ -80,7 +80,8 @@ vigia-api/
 │   │   │   ├── repository/             # Interfaces do Spring Data
 │   │   │   ├── model/                  # As @Entity
 │   │   │   ├── dto/                    # Entrada e saída da API (usar record)
-│   │   │   └── exception/              # Tratamento de erros
+│   │   │   ├── exception/              # Tratamento de erros
+│   │   │   └── config/                 # Configurações sob demanda (ex.: seed, DataSeeder)
 │   │   └── resources/
 │   │       └── application.properties  # Configuração do banco
 │   └── test/
@@ -99,7 +100,7 @@ vigia-api/
 | `REGRAS_NEGOCIO` | `service` |
 | `REPOSITORIES` | `repository` |
 | `MODEL_BACKEND` | `model` |
-| `DTO` / `EXCEPTION` | `dto` / `exception` (a adicionar ao diagrama) |
+| `DTO` / `EXCEPTION` / `CONFIG` | `dto` / `exception` / `config` (adicionar ao diagrama — já existem no código) |
 
 ## 📐 Regras de Tradução do Diagrama de Classes para o Código
 

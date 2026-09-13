@@ -2,13 +2,12 @@ package com.uscs.vigia.controller;
 
 import java.util.List;
 
+import com.uscs.vigia.dto.ReporteRequest;
+import com.uscs.vigia.dto.ReporteResponse;
+import com.uscs.vigia.repository.ReporteRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.uscs.vigia.model.Reporte;
 import com.uscs.vigia.service.ReporteService;
@@ -23,13 +22,18 @@ public class ReporteController {
 	private final ReporteService reporteService;
 
 	@GetMapping
-	public List<Reporte> listar() {
+	public List<ReporteResponse> listar() {
 		return reporteService.listar();
 	}
 
+    @GetMapping("/{id}")
+    public ReporteResponse listarPorId(@PathVariable Long id) {
+        return reporteService.listarPorId(id);
+    }
+
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Reporte salvar(@RequestBody Reporte reporte) {
-		return reporteService.salvar(reporte);
+	public ReporteResponse criar(@Valid @RequestBody ReporteRequest reporteRequest) {
+		return reporteService.criar(reporteRequest);
 	}
 }
