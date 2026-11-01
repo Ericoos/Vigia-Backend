@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 public class Usuario extends UsuarioBase {
 
     private String telefone;
-    private LocalDateTime dataCadastro;
+    private Double avaliacao;
+    private String avatar;
+    private LocalDateTime dataInicio;
+    private LocalDateTime dataFim;
 
 }

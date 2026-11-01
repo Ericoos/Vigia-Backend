@@ -15,13 +15,14 @@ public abstract class UsuarioBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
+    private String nome;
+    private String senhaHash;
+    private LocalDate dataNascimento;
 
-    protected String nome;
-    protected String email;
-    protected String senha;
-    protected LocalDate dataNascimento;
+    @Column(unique = true)
+    private String email;
 
     @Enumerated(EnumType.STRING)
-    protected TipoUsuario status;
+    private TipoUsuario status;
 }
