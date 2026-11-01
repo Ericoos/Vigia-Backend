@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uscs.vigia.model.Subcategoria;
+import com.uscs.vigia.dto.SubcategoriaResponse;
 import com.uscs.vigia.service.SubcategoriaService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class SubcategoriaController {
 	private final SubcategoriaService subcategoriaService;
 
 	@GetMapping
-	public List<Subcategoria> listar() {
+	public List<SubcategoriaResponse> listar() {
 		return subcategoriaService.listar();
 	}
 }

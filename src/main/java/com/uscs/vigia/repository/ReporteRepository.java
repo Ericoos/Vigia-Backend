@@ -7,5 +7,5 @@ import com.uscs.vigia.model.Reporte;
 import java.util.List;
 
 public interface ReporteRepository extends JpaRepository<Reporte, Long> {
-    public List<Reporte> findAllByStatus(StatusReporte statusReporte);
+    List<Reporte> findAllByStatus(StatusReporte statusReporte);
 }

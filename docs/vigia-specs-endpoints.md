@@ -76,7 +76,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 ```
 
 #### Regras de negócio e validações
-1. **`titulo` e `descricao` obrigatórios** — `@NotBlank`.
+1. **`titulo` e `descricao` obrigatórios** — `@NotBlank`. A coluna `descricao` é `TEXT` (sem o limite de 255 caracteres).
 2. **`latitude` e `longitude` obrigatórias** — `@NotNull`, com `@DecimalMin`/`@DecimalMax` (lat -90..90, lon -180..180).
 3. **`categoria` e `subcategoria` obrigatórias** — `@NotNull`. Nome que não existe no enum (ex.: `"ASSALTO"`) → `400` "Erro de validação".
 4. **Sub desalinhada da categoria** → `400` (regra de negócio).
@@ -117,7 +117,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 ## 4. ENDPOINT: GET /api/reportes/{id} — detalhe do reporte
 
 - Devolve o mesmo objeto da listagem, sem o array.
-- `404` quando o id não existir (usando o `@RestControllerAdvice`).
+- `404` quando o id não existir ou o reporte não estiver `PUBLICADO` (usando o `@RestControllerAdvice`).
 
 ---
 
@@ -132,27 +132,27 @@ Alimenta os seletores da tela de criação (categoria → subcategorias). **Popu
   {
     "tipoCategoria": "SEGURANCA",
     "subcategorias": [
-      { "tipoSubCategoria": "ILUMINACAO_BOA" },
-      { "tipoSubCategoria": "AREA_MOVIMENTADA" },
-      { "tipoSubCategoria": "PRESENCA_POLICIAL" },
-      { "tipoSubCategoria": "COMERCIO_ATIVO" },
-      { "tipoSubCategoria": "CAMERAS" }
+      { "tipoSubCategoria": "ILUMINACAO_BOA", "categoria": "SEGURANCA" },
+      { "tipoSubCategoria": "AREA_MOVIMENTADA", "categoria": "SEGURANCA" },
+      { "tipoSubCategoria": "PRESENCA_POLICIAL", "categoria": "SEGURANCA" },
+      { "tipoSubCategoria": "COMERCIO_ATIVO", "categoria": "SEGURANCA" },
+      { "tipoSubCategoria": "CAMERAS", "categoria": "SEGURANCA" }
     ]
   },
   {
     "tipoCategoria": "INSEGURANCA",
     "subcategorias": [
-      { "tipoSubCategoria": "ILUMINACAO_RUIM" },
-      { "tipoSubCategoria": "ROUBO" },
-      { "tipoSubCategoria": "FURTO" },
-      { "tipoSubCategoria": "VANDALISMO" },
-      { "tipoSubCategoria": "ACIDENTE" }
+      { "tipoSubCategoria": "ILUMINACAO_RUIM", "categoria": "INSEGURANCA" },
+      { "tipoSubCategoria": "ROUBO", "categoria": "INSEGURANCA" },
+      { "tipoSubCategoria": "FURTO", "categoria": "INSEGURANCA" },
+      { "tipoSubCategoria": "VANDALISMO", "categoria": "INSEGURANCA" },
+      { "tipoSubCategoria": "ACIDENTE", "categoria": "INSEGURANCA" }
     ]
   }
 ]
 ```
 
-> Não há ids numéricos: o nome do enum é a chave e é o que o POST usa em `categoria` + `subcategoria`. O campo `categoria` dentro de cada sub não aparece no JSON (marcado `WRITE_ONLY` para evitar recursão).
+> Não há ids numéricos: o nome do enum é a chave e é o que o POST usa em `categoria` + `subcategoria`. A resposta sai de DTOs (`CategoriaResponse`/`SubcategoriaResponse`), não da entidade; cada sub traz o nome da sua `categoria`. `GET /api/subcategorias` devolve a mesma lista de subs sem agrupar e `GET /api/bairro` devolve `[{ "id", "nome", "classificacaoSeguranca" }]` (`BairroResponse`).
 
 ---
 

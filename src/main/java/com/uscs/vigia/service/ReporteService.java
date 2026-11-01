@@ -2,7 +2,6 @@ package com.uscs.vigia.service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 
 import com.uscs.vigia.dto.ReporteRequest;
@@ -37,14 +36,11 @@ public class ReporteService {
     @Transactional(readOnly = true)
     public ReporteResponse listarPorId(Long id) {
         Reporte reporte = reporteRepository.findById(id)
+                .filter(r -> r.getStatus() == StatusReporte.PUBLICADO)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Reporte não encontrado: " + id));
         return toResponse(reporte);
     }
-
-	public Reporte salvar(Reporte reporte) {
-		return reporteRepository.save(reporte);
-	}
 
     @Transactional
     public ReporteResponse criar(ReporteRequest reporteRequest) {
@@ -75,7 +71,7 @@ public class ReporteService {
         reporte.setDataReporte(OffsetDateTime.now(ZoneId.of("America/Sao_Paulo")));
 
         Reporte reporteSalvo = reporteRepository.save(reporte);
-        return toResponse(reporte);
+        return toResponse(reporteSalvo);
     }
 
     private ReporteResponse toResponse(Reporte reporte) {

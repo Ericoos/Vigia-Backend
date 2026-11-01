@@ -1,5 +1,6 @@
 package com.uscs.vigia.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,7 +27,10 @@ public class Reporte {
 	private Long idReporte;
 
 	private String titulo;
+
+	@Column(columnDefinition = "TEXT")
 	private String descricao;
+
 	private double latitude;
 	private double longitude;
 	private String endereco;

@@ -1,7 +1,5 @@
 package com.uscs.vigia.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.*;
 
 import lombok.Getter;
@@ -20,7 +18,6 @@ public class Subcategoria {
 
 	@ManyToOne
 	@JoinColumn(name = "categoria_id")
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private Categoria categoria;
 
     public Subcategoria(TipoSubcategoria tipoSubCategoria, Categoria categoria) {

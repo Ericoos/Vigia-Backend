@@ -1,6 +1,6 @@
 package com.uscs.vigia.controller;
 
-import com.uscs.vigia.model.Bairro;
+import com.uscs.vigia.dto.BairroResponse;
 import com.uscs.vigia.service.BairroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +14,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BairroController {
 
-    public final BairroService bairroService;
+    private final BairroService bairroService;
 
     @GetMapping
-    public List<Bairro> listar() {
+    public List<BairroResponse> listar() {
         return bairroService.listar();
     }
 }
