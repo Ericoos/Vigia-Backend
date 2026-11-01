@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -35,6 +36,13 @@ public class GlobalExceptionHandler {
                 .orElse("requisição inválida");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(corpo(HttpStatus.BAD_REQUEST, "Erro de validação", mensagem, request));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleJsonInvalido(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(corpo(HttpStatus.BAD_REQUEST, "Erro de validação",
+                        "JSON inválido ou valor desconhecido (categoria/subcategoria devem ser um dos nomes de GET /api/categorias)", request));
     }
 
     private Map<String, Object> corpo(HttpStatus status, String erro, String mensagem, HttpServletRequest request) {

@@ -53,12 +53,12 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
   "descricao": "Postes apagados na rua de tras da USCS.",
   "latitude": -23.6182,
   "longitude": -46.5645,
-  "idCategoria": 2,
-  "idSubcategoria": 6
+  "categoria": "INSEGURANCA",
+  "subcategoria": "ILUMINACAO_RUIM"
 }
 ```
 
-> O app envia `idCategoria` **e** `idSubcategoria`. O servidor valida se a sub pertence à categoria.
+> O app envia `categoria` **e** `subcategoria` pelo **nome do enum** (desde 01/11/2026 a chave primária dessas tabelas é o próprio enum, não há mais id numérico). O servidor valida se a sub pertence à categoria.
 
 #### Resposta `201` — reporte criado (formato da listagem)
 
@@ -78,7 +78,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 #### Regras de negócio e validações
 1. **`titulo` e `descricao` obrigatórios** — `@NotBlank`.
 2. **`latitude` e `longitude` obrigatórias** — `@NotNull`, com `@DecimalMin`/`@DecimalMax` (lat -90..90, lon -180..180).
-3. **`idCategoria` e `idSubcategoria` obrigatórios** — `@NotNull`. Ids inexistentes → `404`.
+3. **`categoria` e `subcategoria` obrigatórias** — `@NotNull`. Nome que não existe no enum (ex.: `"ASSALTO"`) → `400` "Erro de validação".
 4. **Sub desalinhada da categoria** → `400` (regra de negócio).
 5. **O cliente não envia `status` nem `dataReporte`** — o Service define `status = PUBLICADO` e `dataReporte = agora` (`America/Sao_Paulo`).
 6. **`endereco` e `bairro` ficam nulos por enquanto** — a geocodificação é feita no front, não é responsabilidade do back.
@@ -130,31 +130,29 @@ Alimenta os seletores da tela de criação (categoria → subcategorias). **Popu
 ```json
 [
   {
-    "id": 1,
     "tipoCategoria": "SEGURANCA",
     "subcategorias": [
-      { "id": 1, "tipoSubCategoria": "ILUMINACAO_BOA" },
-      { "id": 2, "tipoSubCategoria": "AREA_MOVIMENTADA" },
-      { "id": 3, "tipoSubCategoria": "PRESENCA_POLICIAL" },
-      { "id": 4, "tipoSubCategoria": "COMERCIO_ATIVO" },
-      { "id": 5, "tipoSubCategoria": "CAMERAS" }
+      { "tipoSubCategoria": "ILUMINACAO_BOA" },
+      { "tipoSubCategoria": "AREA_MOVIMENTADA" },
+      { "tipoSubCategoria": "PRESENCA_POLICIAL" },
+      { "tipoSubCategoria": "COMERCIO_ATIVO" },
+      { "tipoSubCategoria": "CAMERAS" }
     ]
   },
   {
-    "id": 2,
     "tipoCategoria": "INSEGURANCA",
     "subcategorias": [
-      { "id": 6, "tipoSubCategoria": "ILUMINACAO_RUIM" },
-      { "id": 7, "tipoSubCategoria": "ROUBO" },
-      { "id": 8, "tipoSubCategoria": "FURTO" },
-      { "id": 9, "tipoSubCategoria": "VANDALISMO" },
-      { "id": 10, "tipoSubCategoria": "ACIDENTE" }
+      { "tipoSubCategoria": "ILUMINACAO_RUIM" },
+      { "tipoSubCategoria": "ROUBO" },
+      { "tipoSubCategoria": "FURTO" },
+      { "tipoSubCategoria": "VANDALISMO" },
+      { "tipoSubCategoria": "ACIDENTE" }
     ]
   }
 ]
 ```
 
-> Os ids exatos vêm do `SELECT` no H2 — o POST usa `idCategoria` + `idSubcategoria`. O campo `categoria` dentro de cada sub não aparece no JSON (marcado `WRITE_ONLY` para evitar recursão).
+> Não há ids numéricos: o nome do enum é a chave e é o que o POST usa em `categoria` + `subcategoria`. O campo `categoria` dentro de cada sub não aparece no JSON (marcado `WRITE_ONLY` para evitar recursão).
 
 ---
 

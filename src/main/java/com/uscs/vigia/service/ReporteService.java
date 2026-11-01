@@ -48,15 +48,15 @@ public class ReporteService {
 
     @Transactional
     public ReporteResponse criar(ReporteRequest reporteRequest) {
-        Categoria categoria = categoriaRepository.findById(reporteRequest.idCategoria())
+        Categoria categoria = categoriaRepository.findById(reporteRequest.categoria())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Categoria não encontrada: " + reporteRequest.idCategoria()));
+                        "Categoria não encontrada: " + reporteRequest.categoria()));
 
-        Subcategoria subcategoria = subcategoriaRepository.findById(reporteRequest.idSubcategoria())
+        Subcategoria subcategoria = subcategoriaRepository.findById(reporteRequest.subcategoria())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Subcategoria não encontrada: " + reporteRequest.idSubcategoria()));
+                        "Subcategoria não encontrada: " + reporteRequest.subcategoria()));
 
-        if (!subcategoria.getCategoria().getId().equals(categoria.getId())) {
+        if (subcategoria.getCategoria().getTipoCategoria() != categoria.getTipoCategoria()) {
             throw new IllegalArgumentException(
                     "A subcategoria não pertence a categoria informada");
         }

@@ -1,5 +1,8 @@
 package com.uscs.vigia.dto;
 
+import com.uscs.vigia.model.TipoCategoria;
+import com.uscs.vigia.model.TipoSubcategoria;
+
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -22,9 +25,9 @@ public record ReporteRequest(
         @DecimalMax(value = "180.0", message = "longitude máxima é 180")
         Double longitude,
 
-        @NotNull(message = "idCategoria é obrigatório")
-        Long idCategoria,
+        @NotNull(message = "categoria é obrigatória")
+        TipoCategoria categoria,
 
-        @NotNull(message = "idSubcategoria é obrigatório")
-        Long idSubcategoria) {
+        @NotNull(message = "subcategoria é obrigatória")
+        TipoSubcategoria subcategoria) {
 }

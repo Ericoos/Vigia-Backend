@@ -16,9 +16,6 @@ import lombok.Setter;
 public class Categoria {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
     @Enumerated(EnumType.STRING)
 	private TipoCategoria tipoCategoria;
 
