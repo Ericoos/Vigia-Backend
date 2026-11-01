@@ -1,9 +1,6 @@
 package com.uscs.vigia.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +13,12 @@ import lombok.Setter;
 public class Bairro {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	@Enumerated(EnumType.STRING)
+	private TipoBairro tipoBairro;
 
-	private String nome;
 	private Double classificacaoSeguranca;
+
+    public Bairro(TipoBairro tipoBairro) {
+        this.tipoBairro = tipoBairro;
+    }
 }

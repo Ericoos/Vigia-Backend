@@ -1,15 +1,14 @@
 package com.uscs.vigia.config;
 
-import com.uscs.vigia.model.Categoria;
-import com.uscs.vigia.model.Subcategoria;
-import com.uscs.vigia.model.TipoCategoria;
-import com.uscs.vigia.model.TipoSubcategoria;
+import com.uscs.vigia.model.*;
+import com.uscs.vigia.repository.BairroRepository;
 import com.uscs.vigia.repository.CategoriaRepository;
 import com.uscs.vigia.repository.SubcategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -19,8 +18,15 @@ public class DataSeeder implements CommandLineRunner {
     private final CategoriaRepository categoriaRepository;
     private final SubcategoriaRepository subcategoriaRepository;
 
+    private final BairroRepository bairroRepository;
+
     @Override
     public void run(String... args) {
+        seedCategorias();
+        seedBairros();
+    }
+
+    private void seedCategorias() {
         if (categoriaRepository.count() > 0 || subcategoriaRepository.count() > 0) {
             return;
         }
@@ -43,5 +49,11 @@ public class DataSeeder implements CommandLineRunner {
         Subcategoria acidente = new Subcategoria(TipoSubcategoria.ACIDENTE, inseguranca);
 
         subcategoriaRepository.saveAll(List.of(iluminacaoBoa, areaMovimentada, presencaPolicial, comercioAtivo, cameras, iluminacaoRuim, roubo, furto, vandalismo, acidente));
+    }
+
+    private void seedBairros() {
+        if (bairroRepository.count() == 0) {
+            bairroRepository.saveAll(Arrays.stream(TipoBairro.values()).map(Bairro::new).toList());
+        }
     }
 }

@@ -22,9 +22,6 @@ public class BairroService {
     }
 
     private BairroResponse toResponse(Bairro bairro) {
-        return new BairroResponse(
-                bairro.getId(),
-                bairro.getNome(),
-                bairro.getClassificacaoSeguranca());
+        return new BairroResponse(bairro.getTipoBairro(), bairro.getTipoBairro().getNome(), bairro.getClassificacaoSeguranca());
     }
 }

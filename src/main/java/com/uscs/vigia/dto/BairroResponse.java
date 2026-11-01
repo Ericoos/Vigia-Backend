@@ -1,7 +1,6 @@
 package com.uscs.vigia.dto;
 
-public record BairroResponse(
-        Long id,
-        String nome,
-        Double classificacaoSeguranca) {
+import com.uscs.vigia.model.TipoBairro;
+
+public record BairroResponse(TipoBairro tipoBairro, String nome, Double classificacaoSeguranca) {
 }

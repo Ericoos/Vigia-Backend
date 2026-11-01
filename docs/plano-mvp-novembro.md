@@ -20,7 +20,7 @@ Plano de todas as tarefas até a entrega do MVP do Vigia. Cada tarefa vira um ca
 | 5.4 | ✅ Ajustar `DataSeeder`, `GET /api/categorias`, validação "sub pertence à categoria" e apagar o H2 (`data/`) para recriar o esquema | Back |
 | 5.5 | Alinhar a lista de subcategorias com o app (o app mostra "atividade suspeita", que não existe no enum) | Back + Front |
 | 5.6 | ✅ `Usuario` alinhado ao script do relatório: `senhaHash`, `telefone`, `avatar`, `status`, `avaliacao`, `dataInicio`, `dataFim` (sem `ativo`: o `status` já diz se a conta está ativa) | Back |
-| 5.7 | Seed dos bairros de São Caetano do Sul na tabela `bairro` | Back |
+| 5.7 | ✅ Seed dos bairros de São Caetano do Sul na tabela `bairro` | Back |
 | 5.8 | Decidir se a avaliação de 1 a 5 estrelas (`avaliacaoGravidade`) volta ao `Reporte` ou sai das telas | Back + Front |
 | 5.9 | Atualizar `vigia-specs-endpoints.md` com o contrato novo e avisar o front | Doc |
 
