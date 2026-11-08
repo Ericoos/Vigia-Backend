@@ -48,6 +48,14 @@ Nunca é compartilhado código entre repositórios — só o **contrato da API**
    ```
 5. Abra a pasta no IntelliJ como **projeto** (ele detecta o `pom.xml`). Confirme que o painel **Maven** carregou e que `src/main/java` aparece com ícone azul (Source Root).
 
+6. **Crie o arquivo da chave do JWT** (ele não vai para o Git):
+   - copie `src/main/resources/application-local.properties.example` para `src/main/resources/application-local.properties`;
+   - troque o valor de `JWT_SECRET` por uma chave aleatória com **32 caracteres ou mais**. Para gerar uma no PowerShell:
+     ```powershell
+     [Convert]::ToBase64String((1..48 | ForEach-Object { Get-Random -Max 256 }))
+     ```
+   - sem esse arquivo (ou a variável de ambiente `JWT_SECRET`), a API **não sobe** e avisa que falta `JWT_SECRET`. Em produção, a chave vem só da variável de ambiente.
+
 > Dica: se `New → Java Class` não aparecer no menu, o Maven não foi importado. Reabra a pasta escolhendo "Open as Project".
 
 ---
