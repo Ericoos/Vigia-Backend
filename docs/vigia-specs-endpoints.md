@@ -76,7 +76,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 ```
 
 #### Regras de negócio e validações
-1. **`titulo` e `descricao` obrigatórios** — `@NotBlank`. A coluna `descricao` é `TEXT` (sem o limite de 255 caracteres).
+1. **`titulo` obrigatório, de 5 a 30 caracteres; `descricao` obrigatória, de 20 a 500 caracteres** — `@NotBlank` + `@Size`. Fora do tamanho → `400` "Erro de validação", com `mensagem` indicando o campo (ex.: `descricao: Descrição deve ter entre 20 e 500 caracteres.`). A coluna `descricao` é `TEXT` (sem o limite de 255 caracteres).
 2. **`latitude` e `longitude` obrigatórias** — `@NotNull`, com `@DecimalMin`/`@DecimalMax` (lat -90..90, lon -180..180).
 3. **`categoria` e `subcategoria` obrigatórias** — `@NotNull`. Nome que não existe no enum (ex.: `"ASSALTO"`) → `400` "Erro de validação".
 4. **Sub desalinhada da categoria** → `400` (regra de negócio).
