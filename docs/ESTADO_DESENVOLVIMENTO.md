@@ -1,6 +1,8 @@
 # Estado Atual do Desenvolvimento - Back-End Vigia
 
 ## 📍 1. Onde Paramos (Ponto de Controle)
+- **Retomada (10/11/2026 — `tarefas-murilo-semana.md`)**: preparação da seção 0 concluída na ordem do documento: pull na `main` (base `4c056a2`), arquivo local JWT criado a partir do exemplo (ignorado pelo Git), inicialização confirmada e leitura de `AGENTS.md`/guia concluída. A chave não deve ser registrada na documentação nem versionada. Trabalho em etapas, explicando e aguardando autorização de Murilo para avançar.
+- **Tarefa 1 concluída (10/11/2026)**: após autorizações por etapa, adicionados `BairroService.buscarPorTipo(TipoBairro)` e `GET /api/bairro/{tipoBairro}` no `BairroController`. Murilo parou a API com `Ctrl+C` antes de cada alteração Java. Compilação `BUILD SUCCESS`; API reiniciada com `Started VigiaApplication in 3.197 seconds` às 15:27:00, porta 8080, PID 13432. Testes HTTP via curl: `CENTRO` → 200 com `BairroResponse` e classificação `null`; `NAO_EXISTE` → 400. Tarefa pronta para revisão e commit, sem commit/push executados. Tarefa 2 aguarda nova autorização.
 - **Fase/Passo Atual**: **Fases 2 e 3 concluídas** — o **módulo Reporte do backend está funcional de ponta a ponta** (entrega naive v1). As **tarefas 1 a 9** do checklist `C:\Users\teric\Desktop\tarefas-vigia-naive-v1.md` estão **concluídas e testadas**. Falta apenas a **Tarefa 10 — integração com o app** (contrato via IP da rede + teste ponta a ponta), que o time fará depois.
 - **Sessão (01/11/2026)**: `docs/relatorio-vigia.txt` substituído pela versão do 4º semestre (`RELATORIO_VIGIA_4SEM.pdf`, 131 páginas), que inclui o capítulo 7 (Desenvolvimento do Sistema) e o Apêndice D (script de criação do banco). Marcadores `===== Página N =====` indicam a página do PDF. Criado `docs/plano-mvp-novembro.md` com todas as tarefas até a entrega de 30/11 (Fases 5 a 11). **Tarefas 5.1 a 5.4 concluídas**: a chave primária de `Categoria` e `Subcategoria` agora é o próprio enum (`TipoCategoria`/`TipoSubcategoria`), sem id numérico; repositórios usam o enum como tipo do id; `ReporteRequest` recebe `categoria` e `subcategoria` pelo nome (ex.: `"INSEGURANCA"`, `"ROUBO"`); `GlobalExceptionHandler` trata `HttpMessageNotReadableException` (nome inexistente → 400 padronizado); `vigia-specs-endpoints.md` atualizado. O H2 antigo foi movido para `data/backup-2026-11-01/` e o esquema recriado pelo seed. Testado: GET categorias/subcategorias/reportes, POST 201, sub desalinhada 400, nome inválido 400, campos faltando 400; `mvnw test` passa. **Contrato mudou — avisar o front.** Próxima tarefa: ~~5.6~~ (feita, ver acima).
 - **Fase 6 / passo 2 — JWT concluído (08/11/2026)**: `spring-boot-starter-security-oauth2-resource-server` no `pom.xml` (traz o Nimbus para gerar e conferir JWT); `application.properties` com `vigia.jwt.secret=${JWT_SECRET}` sem valor padrão (HS256, mínimo 32 caracteres). A chave fica em `src/main/resources/application-local.properties`, **fora do Git** (`.gitignore`), lido via `spring.config.import=optional:classpath:...`; modelo em `application-local.properties.example`; em produção vem da variável de ambiente `JWT_SECRET`. Sem chave, a API não sobe e `vigia.jwt.expiracao-horas=24`. `SecurityConfig` ganhou os beans `JwtEncoder`/`JwtDecoder` (Nimbus, HS256, mesma chave) e `oauth2ResourceServer(jwt)` — toda requisição com `Authorization: Bearer` tem o token conferido; rotas continuam `permitAll`. Novo `service/TokenService.gerarToken(Usuario)` com `iss=vigia-api`, `sub`=id do usuário, `iat` e `exp` (24h); ainda não é chamado (entra no login, passo 4). Testado: API sobe lendo a chave local, a linha "Using generated security password" sumiu, GET sem token 200, GET com token falso 401. Próximo: passo 3 — cadastro (`POST /api/auth/cadastro`).
@@ -20,6 +22,13 @@
 - **Fluxo do Reporte (funcionando)**: app envia `POST /api/reportes` com `titulo`, `descricao`, `latitude`, `longitude`, `idCategoria`, `idSubcategoria`. O servidor valida a subcontra a categoria (desalinhadas → `400`), define `idReporte` (banco), `status=PUBLICADO` e `dataReporte` no horário de São Caetano do Sul (`America/Sao_Paulo`, `-03:00`). Seed já popula as tabelas no boot.
 
 ## 🛠️ 2. Modificações Efetuadas nesta Sessão
+**Etapa autorizada em 10/11/2026:**
+- `service/BairroService.java` → `buscarPorTipo(TipoBairro)` usa `bairroRepository.findById`, lança `ResourceNotFoundException` se ausente e devolve o DTO pelo `toResponse` existente.
+- `controller/BairroController.java` → nova rota `GET /{tipoBairro}`, recebendo `@PathVariable TipoBairro` e delegando ao Service.
+- `docs/vigia-specs-endpoints.md` → documentada a rota de detalhe do bairro e os retornos esperados.
+- `application-local.properties` → configuração JWT local ignorada pelo Git; não incluir em commit.
+- `docs/ESTADO_DESENVOLVIMENTO.md` → preparação, verificação e progresso parcial registrados.
+
 **Código (módulo Reporte — funcional):**
 - `config/DataSeeder.java` → **novo**: `@Component` + `CommandLineRunner`; cria as 2 categorias e as subs no boot se as tabelas estiverem vazias.
 - `dto/ReporteRequest.java` e `dto/ReporteResponse.java` → **novos** (records; via time). Request com Bean Validation (`@NotBlank` titulo/descricao, `@NotNull`+`@DecimalMin/Max` nas coordenadas e ids); Response sem expor a entidade.
@@ -40,11 +49,15 @@
 - `C:\Users\teric\Desktop\tarefas-vigia-naive-v1.md` → tarefas 1-9 ✅, tarefa 10 (front) pendente.
 
 ## 📋 3. Estado das Dependências instaladas
+- **10/11/2026**: nenhuma dependência nova nesta etapa. A base atual já inclui Spring Security, OAuth2 Resource Server/JWT e BCrypt; os itens históricos abaixo descrevem a entrega anterior.
 - Permanecem as do `pom.xml`: Spring Web, Spring Data JPA, Bean Validation, H2 (runtime), Lombok, starters de teste.
 - **Não adicionadas**: `mysql-connector-j`, Swagger, Spring Security.
 - ⚠️ H2 é ponte temporária `MODE=MySQL`; o banco do projeto é **MySQL**, de outra pessoa da equipe, ainda não existe.
 
 ## 🚀 4. Próximos Passos Imediatos para a Próxima Sessão
+**Próximos passos (tarefas semanais de Murilo):** revisar a Tarefa 1 concluída; commit somente mediante autorização e conforme o workflow do projeto; avisar Erick antes do push e mover o cartão para Revisão. Depois, mediante nova autorização, iniciar a Tarefa 2 (classificação por soma dos reportes publicados). Tarefas 2, 3 e 4 ainda não iniciadas. Preservar os arquivos de autenticação e os arquivos/método reservados ao Erick no documento semanal.
+
+**Histórico da entrega naive v1:**
 1. **Tarefa 10 — integração com o app (ponta a ponta)**:
    - Alinhar o contrato com o front (payload do POST + JSON da lista/reporte).
    - Liberar conexões de fora: `server.address=0.0.0.0` no `application.properties`; descobrir o IP do PC (`ipconfig`) e testar `http://IP:8080/api/reportes` no celular.

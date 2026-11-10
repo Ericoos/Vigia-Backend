@@ -156,6 +156,28 @@ Alimenta os seletores da tela de criação (categoria → subcategorias). **Popu
 
 ---
 
+## 5.1. ENDPOINT: GET /api/bairro/{tipoBairro} — detalhe do bairro
+
+Implementado em 10/11/2026 conforme a Tarefa 1 de `tarefas-murilo-semana.md`.
+
+- Recebe a chave enum `TipoBairro` na URL, por exemplo `GET /api/bairro/CENTRO`.
+- Busca o bairro pelo repositório e devolve `BairroResponse`, usando a conversão do Service.
+- `200` para bairro cadastrado. Exemplo verificado:
+
+```json
+{
+  "tipoBairro": "CENTRO",
+  "nome": "Centro",
+  "classificacaoSeguranca": null
+}
+```
+
+- `400` para texto que não existe no enum, como `NAO_EXISTE` (verificado via HTTP).
+- `404` via `ResourceNotFoundException` se a chave enum for válida, mas o bairro não estiver cadastrado.
+- A classificação continua `null` nesta etapa; seu cálculo é a Tarefa 2, ainda não implementada.
+
+---
+
 ## 6. Pendências do Contrato
 
 1. **Validar com o front-end** o payload do `POST` e o formato de resposta (Fase 4 / Tarefa 10 — nada acordado ainda).
