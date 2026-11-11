@@ -26,9 +26,14 @@ public class ReporteService {
     private final SubcategoriaRepository subcategoriaRepository;
 
     @Transactional(readOnly = true)
-	public List<ReporteResponse> listar() {
-		return reporteRepository.findAllByStatus(StatusReporte.PUBLICADO)
-                .stream()
+	public List<ReporteResponse> listar(TipoCategoria categoria) {
+        List<Reporte> reportes;
+        if (categoria == null) {
+            reportes = reporteRepository.findAllByStatus(StatusReporte.PUBLICADO);
+        } else {
+            reportes = reporteRepository.findAllByStatusAndCategoria_TipoCategoria(StatusReporte.PUBLICADO, categoria);
+        }
+        return reportes.stream()
                 .map(this::toResponse)
                 .toList();
 	}

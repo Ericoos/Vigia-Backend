@@ -109,7 +109,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 
 #### Regras
 1. **Só reportes `PUBLICADO`** aparecem. `RASCUNHO` e `EXCLUIDO` ficam de fora.
-2. Filtros opcionais e combináveis (quando o front precisar): `?categoria=Seguranca|Inseguranca`, `?bairro={id}` — **ainda não implementados**.
+2. **Filtro por categoria implementado** (Tarefa 3 semanal, 10/11/2026): parâmetro opcional `?categoria=SEGURANCA` ou `?categoria=INSEGURANCA`. Sem o parâmetro, retorna todos os publicados; com ele, somente os publicados da categoria informada. Valor inexistente no enum, como `XYZ`, retorna `400`. O filtro por bairro continua pendente.
 3. O JSON é desnormalizado de propósito: `categoria` e `subcategoria` saem como **nome do enum** (texto), não como ids — o app desenha o pin com uma única requisição.
 
 ---
@@ -162,7 +162,7 @@ Implementado em 10/11/2026 conforme a Tarefa 1 de `tarefas-murilo-semana.md`.
 
 - Recebe a chave enum `TipoBairro` na URL, por exemplo `GET /api/bairro/CENTRO`.
 - Busca o bairro pelo repositório e devolve `BairroResponse`, usando a conversão do Service.
-- `200` para bairro cadastrado. Exemplo verificado:
+- `200` para bairro cadastrado. Exemplo sem reportes publicados associados:
 
 ```json
 {
@@ -174,7 +174,9 @@ Implementado em 10/11/2026 conforme a Tarefa 1 de `tarefas-murilo-semana.md`.
 
 - `400` para texto que não existe no enum, como `NAO_EXISTE` (verificado via HTTP).
 - `404` via `ResourceNotFoundException` se a chave enum for válida, mas o bairro não estiver cadastrado.
-- A classificação continua `null` nesta etapa; seu cálculo é a Tarefa 2, ainda não implementada.
+- Ao buscar o detalhe, o Service recalcula e salva a classificação somando as notas dos reportes `PUBLICADO` daquele bairro, com a fórmula existente em `TipoCategoria.calculaClassificacao`.
+- Sem reportes publicados associados, a classificação é `null` (não zero).
+- Verificado em 10/11/2026: três reportes publicados de `CENTRO` (`PRESENCA_POLICIAL`, `ROUBO`, `CAMERAS`) resultaram em `classificacaoSeguranca: 0.06` (`0.06 - 0.04 + 0.04`). O valor foi confirmado no banco. Um bairro sem reportes (`BARCELONA`) retornou e persistiu `null`.
 
 ---
 

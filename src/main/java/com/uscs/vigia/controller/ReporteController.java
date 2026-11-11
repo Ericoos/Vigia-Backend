@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.uscs.vigia.dto.ReporteRequest;
 import com.uscs.vigia.dto.ReporteResponse;
+import com.uscs.vigia.model.TipoCategoria;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +21,8 @@ public class ReporteController {
 	private final ReporteService reporteService;
 
 	@GetMapping
-	public List<ReporteResponse> listar() {
-		return reporteService.listar();
+	public List<ReporteResponse> listar(@RequestParam(required = false) TipoCategoria categoria) {
+		return reporteService.listar(categoria);
 	}
 
     @GetMapping("/{id}")
