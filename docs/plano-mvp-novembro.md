@@ -36,6 +36,11 @@ Plano de todas as tarefas até a entrega do MVP do Vigia. Cada tarefa vira um ca
 | 6.6 | Remover o `UsuarioController` antigo, que expõe a entidade e a senha | Back |
 | 6.7 | Ligar as telas de login e cadastro à API e guardar o token | Front |
 
+**Regras do cadastro/login decididas em 10/11/2026** (feito em duas etapas: A = cadastro e login puros; B = regras):
+validação dos campos (nome, e-mail, data no passado, senha 8–72 com maiúscula, minúscula, número e especial), e-mail único (409), e-mail normalizado (minúsculo, sem espaços), idade mínima (13 anos — ajustável), erro de login genérico (401 "E-mail ou senha inválidos"), conta nova `USUARIO_ATIVO` com `dataInicio`, só conta ativa faz login (403).
+
+**Decisões de escopo (10/11/2026)**: **CAPTCHA fora** (o rate limiting + a confirmação de e-mail já seguram robôs). **Confirmação de e-mail por código** será feita, mas **depois do MVP se não houver tempo**. **Termos de uso / LGPD ainda não.**
+
 ## Fase 7 — Perfil do usuário (16/11 a 18/11)
 
 | # | Tarefa | Etiqueta |
@@ -74,7 +79,7 @@ Plano de todas as tarefas até a entrega do MVP do Vigia. Cada tarefa vira um ca
 | 10.2 | Denunciar perfil de outro usuário com justificativa (R68) | Back + Front |
 | 10.3 | Admin: login, listar denúncias pendentes, arquivar ou punir (R69, R44) | Back + Front |
 
-Ficam como **trabalho futuro** no relatório: recuperação de senha por e-mail, exclusão de conta, editar/excluir reporte, recursos de punição e integração com notícias.
+Ficam como **trabalho futuro** no relatório: confirmação de e-mail por código (se não couber no MVP), termos de uso/LGPD, CAPTCHA, recuperação de senha por e-mail, exclusão de conta, editar/excluir reporte, recursos de punição e integração com notícias.
 
 ## Fase 11 — Relatório e apresentação (26/11 a 30/11)
 
