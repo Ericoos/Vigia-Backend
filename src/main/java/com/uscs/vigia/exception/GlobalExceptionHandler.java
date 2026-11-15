@@ -15,17 +15,16 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(corpo(HttpStatus.NOT_FOUND, "Recurso não encontrado", ex.getMessage(), request));
-    }
-
+    
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleRegraNegocio(IllegalArgumentException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(corpo(HttpStatus.BAD_REQUEST, "Regra de negócio", ex.getMessage(), request));
+    }
+
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<Map<String, Object>> handleApi(ApiException ex, HttpServletRequest request) {
+        return ResponseEntity.status(ex.getStatus()).body(corpo(ex.getStatus(), ex.getErro(), ex.getMessage(), request));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

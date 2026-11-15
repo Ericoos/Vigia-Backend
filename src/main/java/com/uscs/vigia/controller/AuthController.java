@@ -1,6 +1,8 @@
 package com.uscs.vigia.controller;
 
 import com.uscs.vigia.dto.CadastroRequest;
+import com.uscs.vigia.dto.LoginRequest;
+import com.uscs.vigia.dto.LoginResponse;
 import com.uscs.vigia.dto.UsuarioResponse;
 import com.uscs.vigia.service.AuthService;
 import jakarta.validation.Valid;
@@ -21,4 +23,8 @@ public class AuthController {
         return authService.cadastrar(cadastroRequest);
     }
 
+    @PostMapping("/login")
+    public LoginResponse login(@Valid @RequestBody LoginRequest loginRequest) {
+        return authService.login(loginRequest);
+    }
 }

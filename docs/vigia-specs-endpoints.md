@@ -18,9 +18,12 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 | Código | Quando |
 |---|---|
 | `200 OK` | Consulta bem-sucedida |
-| `201 Created` | Reporte criado |
+| `201 Created` | Reporte ou usuário criado |
 | `400 Bad Request` | Validação falhou ou regra de negócio (sub desalinhada da categoria) |
+| `401 Unauthorized` | Login com e-mail ou senha inválidos |
+| `403 Forbidden` | Login de conta que não está `USUARIO_ATIVO` |
 | `404 Not Found` | Recurso inexistente |
+| `409 Conflict` | Cadastro com e-mail já existente |
 
 **Formato padrão de erro** (produzido pelo `@RestControllerAdvice` do pacote `exception`):
 
@@ -36,7 +39,12 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 
 - `400` de **validação** → `"erro": "Erro de validação"`.
 - `400` de **regra de negócio** (sub não pertence à categoria) → `"erro": "Regra de negócio"`.
+- `401` → `"erro": "Não autorizado"`.
+- `403` → `"erro": "Conta inativa"`.
 - `404` → `"erro": "Recurso não encontrado"`.
+- `409` → `"erro": "Conflito"`.
+
+> Os erros de negócio da própria API (401, 403, 404, 409) herdam de `exception/ApiException`, que carrega o status e o texto de `erro`; um único handler (`handleApi`) monta a resposta. Validação, JSON inválido e `IllegalArgumentException` continuam com handlers próprios.
 
 ---
 
@@ -177,6 +185,46 @@ Implementado em 10/11/2026 conforme a Tarefa 1 de `tarefas-murilo-semana.md`.
 - Ao buscar o detalhe, o Service recalcula e salva a classificação somando as notas dos reportes `PUBLICADO` daquele bairro, com a fórmula existente em `TipoCategoria.calculaClassificacao`.
 - Sem reportes publicados associados, a classificação é `null` (não zero).
 - Verificado em 10/11/2026: três reportes publicados de `CENTRO` (`PRESENCA_POLICIAL`, `ROUBO`, `CAMERAS`) resultaram em `classificacaoSeguranca: 0.06` (`0.06 - 0.04 + 0.04`). O valor foi confirmado no banco. Um bairro sem reportes (`BARCELONA`) retornou e persistiu `null`.
+
+---
+
+## 5.2. ENDPOINT: POST /api/auth/cadastro — criar conta
+
+Requisição (`CadastroRequest`):
+
+```json
+{
+  "nome": "Maria Silva",
+  "email": "maria@email.com",
+  "telefone": "11987654321",
+  "dataNascimento": "2000-05-20",
+  "senha": "Senha@123"
+}
+```
+
+- Validação: nome 3–100; e-mail válido; telefone só dígitos com DDD; data no passado; senha 8–30 com maiúscula, minúscula, número e especial → `400` se falhar.
+- O e-mail é normalizado (`trim` + minúsculas) antes de gravar.
+- E-mail já cadastrado (comparação já normalizada) → `409` `"Conflito"`.
+- A senha é gravada com BCrypt; a conta nasce `USUARIO_ATIVO` com `dataInicio` no horário de São Caetano do Sul.
+- `201` com `UsuarioResponse` (sem senha): `{ "id", "nome", "email", "telefone", "dataNascimento", "avatar" }`.
+
+## 5.3. ENDPOINT: POST /api/auth/login — entrar
+
+Requisição (`LoginRequest`): `{ "email": "maria@email.com", "senha": "Senha@123" }` — e-mail obrigatório e válido, senha obrigatória (`400` se faltar).
+
+Resposta `200` (`LoginResponse`):
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "usuario": { "id": 2, "nome": "Maria Silva", "email": "maria@email.com", "telefone": "11987654321", "dataNascimento": "2000-05-20", "avatar": null }
+}
+```
+
+- O e-mail é normalizado antes da busca (maiúsculas não importam).
+- E-mail inexistente **e** senha errada devolvem o mesmo `401` com a mesma mensagem, para não revelar quais e-mails têm conta.
+- Conta com senha certa mas `status` diferente de `USUARIO_ATIVO` → `403`. A checagem vem depois da senha.
+- Token JWT HS256: `iss=vigia-api`, `sub`=id do usuário, `iat`, `exp` (24 h). O app manda nas próximas requisições como `Authorization: Bearer <token>`. Por enquanto todas as rotas seguem liberadas; a exigência do token no `POST /api/reportes` entra na Tarefa 17.
 
 ---
 
