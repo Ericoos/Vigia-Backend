@@ -7,6 +7,8 @@ import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.model.TipoCategoria;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import com.uscs.vigia.service.ReporteService;
@@ -32,7 +34,8 @@ public class ReporteController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ReporteResponse criar(@Valid @RequestBody ReporteRequest reporteRequest) {
-		return reporteService.criar(reporteRequest);
+	public ReporteResponse criar(@Valid @RequestBody ReporteRequest reporteRequest, @AuthenticationPrincipal Jwt jwt) {
+        Long idUsuario = Long.valueOf(jwt.getSubject());
+		return reporteService.criar(reporteRequest, idUsuario);
 	}
 }

@@ -20,7 +20,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 | `200 OK` | Consulta bem-sucedida |
 | `201 Created` | Reporte ou usuário criado |
 | `400 Bad Request` | Validação falhou ou regra de negócio (sub desalinhada da categoria) |
-| `401 Unauthorized` | Login com e-mail ou senha inválidos |
+| `401 Unauthorized` | Login com e-mail ou senha inválidos, ou rota protegida sem token / com token inválido |
 | `403 Forbidden` | Login de conta que não está `USUARIO_ATIVO` |
 | `404 Not Found` | Recurso inexistente |
 | `409 Conflict` | Cadastro com e-mail já existente |
@@ -46,12 +46,19 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 
 > Os erros de negócio da própria API (401, 403, 404, 409) herdam de `exception/ApiException`, que carrega o status e o texto de `erro`; um único handler (`handleApi`) monta a resposta. Validação, JSON inválido e `IllegalArgumentException` continuam com handlers próprios.
 
+**Regras de acesso (R49, R50 — `config/SecurityConfig`, desde 15/11/2026):**
+- Livres (sem token): `/api/auth/**`, `/h2-console/**`, `/error` e **somente `GET`** em `/api/reportes/**`, `/api/categorias/**`, `/api/subcategorias/**` e `/api/bairro/**`.
+- Todo o resto exige `Authorization: Bearer <token>` (o token vem do `POST /api/auth/login`). Rotas novas já nascem protegidas.
+- Sem token ou com token inválido numa rota protegida → `401` devolvido pelo Spring Security, **sem corpo JSON** (só o status e o cabeçalho `WWW-Authenticate`). O app deve mandar o usuário para o login.
+
 ---
 
 ## 2. ENDPOINT: POST /api/reportes — criar reporte
 
 #### Requisitos
-- **R19** (Classificação do Reporte), **R20** (Seleção de Subcategoria), **R22** (Preenchimento de Informações do Reporte).
+- **R19** (Classificação do Reporte), **R20** (Seleção de Subcategoria), **R22** (Preenchimento de Informações do Reporte), **R25** (associação ao autor), **R49/R50** (só logado cria).
+
+**Exige token** (`Authorization: Bearer <token>`). Sem token → `401`. O autor é o usuário do token (`sub` do JWT) — o app **não** envia o autor no corpo.
 
 #### Contrato HTTP — Requisição
 
@@ -79,9 +86,13 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
   "longitude": -46.5645,
   "dataReporte": "2026-09-12T15:00:00-03:00",
   "categoria": "INSEGURANCA",
-  "subcategoria": "ILUMINACAO_RUIM"
+  "subcategoria": "ILUMINACAO_RUIM",
+  "autorId": 2,
+  "autorNome": "Maria Silva"
 }
 ```
+
+> `autorId` e `autorNome` aparecem em todas as respostas de reporte (criação, lista e detalhe). Reportes criados antes de 15/11/2026 não têm autor e devolvem os dois como `null`.
 
 #### Regras de negócio e validações
 1. **`titulo` obrigatório, de 5 a 30 caracteres; `descricao` obrigatória, de 20 a 500 caracteres** — `@NotBlank` + `@Size`. Fora do tamanho → `400` "Erro de validação", com `mensagem` indicando o campo (ex.: `descricao: Descrição deve ter entre 20 e 500 caracteres.`). A coluna `descricao` é `TEXT` (sem o limite de 255 caracteres).
@@ -110,10 +121,14 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
     "longitude": -46.5645,
     "dataReporte": "2026-09-12T15:00:00-03:00",
     "categoria": "INSEGURANCA",
-    "subcategoria": "ILUMINACAO_RUIM"
+    "subcategoria": "ILUMINACAO_RUIM",
+    "autorId": 2,
+    "autorNome": "Maria Silva"
   }
 ]
 ```
+
+Não exige token (R49).
 
 #### Regras
 1. **Só reportes `PUBLICADO`** aparecem. `RASCUNHO` e `EXCLUIDO` ficam de fora.
@@ -224,7 +239,7 @@ Resposta `200` (`LoginResponse`):
 - O e-mail é normalizado antes da busca (maiúsculas não importam).
 - E-mail inexistente **e** senha errada devolvem o mesmo `401` com a mesma mensagem, para não revelar quais e-mails têm conta.
 - Conta com senha certa mas `status` diferente de `USUARIO_ATIVO` → `403`. A checagem vem depois da senha.
-- Token JWT HS256: `iss=vigia-api`, `sub`=id do usuário, `iat`, `exp` (24 h). O app manda nas próximas requisições como `Authorization: Bearer <token>`. Por enquanto todas as rotas seguem liberadas; a exigência do token no `POST /api/reportes` entra na Tarefa 17.
+- Token JWT HS256: `iss=vigia-api`, `sub`=id do usuário, `iat`, `exp` (24 h). O app manda nas próximas requisições como `Authorization: Bearer <token>`. Desde 15/11/2026 o token é exigido em toda rota que não seja `GET` de leitura ou `/api/auth/**` (ver "Regras de acesso" na seção 1).
 
 ---
 

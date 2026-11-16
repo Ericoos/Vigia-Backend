@@ -10,6 +10,7 @@ import com.uscs.vigia.exception.ResourceNotFoundException;
 import com.uscs.vigia.model.*;
 import com.uscs.vigia.repository.CategoriaRepository;
 import com.uscs.vigia.repository.SubcategoriaRepository;
+import com.uscs.vigia.repository.UsuarioRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class ReporteService {
 	private final ReporteRepository reporteRepository;
     private final CategoriaRepository categoriaRepository;
     private final SubcategoriaRepository subcategoriaRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Transactional(readOnly = true)
 	public List<ReporteResponse> listar(TipoCategoria categoria) {
@@ -48,7 +50,10 @@ public class ReporteService {
     }
 
     @Transactional
-    public ReporteResponse criar(ReporteRequest reporteRequest) {
+    public ReporteResponse criar(ReporteRequest reporteRequest, Long idUsuario) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado, ID: " + idUsuario));
+
         Categoria categoria = categoriaRepository.findById(reporteRequest.categoria())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Categoria não encontrada: " + reporteRequest.categoria()));
@@ -71,6 +76,7 @@ public class ReporteService {
 
         reporte.setCategoria(categoria);
         reporte.setSubcategoria(subcategoria);
+        reporte.setUsuario(usuario);
 
         reporte.setStatus(StatusReporte.PUBLICADO);
         reporte.setDataReporte(OffsetDateTime.now(ZoneId.of("America/Sao_Paulo")));
@@ -88,7 +94,9 @@ public class ReporteService {
                 reporte.getLongitude(),
                 reporte.getDataReporte(),
                 reporte.getCategoria().getTipoCategoria(),
-                reporte.getSubcategoria().getTipoSubCategoria()
+                reporte.getSubcategoria().getTipoSubCategoria(),
+                reporte.getUsuario() != null ? reporte.getUsuario().getId() : null,
+                reporte.getUsuario() != null ? reporte.getUsuario().getNome() : null
         );
     }
 }

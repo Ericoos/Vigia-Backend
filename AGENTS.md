@@ -26,31 +26,42 @@ Este arquivo é lido em toda sessão de desenvolvimento. Leia e siga rigorosamen
 
 - **App**: Vigia — plataforma colaborativa de segurança urbana de São Caetano do Sul (MVP de TCC).
 - **Este repositório**: a API REST consumida pelo app mobile. Só devolve JSON.
-- **Foco atual**: módulo de **Reporte** — o app cria um reporte georreferenciado, a API recebe, valida e armazena no banco, e devolve a listagem para os pins do mapa.
+- **Foco atual (desde 15/11/2026)**: fechar o **MVP do lado do usuário** até **30/11/2026** — reporte, autenticação (JWT), perfil, bairro, editar/excluir reporte, denúncia de reporte, reputação automática, confirmação de e-mail e recuperação de senha. A lista completa de tarefas, com responsáveis, prazos e passos, está em **`docs/tarefas-mvp-restante.md`** — é o ponto de partida de qualquer sessão.
+- **Requisitos**: a fonte é o relatório (`docs/relatorio-vigia.txt`, §6.1.1, p. 54–62). **Antes de propor uma funcionalidade, leia o requisito correspondente** — não adivinhe regra de negócio.
 - **Coordenadas de referência**: São Caetano do Sul — `lat -23.6182, lon -46.5645`.
 
 ### Divisão de trabalho
 
 | Frente | Responsável | Repositório |
 |---|---|---|
-| **Back-end (API)** | eu | este |
-| Front-end (React Native + Expo) | outra pessoa | separado (`FabricioBucardi/Vigia`) |
-| Banco de dados MySQL | outra pessoa | ainda não iniciado |
+| **Back-end (API)** | Erick (dono desta conta) e Murilo | este |
+| Front-end (React Native + Expo) | Fabrício | separado (`FabricioBucardi/Vigia`) |
+| Banco de dados MySQL | Fernando | ainda não iniciado |
 
-Nunca compartilhamos código entre os repositórios — só o contrato da API.
+Nunca compartilhamos código entre os repositórios — só o contrato da API (`docs/vigia-specs-endpoints.md`). Mudou o contrato → avisar o Fabrício. Tarefas do quadro "Desenvolvimento Backend" no Trello.
 
-### Fora do foco atual (decisões de escopo)
+### Fora do MVP (decisões de escopo, 15/11/2026)
 
-- **Autenticação**: ainda **não** será colocada.
-- **Geocodificação/OpenStreetMap**: já feita no **front** — não é responsabilidade do back.
-- **Classificação de segurança do bairro**: lógica praticamente pronta, mas o foco vem **depois**.
-- **Não implementar agora**: cadastro/login e módulo de usuário, perfil e histórico, denúncias, painel administrativo.
-- `avaliacaoGravidade` foi **removida** do `Reporte` — não deve voltar ao código.
+- Denúncia de **perfil** (R68), painel e ações de admin (R44, R61, R67, R69), punições e recursos (R70–R72), notícias (R31–R32), exclusão permanente de conta (R63), busca textual (R42), agrupamento no mapa (R18), CAPTCHA, termos/LGPD, testes automáticos.
+- **Geocodificação/OpenStreetMap**: feita no **front**; o back só recebe o texto do bairro/endereço.
+- **Não existe avaliação de 1 a 5 dada por usuários.** A "avaliação geral" do perfil é a **reputação automática do R15** (campo `Usuario.avaliacao`). `avaliacaoGravidade` foi **removida** do `Reporte` e não deve voltar.
+- Rate limiting (T40 no Trello) não é requisito do relatório: só se sobrar tempo.
+
+### 🧑‍🏫 Como trabalhar com o Erick
+
+- **O assistente guia; o Erick escreve as classes.** Não editar código Java por conta própria — só ler, revisar, compilar e testar. Escrever código apenas quando ele pedir explicitamente ("arrume o código", "pode corrigir").
+- **Explicações em passos curtos e numerados**: arquivo → o que digitar (código) → "O que faz" em poucas linhas. Separar claramente o passo da explicação; evitar texto longo e enrolado.
+- **Uma tarefa por vez**, dizendo sempre onde estamos ("tarefa X feita, agora a Y") — não perder o fio da meada.
+- **Subir a API para testes no terminal do app** (para o Erick poder parar com Ctrl+C). Rodar `mvnw spring-boot:run` em segundo plano deixa o processo Java preso na porta 8080 e segurando o H2; se acontecer, pedir para ele fechar o PID (`Stop-Process -Id <pid>`).
 
 ## 🛠️ Stack
 
 - **Java 21**, **Spring Boot 4.1.1**, **Maven** (`./mvnw`)
 - Spring Web, Spring Data JPA, Validation, Lombok
+- Spring Security + OAuth2 Resource Server (JWT HS256) + BCrypt. A chave do JWT fica em `src/main/resources/application-local.properties`, **fora do Git** (modelo em `application-local.properties.example`); sem ela a API não sobe.
+- **Erros**: exceções de negócio herdam de `exception/ApiException` (carrega `HttpStatus` + texto de `erro`) e são tratadas por um único handler no `GlobalExceptionHandler`. Erro novo = nova filha de `ApiException`.
+- **Usuário logado**: `@AuthenticationPrincipal Jwt jwt` → `Long.valueOf(jwt.getSubject())`. O id vem sempre do token, nunca da URL ou do corpo.
+- **Acesso**: no `SecurityConfig`, só `/api/auth/**`, `/h2-console/**`, `/error` e os `GET` de leitura são livres; todo o resto exige token.
 
 ### Banco de dados
 
