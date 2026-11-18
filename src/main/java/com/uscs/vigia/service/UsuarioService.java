@@ -1,10 +1,17 @@
 package com.uscs.vigia.service;
 
+import java.util.List;
+
 import com.uscs.vigia.dto.AtualizarUsuarioRequest;
+import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.dto.TrocarSenhaRequest;
 import com.uscs.vigia.dto.UsuarioResponse;
 import com.uscs.vigia.exception.ResourceNotFoundException;
+import com.uscs.vigia.exception.SenhaIgualException;
+import com.uscs.vigia.model.Reporte;
+import com.uscs.vigia.model.StatusReporte;
 import com.uscs.vigia.model.Usuario;
+import com.uscs.vigia.repository.ReporteRepository;
 import com.uscs.vigia.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final ReporteRepository reporteRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UsuarioResponse buscarPorId(Long id) {
@@ -28,8 +36,15 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Usuário não encontrado: " + id));
-        usuario.setNome(request.nome());
-        usuario.setTelefone(request.telefone());
+        if (request.nome() != null) {
+            usuario.setNome(request.nome());
+        }
+        if (request.telefone() != null) {
+            usuario.setTelefone(request.telefone());
+        }
+        if (request.avatar() != null) {
+            usuario.setAvatar(request.avatar());
+        }
         Usuario salvo = usuarioRepository.save(usuario);
         return toResponse(salvo);
     }
@@ -41,8 +56,33 @@ public class UsuarioService {
         if (!passwordEncoder.matches(request.senhaAtual(), usuario.getSenhaHash())) {
             throw new IllegalArgumentException("Senha atual incorreta");
         }
+        if (passwordEncoder.matches(request.novaSenha(), usuario.getSenhaHash())) {
+            throw new SenhaIgualException("A nova senha deve ser diferente da senha atual");
+        }
         usuario.setSenhaHash(passwordEncoder.encode(request.novaSenha()));
         usuarioRepository.save(usuario);
+    }
+
+    public List<ReporteResponse> listarReportes(Long idUsuario) {
+        return reporteRepository.findAllByUsuario_IdAndStatusNotOrderByDataReporteDesc(idUsuario, StatusReporte.EXCLUIDO)
+                .stream()
+                .map(this::toReporteResponse)
+                .toList();
+    }
+
+    private ReporteResponse toReporteResponse(Reporte reporte) {
+        return new ReporteResponse(
+                reporte.getIdReporte(),
+                reporte.getTitulo(),
+                reporte.getDescricao(),
+                reporte.getLatitude(),
+                reporte.getLongitude(),
+                reporte.getDataReporte(),
+                reporte.getCategoria().getTipoCategoria(),
+                reporte.getSubcategoria().getTipoSubCategoria(),
+                reporte.getUsuario() != null ? reporte.getUsuario().getId() : null,
+                reporte.getUsuario() != null ? reporte.getUsuario().getNome() : null
+        );
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {

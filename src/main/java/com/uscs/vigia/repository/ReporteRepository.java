@@ -14,4 +14,6 @@ public interface ReporteRepository extends JpaRepository<Reporte, Long> {
     List<Reporte> findAllByBairroAndStatus(Bairro bairro, StatusReporte status);
 
     List<Reporte> findAllByStatusAndCategoria_TipoCategoria(StatusReporte status, TipoCategoria tipoCategoria);
+
+    List<Reporte> findAllByUsuario_IdAndStatusNotOrderByDataReporteDesc(Long idUsuario, StatusReporte status);
 }

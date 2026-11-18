@@ -243,6 +243,57 @@ Resposta `200` (`LoginResponse`):
 
 ---
 
+## 5.4. Perfil do usuário — Tarefa 3 implementada e revisada
+
+Implementado e testado por HTTP em 18/11/2026, conforme `docs/tarefas-mvp-restante.md` (R11, R12 e R13). Compilação verificada com `BUILD SUCCESS`.
+
+| Método | Rota | Resposta verificada |
+|---|---|---|
+| GET | `/api/usuarios/me` | 200 `UsuarioResponse`, sem senha |
+| PUT | `/api/usuarios/me` | 200 `UsuarioResponse` atualizado |
+| PUT | `/api/usuarios/me/senha` | 204, sem corpo |
+| GET | `/api/usuarios/me/reportes` | 200 `List<ReporteResponse>` |
+
+Todas exigem Bearer Token. O Controller obtém o id exclusivamente de `jwt.getSubject()`; os PUTs validam os DTOs com `@Valid`.
+
+- `AtualizarUsuarioRequest` contém `nome`, `telefone` e `avatar` (String opcional, URL/identificador da foto).
+- Nome é opcional na atualização: ausente/`null` preserva o valor salvo; quando informado, deve ter 3–100 caracteres e não pode ficar em branco. Telefone usa a mesma regex do cadastro: `^[1-9]{2}(9\d{8}|[2-5]\d{7})$`.
+- `TrocarSenhaRequest.novaSenha` usa as mesmas validações de força do cadastro: obrigatória, 8–30 caracteres, maiúscula, minúscula, número e caractere especial. `senhaAtual` continua obrigatória.
+- `UsuarioService.atualizar` já salva avatar e só altera nome/telefone/avatar quando o campo correspondente não é `null`, preservando os valores salvos nos demais.
+- `UsuarioService.trocarSenha` já rejeita nova senha igual à salva, após conferir a senha atual, lançando `SenhaIgualException` (`ApiException`, status `400`, erro "Regra de negócio").
+- Histórico integrado internamente em `UsuarioService.listarReportes(Long idUsuario)`: busca por `usuario.id`, exclui `EXCLUIDO`, ordena por `dataReporte` decrescente e converte para `List<ReporteResponse>` no Service, com os campos atuais de autor.
+
+Exemplo de requisição para `PUT /api/usuarios/me`:
+
+```json
+{
+  "nome": "Maria Silva",
+  "telefone": "11987654321",
+  "avatar": "https://example.com/avatar.png"
+}
+```
+
+Exemplo de requisição para `PUT /api/usuarios/me/senha`:
+
+```json
+{
+  "senhaAtual": "Atual@123",
+  "novaSenha": "NovaSenha@456"
+}
+```
+
+Verificações do roteiro:
+- Login → `200`; GET perfil → `200`, com o usuário do token e sem `senha`/`senhaHash`.
+- PUT nome/avatar → `200`; telefone/avatar enviados como `null` mantiveram os valores salvos; telefone inválido → `400`.
+- Senha atual errada, nova fraca (`123`) ou nova igual à atual → `400`.
+- Troca válida → `204` sem corpo; login com a nova senha → `200`.
+- Histórico → `200`, somente os reportes do usuário, em ordem decrescente; reporte de teste marcado `EXCLUIDO` no H2 não apareceu.
+- Cada uma das quatro rotas sem token → `401`.
+
+**Correção de revisão verificada (18/11/2026):** nome ausente/`null` é aceito e preserva o valor salvo. Repetição HTTP após reiniciar a API: PUT somente avatar → 200; somente telefone → 200; nome/telefone/avatar explícitos `null` → 200, sem apagar os valores salvos. Nome vazio, somente espaços, com 2 ou 101 caracteres → 400, sem alterar o dado salvo. Compilação e testes focados passaram.
+
+---
+
 ## 6. Pendências do Contrato
 
 1. **Validar com o front-end** o payload do `POST` e o formato de resposta (Fase 4 / Tarefa 10 — nada acordado ainda).
