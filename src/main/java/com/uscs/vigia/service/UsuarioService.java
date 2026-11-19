@@ -1,15 +1,20 @@
 package com.uscs.vigia.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import com.uscs.vigia.dto.AtualizarUsuarioRequest;
+import com.uscs.vigia.dto.DesativarContaRequest;
 import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.dto.TrocarSenhaRequest;
 import com.uscs.vigia.dto.UsuarioResponse;
 import com.uscs.vigia.exception.ResourceNotFoundException;
 import com.uscs.vigia.exception.SenhaIgualException;
+import com.uscs.vigia.exception.SenhaIncorretaException;
 import com.uscs.vigia.model.Reporte;
 import com.uscs.vigia.model.StatusReporte;
+import com.uscs.vigia.model.TipoUsuario;
 import com.uscs.vigia.model.Usuario;
 import com.uscs.vigia.repository.ReporteRepository;
 import com.uscs.vigia.repository.UsuarioRepository;
@@ -60,6 +65,18 @@ public class UsuarioService {
             throw new SenhaIgualException("A nova senha deve ser diferente da senha atual");
         }
         usuario.setSenhaHash(passwordEncoder.encode(request.novaSenha()));
+        usuarioRepository.save(usuario);
+    }
+
+    public void desativarConta(Long id, DesativarContaRequest request) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Usuário não encontrado: " + id));
+        if (!passwordEncoder.matches(request.senha(), usuario.getSenhaHash())) {
+            throw new SenhaIncorretaException("Senha incorreta");
+        }
+        usuario.setStatus(TipoUsuario.USUARIO_INATIVO);
+        usuario.setDataFim(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
         usuarioRepository.save(usuario);
     }
 

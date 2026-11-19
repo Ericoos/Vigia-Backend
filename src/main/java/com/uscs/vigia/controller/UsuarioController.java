@@ -3,6 +3,7 @@ package com.uscs.vigia.controller;
 import java.util.List;
 
 import com.uscs.vigia.dto.AtualizarUsuarioRequest;
+import com.uscs.vigia.dto.DesativarContaRequest;
 import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.dto.TrocarSenhaRequest;
 import com.uscs.vigia.dto.UsuarioResponse;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,13 @@ public class UsuarioController {
     public void trocarSenha(@Valid @RequestBody TrocarSenhaRequest request, @AuthenticationPrincipal Jwt jwt) {
         Long idUsuario = Long.valueOf(jwt.getSubject());
         usuarioService.trocarSenha(idUsuario, request);
+    }
+
+    @PostMapping("/me/desativar")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void desativarConta(@Valid @RequestBody DesativarContaRequest request, @AuthenticationPrincipal Jwt jwt) {
+        Long idUsuario = Long.valueOf(jwt.getSubject());
+        usuarioService.desativarConta(idUsuario, request);
     }
 
     @GetMapping("/me/reportes")

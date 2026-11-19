@@ -294,6 +294,29 @@ Verificações do roteiro:
 
 ---
 
+## 5.5. POST /api/usuarios/me/desativar — Tarefa 4 implementada e testada
+
+Implementado e verificado em 19/11/2026, conforme `docs/tarefas-mvp-restante.md` (R62):
+
+- Criado `DesativarContaRequest` com `String senha` obrigatória (`@NotBlank`).
+- Service implementado: confere a senha; se incorreta, lança `SenhaIncorretaException` (filha de `ApiException`, status 400, mensagem "Senha incorreta"). Com senha correta, define `USUARIO_INATIVO`, grava `dataFim` no horário de São Paulo e salva, preservando os dados e reportes.
+- Implementado `POST /api/usuarios/me/desativar`, com Bearer Token. O id vem exclusivamente do JWT, e a senha recebida é validada com `@Valid`.
+- Resposta verificada: `204`, sem corpo. Exemplo de requisição: `{ "senha": "SuaSenha@123" }`.
+- DTO, Service e Controller compilados com sucesso; roteiro HTTP concluído.
+
+| Teste | Resultado verificado |
+|---|---|
+| Senha errada | 400, mensagem "Senha incorreta" |
+| Senha ausente ou em branco | 400 |
+| Senha correta | 204, sem corpo |
+| Login depois da desativação | 403 |
+| Reporte da conta desativada no mapa/detalhe público | 200, dados e autor preservados |
+| Desativação sem token | 401 |
+
+Conferido no H2: usuário preservado com `USUARIO_INATIVO` e `dataFim` preenchida; reporte permanece `PUBLICADO` e associado ao mesmo usuário. A desativação não apaga os dados.
+
+---
+
 ## 6. Pendências do Contrato
 
 1. **Validar com o front-end** o payload do `POST` e o formato de resposta (Fase 4 / Tarefa 10 — nada acordado ainda).
