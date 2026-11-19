@@ -1,5 +1,8 @@
 package com.uscs.vigia.model;
 
+import java.text.Normalizer;
+import java.util.Optional;
+
 import lombok.Getter;
 
 @Getter
@@ -24,6 +27,28 @@ public enum TipoBairro {
 
     TipoBairro(String nome) {
         this.nome = nome;
+    }
+
+    public static Optional<TipoBairro> porNome(String texto) {
+        if (texto == null) {
+            return Optional.empty();
+        }
+
+        String nomeNormalizado = normalizarNome(texto);
+        if ("Sao Caetano".equalsIgnoreCase(nomeNormalizado)) {
+            return Optional.of(JARDIM_SAO_CAETANO);
+        }
+
+        for (TipoBairro bairro : values()) {
+            if (normalizarNome(bairro.getNome()).equalsIgnoreCase(nomeNormalizado)) {
+                return Optional.of(bairro);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static String normalizarNome(String texto) {
+        return Normalizer.normalize(texto.trim(), Normalizer.Form.NFD).replaceAll("\\p{M}", "");
     }
 
 }

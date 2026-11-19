@@ -38,7 +38,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/h2-console/**", "/error").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reportes/**", "/api/categorias/**",
-                        "/api/subcategorias/**", "/api/bairro/**").permitAll()
+                        "/api/subcategorias/**", "/api/bairros/**").permitAll()
                 .anyRequest().authenticated());
 
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));

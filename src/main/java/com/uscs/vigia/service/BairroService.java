@@ -1,6 +1,8 @@
 package com.uscs.vigia.service;
 
+import com.uscs.vigia.dto.BairroDetalheResponse;
 import com.uscs.vigia.dto.BairroResponse;
+import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.exception.ResourceNotFoundException;
 import com.uscs.vigia.model.Bairro;
 import com.uscs.vigia.model.Reporte;
@@ -27,12 +29,16 @@ public class BairroService {
                 .toList();
     }
 
-    public BairroResponse buscarPorTipo(TipoBairro tipoBairro) {
+    public BairroDetalheResponse buscarPorTipo(TipoBairro tipoBairro) {
         Bairro bairro = bairroRepository.findById(tipoBairro)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Bairro não encontrado: " + tipoBairro));
         recalcularClassificacao(bairro);
-        return toResponse(bairro);
+        List<ReporteResponse> reportes = reporteRepository.findAllByBairroAndStatus(bairro, StatusReporte.PUBLICADO)
+                .stream()
+                .map(this::toReporteResponse)
+                .toList();
+        return new BairroDetalheResponse(bairro.getTipoBairro(), bairro.getTipoBairro().getNome(), bairro.getClassificacaoSeguranca(), reportes);
     }
 
     public void recalcularClassificacao(Bairro bairro) {
@@ -49,6 +55,23 @@ public class BairroService {
 
         bairro.setClassificacaoSeguranca(classificacao);
         bairroRepository.save(bairro);
+    }
+
+    private ReporteResponse toReporteResponse(Reporte reporte) {
+        return new ReporteResponse(
+                reporte.getIdReporte(),
+                reporte.getTitulo(),
+                reporte.getDescricao(),
+                reporte.getLatitude(),
+                reporte.getLongitude(),
+                reporte.getDataReporte(),
+                reporte.getCategoria().getTipoCategoria(),
+                reporte.getSubcategoria().getTipoSubCategoria(),
+                reporte.getUsuario() != null ? reporte.getUsuario().getId() : null,
+                reporte.getUsuario() != null ? reporte.getUsuario().getNome() : null,
+                reporte.getEndereco(),
+                reporte.getBairro() != null ? reporte.getBairro().getTipoBairro() : null
+        );
     }
 
     private BairroResponse toResponse(Bairro bairro) {

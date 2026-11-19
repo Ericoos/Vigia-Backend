@@ -2,7 +2,7 @@
 
 Foco: o app cria um reporte, a API recebe, **valida** e **armazena** no banco, e devolve a listagem para os pins do mapa.
 
-> **Status: implementado no backend (tarefas 1 a 9 concluídas).** Contrato refletindo o que o código realmente faz. Falta só alinhar o contrato com o front (Fase 4 / Tarefa 10).
+> **Status:** base naive v1 concluída; evolução do MVP em andamento. Novas Tarefas 3/4 verificadas por HTTP; Tarefa 7 implementada, compilada e retestada no H2 local recriado, incluindo lista/detalhe públicos em `/api/bairros`, definido por Murilo como caminho canônico. A numeração atual está em `docs/tarefas-mvp-restante.md`.
 
 ---
 
@@ -47,7 +47,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 > Os erros de negócio da própria API (401, 403, 404, 409) herdam de `exception/ApiException`, que carrega o status e o texto de `erro`; um único handler (`handleApi`) monta a resposta. Validação, JSON inválido e `IllegalArgumentException` continuam com handlers próprios.
 
 **Regras de acesso (R49, R50 — `config/SecurityConfig`, desde 15/11/2026):**
-- Livres (sem token): `/api/auth/**`, `/h2-console/**`, `/error` e **somente `GET`** em `/api/reportes/**`, `/api/categorias/**`, `/api/subcategorias/**` e `/api/bairro/**`.
+- Livres (sem token): `/api/auth/**`, `/h2-console/**`, `/error` e **somente `GET`** em `/api/reportes/**`, `/api/categorias/**`, `/api/subcategorias/**` e `/api/bairros/**`.
 - Todo o resto exige `Authorization: Bearer <token>` (o token vem do `POST /api/auth/login`). Rotas novas já nascem protegidas.
 - Sem token ou com token inválido numa rota protegida → `401` devolvido pelo Spring Security, **sem corpo JSON** (só o status e o cabeçalho `WWW-Authenticate`). O app deve mandar o usuário para o login.
 
@@ -69,7 +69,9 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
   "latitude": -23.6182,
   "longitude": -46.5645,
   "categoria": "INSEGURANCA",
-  "subcategoria": "ILUMINACAO_RUIM"
+  "subcategoria": "ILUMINACAO_RUIM",
+  "endereco": "Rua de exemplo, Santa Paula",
+  "bairro": "Santa Paula"
 }
 ```
 
@@ -88,7 +90,9 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
   "categoria": "INSEGURANCA",
   "subcategoria": "ILUMINACAO_RUIM",
   "autorId": 2,
-  "autorNome": "Maria Silva"
+  "autorNome": "Maria Silva",
+  "endereco": "Rua de exemplo, Santa Paula",
+  "bairro": "SANTA_PAULA"
 }
 ```
 
@@ -100,7 +104,8 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 3. **`categoria` e `subcategoria` obrigatórias** — `@NotNull`. Nome que não existe no enum (ex.: `"ASSALTO"`) → `400` "Erro de validação".
 4. **Sub desalinhada da categoria** → `400` (regra de negócio).
 5. **O cliente não envia `status` nem `dataReporte`** — o Service define `status = PUBLICADO` e `dataReporte = agora` (`America/Sao_Paulo`).
-6. **`endereco` e `bairro` ficam nulos por enquanto** — a geocodificação é feita no front, não é responsabilidade do back.
+6. **`endereco` e `bairro` são Strings opcionais na entrada** — a geocodificação é feita no front. O endereço é salvo como recebido; o nome do bairro é comparado com os 15 bairros ignorando acentos, maiúsculas e espaços nas pontas. "São Caetano" corresponde a `JARDIM_SAO_CAETANO`. Bairro informado que não corresponde a nenhum deles → `400` (`BairroInvalidoException`, filha de `ApiException`). Sem bairro informado, a associação permanece nula.
+7. Ao criar um reporte com bairro, o Service recalcula a classificação daquele bairro depois de salvar o reporte, dentro da transação de criação. As respostas de criação/lista/detalhe/histórico incluem `endereco` e `bairro` (`TipoBairro`, nome do enum; `null` sem associação).
 
 ---
 
@@ -123,7 +128,9 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
     "categoria": "INSEGURANCA",
     "subcategoria": "ILUMINACAO_RUIM",
     "autorId": 2,
-    "autorNome": "Maria Silva"
+    "autorNome": "Maria Silva",
+    "endereco": "Rua de exemplo, Santa Paula",
+    "bairro": "SANTA_PAULA"
   }
 ]
 ```
@@ -132,7 +139,7 @@ Não exige token (R49).
 
 #### Regras
 1. **Só reportes `PUBLICADO`** aparecem. `RASCUNHO` e `EXCLUIDO` ficam de fora.
-2. **Filtro por categoria implementado** (Tarefa 3 semanal, 10/11/2026): parâmetro opcional `?categoria=SEGURANCA` ou `?categoria=INSEGURANCA`. Sem o parâmetro, retorna todos os publicados; com ele, somente os publicados da categoria informada. Valor inexistente no enum, como `XYZ`, retorna `400`. O filtro por bairro continua pendente.
+2. **Filtros opcionais de categoria e bairro:** `?categoria=SEGURANCA` ou `?categoria=INSEGURANCA`; `?bairro=SANTA_PAULA`. São combináveis, por exemplo `?categoria=INSEGURANCA&bairro=SANTA_PAULA`. Sem filtros, retorna todos os publicados; com filtros, somente os publicados correspondentes. Valor inexistente em um dos enums, como `XYZ`, retorna `400`. Filtros isolados e combinados verificados por HTTP em 19/11/2026.
 3. O JSON é desnormalizado de propósito: `categoria` e `subcategoria` saem como **nome do enum** (texto), não como ids — o app desenha o pin com uma única requisição.
 
 ---
@@ -175,23 +182,24 @@ Alimenta os seletores da tela de criação (categoria → subcategorias). **Popu
 ]
 ```
 
-> Não há ids numéricos: o nome do enum é a chave e é o que o POST usa em `categoria` + `subcategoria`. A resposta sai de DTOs (`CategoriaResponse`/`SubcategoriaResponse`), não da entidade; cada sub traz o nome da sua `categoria`. `GET /api/subcategorias` devolve a mesma lista de subs sem agrupar e `GET /api/bairro` devolve os 15 bairros de São Caetano do Sul (seed no boot) como `[{ "tipoBairro": "SANTA_PAULA", "nome": "Santa Paula", "classificacaoSeguranca": null }]` (`BairroResponse`). A chave do bairro é o enum `TipoBairro`, sem id numérico.
+> Não há ids numéricos: o nome do enum é a chave e é o que o POST usa em `categoria` + `subcategoria`. A resposta sai de DTOs (`CategoriaResponse`/`SubcategoriaResponse`), não da entidade; cada sub traz o nome da sua `categoria`. `GET /api/subcategorias` devolve a mesma lista de subs sem agrupar e `GET /api/bairros` devolve os 15 bairros de São Caetano do Sul (seed no boot) como `[{ "tipoBairro": "SANTA_PAULA", "nome": "Santa Paula", "classificacaoSeguranca": null }]` (`BairroResponse`). A chave do bairro é o enum `TipoBairro`, sem id numérico.
 
 ---
 
-## 5.1. ENDPOINT: GET /api/bairro/{tipoBairro} — detalhe do bairro
+## 5.1. ENDPOINT: GET /api/bairros/{tipoBairro} — detalhe do bairro
 
-Implementado em 10/11/2026 conforme a Tarefa 1 de `tarefas-murilo-semana.md`.
+Criado em 10/11/2026 e ampliado em 19/11/2026 conforme a Tarefa 7 de `docs/tarefas-mvp-restante.md`. Plural definido por Murilo, compilado e verificado por HTTP sem token no H2 local recriado.
 
-- Recebe a chave enum `TipoBairro` na URL, por exemplo `GET /api/bairro/CENTRO`.
-- Busca o bairro pelo repositório e devolve `BairroResponse`, usando a conversão do Service.
+- Recebe a chave enum `TipoBairro` na URL, por exemplo `GET /api/bairros/CENTRO`.
+- Busca o bairro pelo repositório e devolve `BairroDetalheResponse`, com tipo, nome, classificação e lista de reportes `PUBLICADO` convertidos para `ReporteResponse` no Service. A listagem `GET /api/bairros` continua usando `BairroResponse`.
 - `200` para bairro cadastrado. Exemplo sem reportes publicados associados:
 
 ```json
 {
   "tipoBairro": "CENTRO",
   "nome": "Centro",
-  "classificacaoSeguranca": null
+  "classificacaoSeguranca": null,
+  "reportes": []
 }
 ```
 
@@ -314,6 +322,30 @@ Implementado e verificado em 19/11/2026, conforme `docs/tarefas-mvp-restante.md`
 | Desativação sem token | 401 |
 
 Conferido no H2: usuário preservado com `USUARIO_INATIVO` e `dataFim` preenchida; reporte permanece `PUBLICADO` e associado ao mesmo usuário. A desativação não apaga os dados.
+
+---
+
+## 5.6. Tarefa 7 — verificação e alinhamento
+
+- `TipoBairro.porNome` conferido manualmente no JShell: Santa Paula/caixa variada/espaços → `SANTA_PAULA`; Cerâmica/Ceramica → `CERAMICA`; São Caetano → `JARDIM_SAO_CAETANO`; inexistente → `Optional.empty`.
+- Compilação passou. O teste de contexto já existente passou com um H2 temporário, sem adicionar testes ao projeto.
+- Roteiro HTTP verificado em 19/11/2026 inicialmente com H2 isolado e repetido com sucesso no H2 local recriado após o reset autorizado:
+
+| Caso | Resultado verificado |
+|---|---|
+| Santa Paula / santa paula | 201, associado a `SANTA_PAULA` |
+| Cerâmica / alias São Caetano | 201, `CERAMICA` / `JARDIM_SAO_CAETANO` |
+| Sem endereço/bairro | 201, campos nulos; consulta posterior compatível |
+| Bairro inexistente | 400, sem criar reporte |
+| Bairro isolado ou combinado com categoria | 200, somente reportes correspondentes |
+| Recálculo na criação | Nota já atualizada na lista antes de abrir detalhe |
+| Detalhe do bairro | 200 com classificação e lista de reportes publicados |
+| Sem reportes no bairro | Nota nula e lista vazia |
+| Reporte RASCUNHO / EXCLUIDO | Fora de filtros, detalhe e cálculo do bairro |
+| Histórico do usuário | Endereço/bairro preservados; excluídos continuam de fora |
+| Bairro inválido no filtro / POST sem token | 400 / 401 |
+
+- Caminho canônico definido por Murilo em 19/11/2026: `/api/bairros` e `/api/bairros/{tipoBairro}`. Controller e matcher GET do Security atualizados, sem alias no singular. Lista e detalhe sem token → 200; caminho antigo no singular com token → 404. Comunicar ao Fabrício. O banco local foi recriado pelo Hibernate/seed após reset autorizado, e os testes funcionais passaram nesse banco.
 
 ---
 

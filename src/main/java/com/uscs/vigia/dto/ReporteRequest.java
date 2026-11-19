@@ -28,5 +28,9 @@ public record ReporteRequest(
         TipoCategoria categoria,
 
         @NotNull(message = "Subcategoria é obrigatória.")
-        TipoSubcategoria subcategoria) {
+        TipoSubcategoria subcategoria,
+
+        String endereco,
+
+        String bairro) {
 }

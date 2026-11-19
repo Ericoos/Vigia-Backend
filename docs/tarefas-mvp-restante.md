@@ -11,8 +11,8 @@ Entrega: **30/11/2026**. Cada tarefa vira um cartão no Trello.
 |---|---|---|---|---|---|
 | 1 | ✅ Regras de acesso (feita 15/11) | R49, R50 | Erick | 15/11 | — |
 | 2 | ✅ Reporte ligado ao autor (feita 15/11) | R25 | Erick | 15/11 | 1 |
-| 3 | Perfil: controller + histórico + validações | R11, R12, R13 | Murilo | 18/11 | 1, 2 |
-| 4 | Desativar conta | R62 | Murilo | 18/11 | 3 |
+| 3 | ✅ Perfil: controller + histórico + validações (publicada em `271ce38`) | R11, R12, R13 | Murilo | 18/11 | 1, 2 |
+| 4 | ✅ Desativar conta (publicada em `a5d220f`) | R62 | Murilo | 18/11 | 3 |
 | 5 | Editar reporte (uma vez) | R29 | Erick | 19/11 | 2 |
 | 6 | Excluir reporte | R30 | Erick | 19/11 | 2 |
 | 7 | Reporte com bairro + filtro + detalhe do bairro | R64, R41 | Murilo | 20/11 | 2 |
@@ -36,7 +36,7 @@ Entrega: **30/11/2026**. Cada tarefa vira um cartão no Trello.
 **Onde:** `config/SecurityConfig.java`
 
 **Regras:** trocar o `permitAll` geral por:
-- livres: `/api/auth/**`, `/h2-console/**`, e `GET` em `/api/reportes/**`, `/api/categorias/**`, `/api/subcategorias/**`, `/api/bairro/**`;
+- livres: `/api/auth/**`, `/h2-console/**`, e `GET` em `/api/reportes/**`, `/api/categorias/**`, `/api/subcategorias/**`, `/api/bairros/**`;
 - todo o resto: `authenticated()`.
 
 Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceServer` já está configurado).
@@ -148,6 +148,8 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 
 ## TAREFA 7 — Reporte com bairro, filtro e detalhe do bairro (R64, R41)
 
+**Estado em 19/11/2026:** implementação e testes concluídos, inclusive reteste no H2 local recriado e GETs públicos no plural. Aguardando revisão/autorização de commit e publicação; comunicar o contrato ao Fabrício.
+
 **O que é:** o app manda o bairro que a geocodificação devolveu; a API associa. O detalhe do bairro passa a listar os reportes.
 
 **Onde:** `model/TipoBairro.java`, `dto/ReporteRequest.java`, `dto/ReporteResponse.java`, `ReporteService`, `ReporteController`, `ReporteRepository`, `BairroService`, novo `dto/BairroDetalheResponse.java`
@@ -158,8 +160,8 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 - `ReporteResponse`: `endereco` e `bairro` (`TipoBairro`).
 - Ao criar reporte com bairro: recalcular a classificação daquele bairro (assim a lista de bairros não fica desatualizada).
 - Filtro: `GET /api/reportes?bairro=SANTA_PAULA` (combinável com `?categoria=`).
-- `GET /api/bairro/{tipoBairro}` → `BairroDetalheResponse(tipoBairro, nome, classificacaoSeguranca, List<ReporteResponse> reportes)` — só reportes `PUBLICADO`.
-- **Decidir com o Fabrício** o caminho `/api/bairro` × `/api/bairros` (o código usa singular; o cartão do front usa plural).
+- `GET /api/bairros/{tipoBairro}` → `BairroDetalheResponse(tipoBairro, nome, classificacaoSeguranca, List<ReporteResponse> reportes)` — só reportes `PUBLICADO`.
+- **Caminho definido por Murilo em 19/11/2026:** `/api/bairros` (plural), para lista e detalhe. Comunicar o contrato ao Fabrício.
 
 **Testes:** POST com `"bairro": "Santa Paula"` e com `"santa paula"` → associa `SANTA_PAULA`; `"Inexistente"` → 400; filtro por bairro; detalhe traz os reportes e a nota atualizada.
 
@@ -307,5 +309,5 @@ Logout (R06) é só apagar o token no app — a API não precisa de rota. Telas 
 2. Regra das denúncias na classificação do bairro (tarefa 10).
 3. Lista de motivos de denúncia (tarefa 8) — conferir com a tela do app.
 4. Provedor de e-mail (tarefa 11).
-5. Caminho `/api/bairro` × `/api/bairros` (tarefa 7).
+5. ~~Caminho de bairros (tarefa 7)~~ — definido por Murilo em 19/11/2026: `/api/bairros` (plural); avisar Fabrício.
 6. Rate limiting (T40 do Trello) não é requisito do relatório: fazer só se sobrar tempo.

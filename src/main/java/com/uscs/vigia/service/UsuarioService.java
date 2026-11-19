@@ -98,7 +98,9 @@ public class UsuarioService {
                 reporte.getCategoria().getTipoCategoria(),
                 reporte.getSubcategoria().getTipoSubCategoria(),
                 reporte.getUsuario() != null ? reporte.getUsuario().getId() : null,
-                reporte.getUsuario() != null ? reporte.getUsuario().getNome() : null
+                reporte.getUsuario() != null ? reporte.getUsuario().getNome() : null,
+                reporte.getEndereco(),
+                reporte.getBairro() != null ? reporte.getBairro().getTipoBairro() : null
         );
     }
 

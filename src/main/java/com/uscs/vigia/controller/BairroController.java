@@ -1,5 +1,6 @@
 package com.uscs.vigia.controller;
 
+import com.uscs.vigia.dto.BairroDetalheResponse;
 import com.uscs.vigia.dto.BairroResponse;
 import com.uscs.vigia.model.TipoBairro;
 import com.uscs.vigia.service.BairroService;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bairro")
+@RequestMapping("/api/bairros")
 @RequiredArgsConstructor
 public class BairroController {
 
@@ -24,7 +25,7 @@ public class BairroController {
     }
 
     @GetMapping("/{tipoBairro}")
-    public BairroResponse buscarPorTipo(@PathVariable TipoBairro tipoBairro) {
+    public BairroDetalheResponse buscarPorTipo(@PathVariable TipoBairro tipoBairro) {
         return bairroService.buscarPorTipo(tipoBairro);
     }
 }

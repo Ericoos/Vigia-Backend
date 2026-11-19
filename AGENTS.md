@@ -62,6 +62,7 @@ Nunca compartilhamos código entre os repositórios — só o contrato da API (`
 - **Erros**: exceções de negócio herdam de `exception/ApiException` (carrega `HttpStatus` + texto de `erro`) e são tratadas por um único handler no `GlobalExceptionHandler`. Erro novo = nova filha de `ApiException`.
 - **Usuário logado**: `@AuthenticationPrincipal Jwt jwt` → `Long.valueOf(jwt.getSubject())`. O id vem sempre do token, nunca da URL ou do corpo.
 - **Acesso**: no `SecurityConfig`, só `/api/auth/**`, `/h2-console/**`, `/error` e os `GET` de leitura são livres; todo o resto exige token.
+- **Bairros**: caminho canônico no plural, `/api/bairros` e `/api/bairros/{tipoBairro}` (definido por Murilo em 19/11/2026). O contrato deve ser comunicado ao Fabrício; não manter um segundo endpoint no singular.
 
 ### Banco de dados
 
