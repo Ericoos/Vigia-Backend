@@ -9,6 +9,7 @@ import com.uscs.vigia.model.Reporte;
 import com.uscs.vigia.enums.StatusReporte;
 import com.uscs.vigia.enums.TipoBairro;
 import com.uscs.vigia.repository.BairroRepository;
+import com.uscs.vigia.repository.DenunciaRepository;
 import com.uscs.vigia.repository.ReporteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class BairroService {
 
     private final BairroRepository bairroRepository;
     private final ReporteRepository reporteRepository;
+    private final DenunciaRepository denunciaRepository;
 
     public List<BairroResponse> listar() {
         return bairroRepository.findAll()
@@ -46,6 +48,9 @@ public class BairroService {
 
         double classificacao = 5.0;
         for (Reporte reporte : reportes) {
+            if (denunciaRepository.countByReporteAlvo_IdReporte(reporte.getIdReporte()) >= 3) {
+                continue;
+            }
             classificacao += reporte.getCategoria().getTipoCategoria()
                     .calcularClassificacao(reporte.getSubcategoria().getTipoSubCategoria());
         }

@@ -3,9 +3,11 @@ package com.uscs.vigia.controller;
 import java.util.List;
 
 import com.uscs.vigia.dto.AtualizarUsuarioRequest;
+import com.uscs.vigia.dto.ConfirmarEmailRequest;
 import com.uscs.vigia.dto.DesativarContaRequest;
 import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.dto.TrocarSenhaRequest;
+import com.uscs.vigia.dto.TrocarEmailRequest;
 import com.uscs.vigia.dto.UsuarioResponse;
 import com.uscs.vigia.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -45,6 +47,19 @@ public class UsuarioController {
     public void trocarSenha(@Valid @RequestBody TrocarSenhaRequest request, @AuthenticationPrincipal Jwt jwt) {
         Long idUsuario = Long.valueOf(jwt.getSubject());
         usuarioService.trocarSenha(idUsuario, request);
+    }
+
+    @PutMapping("/me/email")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void solicitarTrocaEmail(@Valid @RequestBody TrocarEmailRequest request, @AuthenticationPrincipal Jwt jwt) {
+        Long idUsuario = Long.valueOf(jwt.getSubject());
+        usuarioService.solicitarTrocaEmail(idUsuario, request);
+    }
+
+    @PostMapping("/me/email/confirmar")
+    public UsuarioResponse confirmarEmail(@Valid @RequestBody ConfirmarEmailRequest request, @AuthenticationPrincipal Jwt jwt) {
+        Long idUsuario = Long.valueOf(jwt.getSubject());
+        return usuarioService.confirmarEmail(idUsuario, request);
     }
 
     @PostMapping("/me/desativar")

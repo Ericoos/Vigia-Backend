@@ -21,12 +21,13 @@ Entrega: **30/11/2026**. Cada tarefa vira um cartão no Trello.
 | 8 | ✅ Denúncia de reporte (commit `6b99a2c`, 21/11) | R43, R45, R66 | Erick | 20/11 | 2 |
 | 9 | Reputação automática (karma permanente) — código pronto, falta testar | R15 | Erick | 22/11 | 8 |
 | 10a | Nota do bairro começa em 5, peso ÷ 50, exibida entre 0 e 5 — código pronto, falta testar | R65 | Erick | 21/11 | 7 |
-| 10 | Janela de 30 dias (nota e mapa) + reporte com 3+ denúncias fora da nota | R65, R41 | Murilo | 22/11 | 8, 10a |
+| 10 | ✅ Denúncias na nota do bairro (3+) — PUBLICADO/EDITADO testados; publicação pendente; janela depende do Erick | R65 | Murilo | 22/11 | 8, 10a |
 | 11 | ~~Base de envio de e-mail~~ cortada (21/11): e-mail em modo desenvolvimento = linha no log | — | — | — | — |
 | 12 | Confirmação de telefone (modo desenvolvimento, cria o `CodigoService`) | R03 (alterado) | Murilo | 22/11 | — |
 | 13 | Recuperação de senha (código no log, modo desenvolvimento) | R07, R08, R09 | Murilo (passada pelo Erick em 21/11) | 22/11 | 12 (reaproveita o `CodigoService`) |
 | 14 | Aviso de senha alterada (log, modo desenvolvimento) | R10 | Murilo | 22/11 | 3, 13 |
 | 15 | Acesso pela rede + MySQL | — | Erick + Fernando | 25/11 | todas |
+| 16 | Troca de email no perfil (código no log) — implementada/testada, publicação pendente | Figura 12 | Murilo | 22/11 | 12 |
 
 > Tarefas 5, 6 e 8 mexem no `ReporteService`/`ReporteController`; 7 também mexe no `ReporteService.criar`. Para não dar conflito, **Murilo só começa a 7 depois do push da 2**, e Erick faz 5, 6 e 8 em sequência.
 
@@ -228,19 +229,20 @@ notaExibida = notaInterna limitada entre 0 e 5, 1 casa      → o que vai no JSO
 
 ---
 
-## TAREFA 10 — Janela de 30 dias e denúncias na nota (R65, R41) — Murilo
+## TAREFA 10 — Denúncias na nota do bairro (R65) — Murilo
 
-**O que é:** a Figura 12 do relatório diz que a nota vem "dos reportes **recentes**", e o R65 fala em "reportes **e denúncias**". Depende da 10a (Erick), que já deixa a nota começando em 5.
+**Atualização do resumo de 22/11/2026:** regra de 3+ denúncias e recálculo após denunciar implementados, compilados e testados. A janela de 30 dias ainda depende de conversar com o Erick e não foi incluída neste bloco. HTTP/H2 aprovado com PUBLICADO e, após recriação do H2 local, também com EDITADO: edição 200, nota 4.9 após uma/duas denúncias e 5.0 após a terceira, conferida na lista antes do detalhe; persistência, karma e presença no mapa/detalhe preservados. Enum antigo do H2 resolvido pelo reset de `data/` com a API parada, seguindo orientação do Erick reafirmada por Murilo. Pronta para commit manual e publicação autorizada junto dos docs.
+
+**O que é:** o R65 usa reportes e denúncias na classificação. Depende da 10a (Erick), que já deixa a nota começando em 5 e preserva a nota interna acima do limite exibido.
 
 **Regras:**
-- **Janela móvel de 30 dias**: só contam reportes `VISIVEIS` com `dataReporte` nos últimos 30 dias. Vale **para a nota e para o mapa** (`GET /api/reportes`, filtros e detalhe do bairro). Sem rotina agendada: é só filtro por data; o reporte antigo **não é apagado**, continua no banco e no histórico do perfil.
-- Consultas novas no `ReporteRepository` com `...AndDataReporteAfter(OffsetDateTime)`. Centralizar o "agora menos 30 dias" num lugar só (ex.: constante `DIAS_NO_MAPA = 30`).
 - Reporte com **3 ou mais denúncias** não entra na nota (`DenunciaRepository`, ex.: `countByReporteAlvo_IdReporte`).
 - Recalcular o bairro do reporte quando ele receber uma denúncia (`DenunciaService.denunciar`).
-- Como a nota muda com o tempo, `GET /api/bairros` também recalcula ao listar (são 15 bairros).
-- Só muda **por dentro** de `recalcularClassificacao`: `criar` e `excluir` do `ReporteService` já chamam ele.
+- Usar `StatusReporte.VISIVEIS` (`PUBLICADO` e `EDITADO`) e preservar a fórmula/limite da 10a.
+- Alterar somente o cálculo por dentro de `recalcularClassificacao`, com a dependência de repositório necessária; `criar` e `excluir` do `ReporteService` já chamam o método e permanecem preservados.
+- **Janela de 30 dias:** ideia anterior, pendente de confirmação com Erick conforme o resumo mais recente. Não adicionar filtros de data ou rotina nesta entrega sem essa decisão.
 
-**Testes:** reporte com `dataReporte` de 31 dias atrás (ajustar no H2) some do mapa e da nota, mas continua em `/api/usuarios/me/reportes` → reporte com 3 denúncias sai da nota → excluir um reporte recalcula.
+**Testes deste bloco:** bairro com um roubo → nota cai → três contas diferentes denunciam → o reporte deixa de contribuir para a nota. Conferir o recálculo imediatamente na lista, antes do detalhe, e preservar o reporte no mapa. Testes de janela temporal ficam pendentes da decisão do Erick.
 
 ---
 
@@ -334,6 +336,26 @@ notaExibida = notaInterna limitada entre 0 e 5, 1 casa      → o que vai no JSO
 
 
 **Índice (decisão de 21/11):** na migração, adicionar no `Reporte` um índice nas colunas `status`, `data_reporte` e `bairro_id` (`@Table(indexes = @Index(columnList = "status, data_reporte, bairro_id"))`), usadas pelo mapa e pela nota. **Docker:** a API inteira + MySQL em `docker-compose`, para o Fabrício rodar no servidor dele; senhas num `.env` fora do Git.
+---
+
+## TAREFA 16 — Troca de email no perfil (Figura 12) — Murilo
+
+Adicionada conforme o resumo `tarefas-murilo2.txt` recebido em 22/11/2026. A Figura 12 mostra edição de email no perfil. Depende da Tarefa 12 (CodigoService).
+
+**Estado em 22/11/2026:** DTOs/Service/Controller implementados, compilados e verificados por contexto/HTTP/H2/EMAIL DEV, incluindo token preservado, normalização, cinco erros e conflito surgido entre pedido e confirmação. Publicação aguarda autorização.
+
+**Onde:** `Usuario.emailPendente`, `UsuarioService`, `UsuarioController`, novos `TrocarEmailRequest(novoEmail, senha)` e `ConfirmarEmailRequest(codigo)`.
+
+**Rotas e regras:**
+- PUT `/api/usuarios/me/email`, autenticado → 204. Confere senha atual (400/SenhaIncorretaException), normaliza novo email com trim/minúsculas e recusa se pertencer a outra conta (409/ConflitoException).
+- Guarda somente em emailPendente, gera código no CodigoService e registra `[EMAIL DEV] Para <novoEmail>: seu código para confirmar o novo e-mail é <codigo>`. O email atual ainda não muda.
+- POST `/api/usuarios/me/email/confirmar`, autenticado → 200 UsuarioResponse. Sem troca pendente ou código errado/vencido → 400/CodigoInvalidoException; salvar as tentativas antes de lançar, sem @Transactional no método.
+- Código correto consome o código, confere de novo se o endereço está livre (409 se outra conta ocupou), efetiva email e limpa emailPendente.
+- Id sempre do token, nunca do corpo/URL. O token anterior permanece válido; login passa a usar o email novo.
+- Aviso ao email antigo é opcional no resumo; não faz parte da implementação obrigatória desta etapa.
+
+**Testes:** senha errada 400 → email de outra conta 409 → pedido 204 com código no log e email atual preservado → código errado 400 → correto 200 → login antigo 401/novo 200; conferir também conflito surgido entre pedido e confirmação e continuidade do token.
+
 ---
 
 ## Do lado do front (Fabrício) — para combinar

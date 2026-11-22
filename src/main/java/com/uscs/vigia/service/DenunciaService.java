@@ -28,6 +28,7 @@ public class DenunciaService {
     private final UsuarioRepository usuarioRepository;
     private final ReporteRepository reporteRepository;
     private final ReputacaoService reputacaoService;
+    private final BairroService bairroService;
 
     @Transactional
     public DenunciaResponse denunciar(Long idReporte, DenunciaRequest request, Long idUsuario) {
@@ -58,6 +59,9 @@ public class DenunciaService {
 
         if (reporteAlvo.getUsuario() != null) {
             reputacaoService.registrarDenunciaRecebida(reporteAlvo.getUsuario());
+        }
+        if (reporteAlvo.getBairro() != null) {
+            bairroService.recalcularClassificacao(reporteAlvo.getBairro());
         }
         return toResponse(denunciaSalva);
     }

@@ -453,6 +453,39 @@ Implementação de 22/11/2026 compilada, contexto conferido e roteiro HTTP/H2/EM
 
 ---
 
+## 5.12. Troca de email no perfil — Tarefa 16 implementada e testada
+
+Implementação de 22/11/2026 compilada, contexto conferido e roteiro HTTP/H2/EMAIL DEV concluído. Ambas as rotas exigem Bearer Token e usam somente o id do JWT.
+
+| Método | Rota | Corpo | Resposta configurada |
+|---|---|---|---|
+| PUT | `/api/usuarios/me/email` | `{ "novoEmail": "novo@email.com", "senha": "Senha@123" }` | 204, sem corpo |
+| POST | `/api/usuarios/me/email/confirmar` | `{ "codigo": "123456" }` | 200 `UsuarioResponse` com email atualizado |
+
+- Senha errada no pedido → 400 (`SenhaIncorretaException`). Novo email usado por outra conta → 409 (`ConflitoException`).
+- Novo email normalizado com trim/minúsculas; não muda imediatamente o endereço da conta. Fica em emailPendente, com código gerado pelo mesmo CodigoService (seis dígitos/dez minutos/cinco erros).
+- Entrega simulada: `[EMAIL DEV] Para <novoEmail>: seu código para confirmar o novo e-mail é <codigo>`.
+- Confirmação sem troca pendente ou com código errado/vencido/usado/invalidado → 400 (`CodigoInvalidoException`). Tentativas são salvas antes do erro, sem @Transactional no método.
+- Na confirmação válida, a disponibilidade é checada novamente; endereço ocupado por outra conta entre pedido e confirmação → 409. Se livre, email recebe o pendente e emailPendente é limpo.
+- Login passa a usar o endereço novo; token atual continua válido porque contém o id.
+- JSON de perfil continua sendo UsuarioResponse, sem expor campos de código/emailPendente.
+- Testes conferidos: senha errada 400; email ocupado 409; formato inválido 400; pedido com espaços/maiúsculas 204, mantendo o email efetivo; código errado 400 e tentativas persistidas; código do log 200 com novo email; login antigo 401/novo 200 e token anterior ainda válido (GET perfil 200). Sem pendência, código vencido/usado/invalidado e cinco erros retornaram 400. Cadastro ocupando o destino entre pedido e confirmação resultou em 409 sem tomar o endereço. As duas rotas sem token retornaram 401.
+
+---
+
+## 5.13. Denúncias na nota do bairro — Tarefa 10 implementada e testada
+
+- Nenhuma rota ou formato de resposta novo. O recálculo considera reportes em `StatusReporte.VISIVEIS` (`PUBLICADO` e `EDITADO`) do bairro.
+- Reporte com três ou mais denúncias deixa de contribuir para a nota. As denúncias são contadas pelo método derivado `DenunciaRepository.countByReporteAlvo_IdReporte`.
+- Após salvar uma denúncia, o Service recalcula o bairro do reporte, se houver, mantendo também o registro de karma permanente já implementado pelo Erick.
+- Fórmula da 10a preservada: nota interna começa em 5 e soma os pesos existentes; exibição permanece limitada entre 0 e 5 com uma casa decimal.
+- O reporte não é excluído nem ocultado do mapa por essa regra; apenas sua contribuição à nota é removida.
+- Janela de 30 dias não foi adicionada: o resumo recebido de 22/11 pede falar com Erick antes dessa decisão.
+- Compilação/contexto e teste HTTP/H2 com PUBLICADO conferidos em 22/11/2026: três denunciantes diferentes receberam 201; nota na lista antes do detalhe ficou 4.9 após uma/duas denúncias e 5.0 após a terceira. Nota interna, denúncias, karma e presença do reporte no mapa conferidos.
+- Reteste com EDITADO aprovado no H2 recriado: edição retornou 200 com editado=true e contribuição 4.9 preservada; três denúncias de contas diferentes retornaram 201, com notas imediatas 4.9/4.9/5.0 na lista. H2 confirmou as três pessoas/denúncias, nota interna 5.0 e karma do autor em 3. Reporte permaneceu no mapa e detalhe (200). O enum antigo do H2, que antes causava 500 na edição, foi resolvido pela recriação de `data/` com API parada, sem alteração do contrato da edição.
+
+---
+
 ## 6. Pendências do Contrato
 
 1. **Validar com o front-end** o payload do `POST` e o formato de resposta (Fase 4 / Tarefa 10 — nada acordado ainda).

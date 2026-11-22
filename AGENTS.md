@@ -78,6 +78,7 @@ Isso não afeta o código, porque o esquema é gerado pelo Hibernate a partir da
 - **Nunca use `nativeQuery`.** Use métodos derivados do Spring Data ou JPQL.
 - Use `MODE=MySQL` na URL do H2, para desenvolver contra o mesmo dialeto.
 - Prefira o H2 em modo arquivo ao modo memória, para os dados não sumirem a cada reinício.
+- **Rodadas de testes locais (orientação do Erick, reafirmada por Murilo em 22/11/2026):** apagar a pasta `data/` inteira antes de cada nova rodada para o Hibernate/seed recriarem o H2 com o esquema atual. Confirmar primeiro que a API está parada e o banco não está em uso. Essa rotina se aplica somente ao H2 local de desenvolvimento.
 
 ## 📁 Estrutura de Pastas
 

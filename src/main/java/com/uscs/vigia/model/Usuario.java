@@ -23,5 +23,6 @@ public class Usuario extends UsuarioBase {
     private String codigoVerificacao;
     private LocalDateTime codigoExpiraEm;
     private Integer tentativasCodigo;
+    private String emailPendente;
 
 }

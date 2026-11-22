@@ -5,12 +5,15 @@ import java.time.ZoneId;
 import java.util.List;
 
 import com.uscs.vigia.dto.AtualizarUsuarioRequest;
+import com.uscs.vigia.dto.ConfirmarEmailRequest;
 import com.uscs.vigia.dto.DesativarContaRequest;
 import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.dto.TrocarSenhaRequest;
+import com.uscs.vigia.dto.TrocarEmailRequest;
 import com.uscs.vigia.dto.UsuarioResponse;
 import com.uscs.vigia.exception.RecursoNaoEncontradoException;
 import com.uscs.vigia.exception.ConflitoException;
+import com.uscs.vigia.exception.CodigoInvalidoException;
 import com.uscs.vigia.exception.SenhaIgualException;
 import com.uscs.vigia.exception.SenhaIncorretaException;
 import com.uscs.vigia.model.Reporte;
@@ -83,6 +86,44 @@ public class UsuarioService {
         avisarSenhaAlterada(salvo);
     }
 
+    public void solicitarTrocaEmail(Long idUsuario, TrocarEmailRequest request) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Usuário não encontrado: " + idUsuario));
+        if (!passwordEncoder.matches(request.senha(), usuario.getSenhaHash())) {
+            throw new SenhaIncorretaException("Senha incorreta");
+        }
+
+        String novoEmail = normalizarEmail(request.novoEmail());
+        validarEmailDisponivel(novoEmail, idUsuario);
+        usuario.setEmailPendente(novoEmail);
+        codigoService.gerar(usuario);
+        Usuario salvo = usuarioRepository.save(usuario);
+        log.info("[EMAIL DEV] Para {}: seu código para confirmar o novo e-mail é {}", salvo.getEmailPendente(), salvo.getCodigoVerificacao());
+    }
+
+    public UsuarioResponse confirmarEmail(Long idUsuario, ConfirmarEmailRequest request) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Usuário não encontrado: " + idUsuario));
+        String novoEmail = usuario.getEmailPendente();
+        if (novoEmail == null) {
+            throw new CodigoInvalidoException("Não há troca de e-mail pendente");
+        }
+
+        boolean codigoValido = codigoService.validar(usuario, request.codigo());
+        usuarioRepository.save(usuario);
+        if (!codigoValido) {
+            throw new CodigoInvalidoException("Código inválido ou expirado");
+        }
+
+        validarEmailDisponivel(novoEmail, idUsuario);
+        usuario.setEmail(novoEmail);
+        usuario.setEmailPendente(null);
+        Usuario salvo = usuarioRepository.save(usuario);
+        return toResponse(salvo);
+    }
+
     public void desativarConta(Long id, DesativarContaRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
@@ -118,6 +159,19 @@ public class UsuarioService {
                 reporte.getBairro() != null ? reporte.getBairro().getTipoBairro() : null,
                 reporte.getStatus() == StatusReporte.EDITADO
         );
+    }
+
+    private String normalizarEmail(String email) {
+        return email.trim().toLowerCase();
+    }
+
+    private void validarEmailDisponivel(String email, Long idUsuario) {
+        boolean usadoPorOutraConta = usuarioRepository.findByEmail(email)
+                .filter(usuario -> !usuario.getId().equals(idUsuario))
+                .isPresent();
+        if (usadoPorOutraConta) {
+            throw new ConflitoException("E-mail já cadastrado");
+        }
     }
 
     private void avisarSenhaAlterada(Usuario usuario) {
