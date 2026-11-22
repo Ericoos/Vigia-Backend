@@ -19,7 +19,7 @@ Entrega: **30/11/2026**. Cada tarefa vira um cartão no Trello.
 | 6 | Excluir reporte (soft delete) — código pronto, falta testar | R30 | Erick | 19/11 | 2 |
 | 7 | ✅ Reporte com bairro + filtro + detalhe do bairro (publicada em `e4641da`) | R64, R41 | Murilo | 20/11 | 2 |
 | 8 | ✅ Denúncia de reporte (commit `6b99a2c`, 21/11) | R43, R45, R66 | Erick | 20/11 | 2 |
-| 9 | Reputação automática (karma permanente) — só `avaliacao` no `UsuarioResponse` feito; passos 1–6 pendentes | R15 | Erick | 22/11 | 8 |
+| 9 | Reputação automática (karma permanente) — código pronto, falta testar | R15 | Erick | 22/11 | 8 |
 | 10a | Nota do bairro começa em 5, peso ÷ 50, exibida entre 0 e 5 — código pronto, falta testar | R65 | Erick | 21/11 | 7 |
 | 10 | Janela de 30 dias (nota e mapa) + reporte com 3+ denúncias fora da nota | R65, R41 | Murilo | 22/11 | 8, 10a |
 | 11 | ~~Base de envio de e-mail~~ cortada (21/11): e-mail em modo desenvolvimento = linha no log | — | — | — | — |
@@ -204,10 +204,12 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 **Regras:**
 - Campo já existe: `Usuario.avaliacao` (`Double`).
 - Recalcular sempre que o usuário receber uma denúncia (tarefa 8) e quando publicar ou excluir um reporte.
-- **Fórmula — decidir com o grupo antes de codar** (o relatório não fixa números). Proposta: escala 0 a 5; usuário sem reportes → `null`; caso contrário `5 − 5 × (denúncias recebidas ÷ reportes publicados)`, limitado entre 0 e 5. Exemplo: 4 reportes e 1 denúncia → 3,75.
+- **Fórmula implementada (21/11, validar com o grupo):** `avaliacao = 5 × (reportes + 1) / (reportes + 1 + denúncias recebidas)`, 1 casa decimal. Conta nova → 5,0; 1 reporte e 1 denúncia → 3,3; 10 reportes e 1 denúncia → 4,6; 1 reporte e 3 denúncias → 1,7. Nunca negativa. `reportes` conta **todos** os reportes já feitos (inclusive excluídos) e `denúncias` vem do contador permanente, então excluir um reporte não muda a nota.
 - `UsuarioResponse` ganha `avaliacao`.
 
-**Testes:** usuário novo → `null`; 2 reportes sem denúncia → 5,0; recebe 1 denúncia → 2,5.
+**Implementação:** `service/ReputacaoService` (`registrarDenunciaRecebida`, `recalcular`), `Usuario.totalDenunciasRecebidas`, `ReporteRepository.countByUsuario_Id`; chamado em `DenunciaService.denunciar` (autor do reporte) e `ReporteService.criar`; cadastro começa com `avaliacao = 5.0` e contador 0; `UsuarioResponse.avaliacao` (nulo aparece como 5,0).
+
+**Testes:** conta nova → 5,0 → cria 1 reporte → 5,0 → recebe 1 denúncia → 3,3 → exclui o reporte → continua 3,3 → cria outro reporte → 3,8.
 
 
 **Karma permanente (decisão de 21/11, igual ao Reddit):** a reputação **nunca se perde** com o tempo, nem quando o reporte sai do mapa (30 dias), é excluído ou (no futuro) arquivado. Implementar com o contador `Usuario.totalDenunciasRecebidas`, somado em `DenunciaService.denunciar` a cada denúncia recebida; a reputação é calculada a partir dele, e não contando as linhas de `denuncia` por status ou data do reporte. Isso fecha a brecha de excluir o reporte para limpar a ficha e deixa a base pronta para o arquivamento futuro.

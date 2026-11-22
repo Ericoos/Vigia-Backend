@@ -27,6 +27,7 @@ public class DenunciaService {
     private final DenunciaRepository denunciaRepository;
     private final UsuarioRepository usuarioRepository;
     private final ReporteRepository reporteRepository;
+    private final ReputacaoService reputacaoService;
 
     @Transactional
     public DenunciaResponse denunciar(Long idReporte, DenunciaRequest request, Long idUsuario) {
@@ -54,6 +55,10 @@ public class DenunciaService {
         denuncia.setStatusDenuncia(StatusDenuncia.PENDENTE);
 
         Denuncia denunciaSalva = denunciaRepository.save(denuncia);
+
+        if (reporteAlvo.getUsuario() != null) {
+            reputacaoService.registrarDenunciaRecebida(reporteAlvo.getUsuario());
+        }
         return toResponse(denunciaSalva);
     }
 

@@ -399,7 +399,7 @@ Testado via HTTP em 21/11/2026 (todos os casos acima, com reporte id 65 e contas
 
 **Nota do bairro** (`classificacaoSeguranca` em `/api/bairros` e `/api/bairros/{tipoBairro}`): agora sempre entre **0 e 5**, com 1 casa decimal; bairro sem reportes = 5,0 (antes era `null`).
 
-**`UsuarioResponse`** (login, cadastro, `/api/usuarios/me`) ganhou `avaliacao` (0 a 5; usuários sem nota aparecem com 5,0). O cálculo automático (tarefa 9) ainda não está ligado.
+**`UsuarioResponse`** (login, cadastro, `/api/usuarios/me`) ganhou `avaliacao` (0 a 5; usuários sem nota aparecem com 5,0). Calculada automaticamente (tarefa 9): `5 × (reportes + 1) / (reportes + 1 + denúncias recebidas)`; cai quando o autor recebe denúncia e sobe com novos reportes. Permanente: excluir reporte não altera.
 
 ---
 

@@ -18,5 +18,6 @@ public class Usuario extends UsuarioBase {
     private String avatar;
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
+    private Integer totalDenunciasRecebidas;
 
 }

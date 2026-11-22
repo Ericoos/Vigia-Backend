@@ -36,6 +36,7 @@ public class ReporteService {
     private final UsuarioRepository usuarioRepository;
     private final BairroRepository bairroRepository;
     private final BairroService bairroService;
+    private final ReputacaoService reputacaoService;
 
     @Transactional(readOnly = true)
     public List<ReporteResponse> listar(TipoCategoria categoria, TipoBairro bairro) {
@@ -107,6 +108,7 @@ public class ReporteService {
         reporte.setDataReporte(OffsetDateTime.now(ZoneId.of("America/Sao_Paulo")));
 
         Reporte reporteSalvo = reporteRepository.save(reporte);
+        reputacaoService.recalcular(usuario);
         if (reporteSalvo.getBairro() != null) {
             bairroService.recalcularClassificacao(reporteSalvo.getBairro());
         }

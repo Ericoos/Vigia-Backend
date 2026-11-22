@@ -36,6 +36,8 @@ public class AuthService {
         usuario.setSenhaHash(passwordEncoder.encode(cadastroRequest.senha()));
 
         usuario.setStatus(StatusUsuario.USUARIO_ATIVO);
+        usuario.setAvaliacao(5.0);
+        usuario.setTotalDenunciasRecebidas(0);
         usuario.setDataInicio(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
 
         Usuario salvo = usuarioRepository.save(usuario);

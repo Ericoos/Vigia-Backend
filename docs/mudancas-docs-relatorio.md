@@ -169,7 +169,7 @@ Depende do painel administrativo, das punições e dos recursos (R44, R61, R69�
 
 - **Nota do bairro (R65):** escala de 0 a 5. Todo bairro começa com 5,0; cada reporte recente altera a nota pelo peso da sua subcategoria (insegurança diminui, segurança aumenta). Internamente a nota pode passar de 5 (os reportes de segurança formam uma reserva), mas o usuário vê no máximo 5.
 - **Reportes recentes:** o mapa e a nota consideram apenas os reportes dos **últimos 30 dias** (janela móvel). Reportes mais antigos deixam de aparecer no mapa, mas continuam registrados e no histórico do autor.
-- **Reputação do usuário (R15):** é **permanente**, no modelo do "karma" do Reddit. As denúncias recebidas continuam contando mesmo depois que o reporte sai do mapa ou é excluído, o que impede que um usuário apague reportes denunciados para limpar a própria reputação.
+- **Reputação do usuário (R15):** é **permanente**, no modelo do "karma" do Reddit. As denúncias recebidas continuam contando mesmo depois que o reporte sai do mapa ou é excluído, o que impede que um usuário apague reportes denunciados para limpar a própria reputação. Fórmula: `avaliação = 5 × (reportes + 1) / (reportes + 1 + denúncias recebidas)` — toda conta começa com 5, cada denúncia recebida reduz a nota e cada novo reporte a recupera aos poucos.
 
 ## 8. Funcionalidade futura: arquivamento de reportes (para "Trabalhos Futuros")
 
