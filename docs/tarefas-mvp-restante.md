@@ -15,16 +15,17 @@ Entrega: **30/11/2026**. Cada tarefa vira um cartão no Trello.
 | 2 | ✅ Reporte ligado ao autor (feita 15/11) | R25 | Erick | 15/11 | 1 |
 | 3 | ✅ Perfil: controller + histórico + validações (publicada em `271ce38`) | R11, R12, R13 | Murilo | 18/11 | 1, 2 |
 | 4 | ✅ Desativar conta (publicada em `a5d220f`) | R62 | Murilo | 18/11 | 3 |
-| 5 | Editar reporte (uma vez) | R29 | Erick | 19/11 | 2 |
-| 6 | Excluir reporte | R30 | Erick | 19/11 | 2 |
+| 5 | Editar reporte (uma vez, só a descrição) — código pronto, falta testar | R29 | Erick | 19/11 | 2 |
+| 6 | Excluir reporte (soft delete) — código pronto, falta testar | R30 | Erick | 19/11 | 2 |
 | 7 | ✅ Reporte com bairro + filtro + detalhe do bairro (publicada em `e4641da`) | R64, R41 | Murilo | 20/11 | 2 |
-| 8 | ✅ Denúncia de reporte (feita e testada 21/11, aguardando commit) | R43, R45, R66 | Erick | 20/11 | 2 |
-| 9 | Reputação automática do usuário | R15 | Murilo | 21/11 | 8 |
-| 10 | Classificação do bairro considera denúncias | R65 | Murilo | 21/11 | 7, 8 |
-| 11 | Base de envio de e-mail | — | Erick | 21/11 | — |
-| 12 | Confirmação de telefone (modo desenvolvimento) | R03 (alterado) | Erick | 22/11 | — |
-| 13 | Recuperação de senha | R07, R08, R09 | Erick | 22/11 | 11 |
-| 14 | Aviso de senha alterada | R10 | Murilo | 22/11 | 3, 11, 13 |
+| 8 | ✅ Denúncia de reporte (commit `6b99a2c`, 21/11) | R43, R45, R66 | Erick | 20/11 | 2 |
+| 9 | Reputação automática (karma permanente) — só `avaliacao` no `UsuarioResponse` feito; passos 1–6 pendentes | R15 | Erick | 22/11 | 8 |
+| 10a | Nota do bairro começa em 5, peso ÷ 50, exibida entre 0 e 5 — código pronto, falta testar | R65 | Erick | 21/11 | 7 |
+| 10 | Janela de 30 dias (nota e mapa) + reporte com 3+ denúncias fora da nota | R65, R41 | Murilo | 22/11 | 8, 10a |
+| 11 | ~~Base de envio de e-mail~~ cortada (21/11): e-mail em modo desenvolvimento = linha no log | — | — | — | — |
+| 12 | Confirmação de telefone (modo desenvolvimento, cria o `CodigoService`) | R03 (alterado) | Murilo | 22/11 | — |
+| 13 | Recuperação de senha (código no log, modo desenvolvimento) | R07, R08, R09 | Murilo (passada pelo Erick em 21/11) | 22/11 | 12 (reaproveita o `CodigoService`) |
+| 14 | Aviso de senha alterada (log, modo desenvolvimento) | R10 | Murilo | 22/11 | 3, 13 |
 | 15 | Acesso pela rede + MySQL | — | Erick + Fernando | 25/11 | todas |
 
 > Tarefas 5, 6 e 8 mexem no `ReporteService`/`ReporteController`; 7 também mexe no `ReporteService.criar`. Para não dar conflito, **Murilo só começa a 7 depois do push da 2**, e Erick faz 5, 6 e 8 em sequência.
@@ -208,19 +209,36 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 
 **Testes:** usuário novo → `null`; 2 reportes sem denúncia → 5,0; recebe 1 denúncia → 2,5.
 
+
+**Karma permanente (decisão de 21/11, igual ao Reddit):** a reputação **nunca se perde** com o tempo, nem quando o reporte sai do mapa (30 dias), é excluído ou (no futuro) arquivado. Implementar com o contador `Usuario.totalDenunciasRecebidas`, somado em `DenunciaService.denunciar` a cada denúncia recebida; a reputação é calculada a partir dele, e não contando as linhas de `denuncia` por status ou data do reporte. Isso fecha a brecha de excluir o reporte para limpar a ficha e deixa a base pronta para o arquivamento futuro.
 ---
 
-## TAREFA 10 — Classificação do bairro considera denúncias (R65)
+## TAREFA 10a — Nota do bairro começa em 5 (R65) — Erick, 21/11
 
-**O que é:** o R65 diz que a classificação usa "reportes **e denúncias**". Reporte muito denunciado deve pesar menos.
+**Regra do grupo (21/11), igual ao rating da Uber:** o bairro começa com **5,0**; cada reporte soma o peso que já existe em `TipoCategoria.calcularClassificacao`, agora dividido por **50** (ROUBO `(1 − 5)/50 = −0,08`; PRESENÇA POLICIAL `(1 + 5)/50 = +0,12` — cerca de 12 roubos para cair 1 ponto).
+```
+notaInterna = 5,0 + soma de calcularClassificacao(reporte)  → salva em Bairro.classificacaoSeguranca (pode passar de 5)
+notaExibida = notaInterna limitada entre 0 e 5, 1 casa      → o que vai no JSON
+```
+- Reportes de segurança viram **"gordura"**: no back a nota passa de 5; para o usuário trava em 5.
+- Bairro sem reportes → 5,0 (hoje é `null`).
+- **Onde:** `TipoCategoria` (`/ 100.0` → `/ 50.0`), `BairroService.recalcularClassificacao` (começa em `5.0`) e a conversão para `BairroResponse`/`BairroDetalheResponse` no `BairroService` (limite 0–5).
 
-**Onde:** `service/BairroService.recalcularClassificacao`
+---
+
+## TAREFA 10 — Janela de 30 dias e denúncias na nota (R65, R41) — Murilo
+
+**O que é:** a Figura 12 do relatório diz que a nota vem "dos reportes **recentes**", e o R65 fala em "reportes **e denúncias**". Depende da 10a (Erick), que já deixa a nota começando em 5.
 
 **Regras:**
-- **Decidir com o grupo a regra** (sugestão: reporte com 3 ou mais denúncias não entra na soma).
-- Recalcular o bairro do reporte quando ele receber uma denúncia.
+- **Janela móvel de 30 dias**: só contam reportes `VISIVEIS` com `dataReporte` nos últimos 30 dias. Vale **para a nota e para o mapa** (`GET /api/reportes`, filtros e detalhe do bairro). Sem rotina agendada: é só filtro por data; o reporte antigo **não é apagado**, continua no banco e no histórico do perfil.
+- Consultas novas no `ReporteRepository` com `...AndDataReporteAfter(OffsetDateTime)`. Centralizar o "agora menos 30 dias" num lugar só (ex.: constante `DIAS_NO_MAPA = 30`).
+- Reporte com **3 ou mais denúncias** não entra na nota (`DenunciaRepository`, ex.: `countByReporteAlvo_IdReporte`).
+- Recalcular o bairro do reporte quando ele receber uma denúncia (`DenunciaService.denunciar`).
+- Como a nota muda com o tempo, `GET /api/bairros` também recalcula ao listar (são 15 bairros).
+- Só muda **por dentro** de `recalcularClassificacao`: `criar` e `excluir` do `ReporteService` já chamam ele.
 
-**Testes:** bairro com um reporte de ROUBO → nota negativa; o reporte recebe 3 denúncias → sai da soma.
+**Testes:** reporte com `dataReporte` de 31 dias atrás (ajustar no H2) some do mapa e da nota, mas continua em `/api/usuarios/me/reportes` → reporte com 3 denúncias sai da nota → excluir um reporte recalcula.
 
 ---
 
@@ -250,10 +268,10 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 **Onde:** `model/Usuario.java`, `dto/CadastroRequest`, `AuthService`, `AuthController`, `repository/UsuarioRepository`, novo `service/SmsService.java` (versão de desenvolvimento que só escreve no log), novos DTOs `ConfirmarTelefoneRequest` (`email`, `codigo`) e `ReenviarCodigoRequest` (`email`)
 
 **Regras:**
-- `Usuario` ganha `boolean telefoneConfirmado` (default `false`), `codigoConfirmacao`, `codigoExpiraEm` e `tentativasCodigo`.
+- `Usuario` ganha `Boolean telefoneConfirmado`, `codigoVerificacao`, `codigoExpiraEm` e `tentativasCodigo`. Os campos de código têm nome genérico porque a tarefa 13 (recuperação de senha) usa os mesmos. Usuários antigos ficam com `telefoneConfirmado = null` e continuam entrando (só `false` bloqueia).
 - **Telefone único:** cadastro com telefone já usado → 409 "Telefone já cadastrado" (`existsByTelefone` no repositório).
 - Cadastro: gera código aleatório de 6 dígitos (`SecureRandom`), validade de **10 min**, e chama `smsService.enviar(telefone, codigo)`. No modo desenvolvimento, isso só faz `log.info` com o telefone e o código.
-- `POST /api/auth/confirmar-telefone` `{ email, codigo }` → 200 `{ "mensagem": "Telefone confirmado" }`. Código errado ou vencido → 400. Depois de **5 erros**, o código é invalidado e é preciso reenviar.
+- `POST /api/auth/confirmar-telefone` `{ email, codigo }` → 204. Código errado ou vencido → 400. Depois de **5 erros**, o código é invalidado e é preciso reenviar.
 - Ao confirmar: `telefoneConfirmado = true` e apaga código, validade e tentativas.
 - Login com telefone não confirmado → 403 "Confirme seu telefone antes de entrar" (checado depois da senha, como o status).
 - `POST /api/auth/reenviar-codigo` `{ email }` → 204 sempre (não revela se o e-mail existe); gera código novo. No máximo 1 reenvio por minuto.
@@ -264,31 +282,32 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 
 ---
 
-## TAREFA 13 — Recuperação de senha (R07, R08, R09)
+## TAREFA 13 — Recuperação de senha (R07, R08, R09) — Murilo
 
-**O que é:** o usuário pede a recuperação, recebe um link único com prazo e define uma senha nova.
+**O que é:** o usuário esquece a senha, recebe um **código de 6 dígitos** com prazo e define uma senha nova. **Modo desenvolvimento** (decisão de 21/11): o "e-mail" é uma linha no log da API com o código, sem envio real — igual à confirmação de telefone.
 
-**Onde:** `AuthService`, `AuthController`, novos `dto/EsqueciSenhaRequest.java` (`email`), `dto/RedefinirSenhaRequest.java` (`token`, `novaSenha`)
+**Depende de:** tarefa 12 (Murilo), que cria o `CodigoService` (gerar, expirar, contar tentativas e validar código). A 13 reaproveita ele; não criar outro.
+
+**Onde:** `AuthService`, `AuthController`, novos `dto/EsqueciSenhaRequest.java` (`email`), `dto/RedefinirSenhaRequest.java` (`email`, `codigo`, `novaSenha`)
 
 **Regras:**
-- `POST /api/auth/esqueci-senha` `{ email }` → 204 **sempre** (não revela se o e-mail existe). Se existir: token `RECUPERACAO_SENHA` com validade de **30 min** e e-mail com o link (R07, R08).
-- O link abre o app: `vigia://redefinir-senha?token=...` (deep link do Expo — combinar com o Fabrício).
-- `POST /api/auth/redefinir-senha` `{ token, novaSenha }` → 204. `novaSenha` com a **mesma regra de força** do cadastro (R09). Token inexistente, vencido ou usado → 400.
-- Ao redefinir: marca o token como usado e invalida os outros tokens de recuperação do usuário.
+- `POST /api/auth/esqueci-senha` `{ email }` → 204 **sempre** (não revela se o e-mail existe). Se existir: gera o código pelo `CodigoService` (validade **30 min**, R08) e escreve no log: `[EMAIL DEV] Para <email>: seu código de recuperação é 123456`.
+- `POST /api/auth/redefinir-senha` `{ email, codigo, novaSenha }` → 204. `novaSenha` com a **mesma regra de força** do cadastro (R09). Código errado, vencido ou já usado → 400; 5 erros invalidam o código.
+- Depois de redefinir, o código é descartado (não pode ser usado de novo).
 
-**Testes:** pedir com e-mail existente e inexistente → ambos 204 → redefinir com token válido 204 → login com a nova 200 → mesmo token de novo 400 → senha fraca 400.
+**Testes:** pedir com e-mail existente e inexistente → ambos 204 (só o existente gera log) → redefinir com o código do log 204 → login com a senha nova 200 → mesmo código de novo 400 → senha fraca 400 → código errado 400.
 
 ---
 
-## TAREFA 14 — Aviso de senha alterada (R10)
+## TAREFA 14 — Aviso de senha alterada (R10) — Murilo
 
-**O que é:** e-mail avisando o usuário sempre que a senha mudar.
+**O que é:** avisar o usuário sempre que a senha mudar. **Modo desenvolvimento:** o aviso é uma linha no log (`[EMAIL DEV] Para <email>: sua senha foi alterada em <data/hora>. Se não foi você, recupere sua senha.`).
 
 **Onde:** `UsuarioService.trocarSenha` (tarefa 3) e `AuthService` redefinir senha (tarefa 13)
 
-**Regras:** depois de salvar a senha nova, `emailService.enviar(...)` com data/hora e o aviso "se não foi você, recupere a senha". Falha no envio não desfaz a troca.
+**Regras:** depois de salvar a senha nova, escrever o aviso no log com data/hora (São Paulo). Uma falha no aviso não desfaz a troca.
 
-**Testes:** trocar senha pelo perfil e pela recuperação → e-mail chega nos dois casos.
+**Testes:** trocar a senha pelo perfil e pela recuperação → o aviso aparece no log nos dois casos.
 
 ---
 
@@ -303,6 +322,8 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 - `mysql-connector-j` + conexão com senha em variável de ambiente (`DB_SENHA`), fora do Git.
 - Repetir o roteiro completo do Postman: cadastro → confirmar telefone → login → criar/editar/excluir reporte → denunciar → bairro → perfil → desativar.
 
+
+**Índice (decisão de 21/11):** na migração, adicionar no `Reporte` um índice nas colunas `status`, `data_reporte` e `bairro_id` (`@Table(indexes = @Index(columnList = "status, data_reporte, bairro_id"))`), usadas pelo mapa e pela nota. **Docker:** a API inteira + MySQL em `docker-compose`, para o Fabrício rodar no servidor dele; senhas num `.env` fora do Git.
 ---
 
 ## Do lado do front (Fabrício) — para combinar

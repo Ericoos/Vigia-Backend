@@ -34,23 +34,20 @@ public class BairroService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Bairro não encontrado: " + tipoBairro));
         recalcularClassificacao(bairro);
-        List<ReporteResponse> reportes = reporteRepository.findAllByBairroAndStatus(bairro, StatusReporte.PUBLICADO)
+        List<ReporteResponse> reportes = reporteRepository.findAllByBairroAndStatusIn(bairro, StatusReporte.VISIVEIS)
                 .stream()
                 .map(this::toReporteResponse)
                 .toList();
-        return new BairroDetalheResponse(bairro.getTipoBairro(), bairro.getTipoBairro().getNome(), bairro.getClassificacaoSeguranca(), reportes);
+        return new BairroDetalheResponse(bairro.getTipoBairro(), bairro.getTipoBairro().getNome(), notaExibida(bairro.getClassificacaoSeguranca()), reportes);
     }
 
     public void recalcularClassificacao(Bairro bairro) {
-        List<Reporte> reportes = reporteRepository.findAllByBairroAndStatus(bairro, StatusReporte.PUBLICADO);
+        List<Reporte> reportes = reporteRepository.findAllByBairroAndStatusIn(bairro, StatusReporte.VISIVEIS);
 
-        Double classificacao = null;
-        if (!reportes.isEmpty()) {
-            classificacao = 0.0;
-            for (Reporte reporte : reportes) {
-                classificacao += reporte.getCategoria().getTipoCategoria()
-                        .calcularClassificacao(reporte.getSubcategoria().getTipoSubCategoria());
-            }
+        double classificacao = 5.0;
+        for (Reporte reporte : reportes) {
+            classificacao += reporte.getCategoria().getTipoCategoria()
+                    .calcularClassificacao(reporte.getSubcategoria().getTipoSubCategoria());
         }
 
         bairro.setClassificacaoSeguranca(classificacao);
@@ -70,11 +67,20 @@ public class BairroService {
                 reporte.getUsuario() != null ? reporte.getUsuario().getId() : null,
                 reporte.getUsuario() != null ? reporte.getUsuario().getNome() : null,
                 reporte.getEndereco(),
-                reporte.getBairro() != null ? reporte.getBairro().getTipoBairro() : null
+                reporte.getBairro() != null ? reporte.getBairro().getTipoBairro() : null,
+                reporte.getStatus() == StatusReporte.EDITADO
         );
     }
 
     private BairroResponse toResponse(Bairro bairro) {
-        return new BairroResponse(bairro.getTipoBairro(), bairro.getTipoBairro().getNome(), bairro.getClassificacaoSeguranca());
+        return new BairroResponse(bairro.getTipoBairro(), bairro.getTipoBairro().getNome(), notaExibida(bairro.getClassificacaoSeguranca()));
+    }
+
+    private Double notaExibida(Double notaInterna) {
+        if (notaInterna == null) {
+            return 5.0;
+        }
+        double limitada = Math.max(0.0, Math.min(5.0, notaInterna));
+        return Math.round(limitada * 10) / 10.0;
     }
 }

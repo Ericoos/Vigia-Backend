@@ -41,6 +41,8 @@ public class Reporte {
 
     private OffsetDateTime dataReporte;
 
+    private OffsetDateTime dataEdicao;
+
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;

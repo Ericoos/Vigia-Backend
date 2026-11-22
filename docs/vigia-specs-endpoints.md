@@ -389,6 +389,20 @@ Testado via HTTP em 21/11/2026 (todos os casos acima, com reporte id 65 e contas
 
 ---
 
+## 5.8. Editar, excluir, nota do bairro e avaliação (21/11/2026) — código pronto, testes pendentes
+
+**`PUT /api/reportes/{idReporte}`** (token; só o autor; uma vez) — corpo `{ "descricao": "..." }` (20 a 500 caracteres). Só a descrição muda. Resposta 200 com o `ReporteResponse` (`editado: true`). Erros: 400 descrição inválida, 401 sem token, 403 não é o autor, 404 inexistente/excluído, 409 já editado.
+
+**`DELETE /api/reportes/{idReporte}`** (token; só o autor) — 204 sem corpo. É soft delete: o status vira `EXCLUIDO`, o reporte some do mapa, filtros, bairro e histórico, e a nota do bairro é recalculada. Erros: 401, 403, 404 (inexistente ou já excluído).
+
+**`ReporteResponse`** ganhou `editado` (boolean) no fim. Reportes editados (status `EDITADO`) continuam no mapa e podem ser denunciados.
+
+**Nota do bairro** (`classificacaoSeguranca` em `/api/bairros` e `/api/bairros/{tipoBairro}`): agora sempre entre **0 e 5**, com 1 casa decimal; bairro sem reportes = 5,0 (antes era `null`).
+
+**`UsuarioResponse`** (login, cadastro, `/api/usuarios/me`) ganhou `avaliacao` (0 a 5; usuários sem nota aparecem com 5,0). O cálculo automático (tarefa 9) ainda não está ligado.
+
+---
+
 ## 6. Pendências do Contrato
 
 1. **Validar com o front-end** o payload do `POST` e o formato de resposta (Fase 4 / Tarefa 10 — nada acordado ainda).

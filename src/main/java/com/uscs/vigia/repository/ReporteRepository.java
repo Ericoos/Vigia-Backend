@@ -10,15 +10,15 @@ import com.uscs.vigia.model.Reporte;
 import java.util.List;
 
 public interface ReporteRepository extends JpaRepository<Reporte, Long> {
-    List<Reporte> findAllByStatus(StatusReporte statusReporte);
+    List<Reporte> findAllByStatusIn(List<StatusReporte> status);
 
-    List<Reporte> findAllByBairroAndStatus(Bairro bairro, StatusReporte status);
+    List<Reporte> findAllByBairroAndStatusIn(Bairro bairro, List<StatusReporte> status);
 
-    List<Reporte> findAllByStatusAndCategoria_TipoCategoria(StatusReporte status, TipoCategoria tipoCategoria);
+    List<Reporte> findAllByStatusInAndCategoria_TipoCategoria(List<StatusReporte> status, TipoCategoria tipoCategoria);
 
-    List<Reporte> findAllByStatusAndBairro_TipoBairro(StatusReporte status, TipoBairro tipoBairro);
+    List<Reporte> findAllByStatusInAndBairro_TipoBairro(List<StatusReporte> status, TipoBairro tipoBairro);
 
-    List<Reporte> findAllByStatusAndCategoria_TipoCategoriaAndBairro_TipoBairro(StatusReporte status, TipoCategoria tipoCategoria, TipoBairro tipoBairro);
+    List<Reporte> findAllByStatusInAndCategoria_TipoCategoriaAndBairro_TipoBairro(List<StatusReporte> status, TipoCategoria tipoCategoria, TipoBairro tipoBairro);
 
     List<Reporte> findAllByUsuario_IdAndStatusNotOrderByDataReporteDesc(Long idUsuario, StatusReporte status);
 }

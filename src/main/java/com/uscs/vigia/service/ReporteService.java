@@ -4,12 +4,15 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
+import com.uscs.vigia.dto.EditarReporteRequest;
 import com.uscs.vigia.dto.ReporteRequest;
 import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.enums.StatusReporte;
 import com.uscs.vigia.enums.TipoBairro;
 import com.uscs.vigia.enums.TipoCategoria;
+import com.uscs.vigia.exception.AcessoNegadoException;
 import com.uscs.vigia.exception.BairroInvalidoException;
+import com.uscs.vigia.exception.ConflitoException;
 import com.uscs.vigia.exception.RecursoNaoEncontradoException;
 import com.uscs.vigia.model.*;
 import com.uscs.vigia.repository.BairroRepository;
@@ -38,13 +41,13 @@ public class ReporteService {
     public List<ReporteResponse> listar(TipoCategoria categoria, TipoBairro bairro) {
         List<Reporte> reportes;
         if (categoria != null && bairro != null) {
-            reportes = reporteRepository.findAllByStatusAndCategoria_TipoCategoriaAndBairro_TipoBairro(StatusReporte.PUBLICADO, categoria, bairro);
+            reportes = reporteRepository.findAllByStatusInAndCategoria_TipoCategoriaAndBairro_TipoBairro(StatusReporte.VISIVEIS, categoria, bairro);
         } else if (categoria != null) {
-            reportes = reporteRepository.findAllByStatusAndCategoria_TipoCategoria(StatusReporte.PUBLICADO, categoria);
+            reportes = reporteRepository.findAllByStatusInAndCategoria_TipoCategoria(StatusReporte.VISIVEIS, categoria);
         } else if (bairro != null) {
-            reportes = reporteRepository.findAllByStatusAndBairro_TipoBairro(StatusReporte.PUBLICADO, bairro);
+            reportes = reporteRepository.findAllByStatusInAndBairro_TipoBairro(StatusReporte.VISIVEIS, bairro);
         } else {
-            reportes = reporteRepository.findAllByStatus(StatusReporte.PUBLICADO);
+            reportes = reporteRepository.findAllByStatusIn(StatusReporte.VISIVEIS);
         }
         return reportes.stream()
                 .map(this::toResponse)
@@ -54,7 +57,7 @@ public class ReporteService {
     @Transactional(readOnly = true)
     public ReporteResponse buscarPorId(Long id) {
         Reporte reporte = reporteRepository.findById(id)
-                .filter(r -> r.getStatus() == StatusReporte.PUBLICADO)
+                .filter(r -> StatusReporte.VISIVEIS.contains(r.getStatus()))
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Reporte não encontrado: " + id));
         return toResponse(reporte);
@@ -110,6 +113,46 @@ public class ReporteService {
         return toResponse(reporteSalvo);
     }
 
+    @Transactional
+    public ReporteResponse editar(Long idReporte, EditarReporteRequest request, Long idUsuario) {
+        Reporte reporte = reporteRepository.findById(idReporte)
+                .filter(r -> StatusReporte.VISIVEIS.contains(r.getStatus()))
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Reporte não encontrado: " + idReporte));
+
+        if (reporte.getUsuario() == null || !reporte.getUsuario().getId().equals(idUsuario)) {
+            throw new AcessoNegadoException("Só o autor pode editar o reporte");
+        }
+
+        if (reporte.getStatus() == StatusReporte.EDITADO) {
+            throw new ConflitoException("Esse reporte já foi editado uma vez");
+        }
+
+        reporte.setDescricao(request.descricao());
+        reporte.setStatus(StatusReporte.EDITADO);
+        reporte.setDataEdicao(OffsetDateTime.now(ZoneId.of("America/Sao_Paulo")));
+
+        Reporte reporteEditado = reporteRepository.save(reporte);
+        return toResponse(reporteEditado);
+    }
+
+    @Transactional
+    public void excluir(Long idReporte, Long idUsuario) {
+        Reporte reporte = reporteRepository.findById(idReporte)
+                .filter(r  -> StatusReporte.VISIVEIS.contains(r.getStatus()))
+                .orElseThrow(()  -> new RecursoNaoEncontradoException("Reporte não encontrado: " + idReporte));
+
+        if (reporte.getUsuario() == null || !reporte.getUsuario().getId().equals(idUsuario)) {
+            throw new AcessoNegadoException("Só o autor pode excluir o reporte");
+        }
+
+        reporte.setStatus(StatusReporte.EXCLUIDO);
+        reporteRepository.save(reporte);
+
+        if(reporte.getBairro() != null) {
+            bairroService.recalcularClassificacao(reporte.getBairro());
+        }
+    }
+
     private ReporteResponse toResponse(Reporte reporte) {
         return new ReporteResponse(
                 reporte.getIdReporte(),
@@ -123,7 +166,8 @@ public class ReporteService {
                 reporte.getUsuario() != null ? reporte.getUsuario().getId() : null,
                 reporte.getUsuario() != null ? reporte.getUsuario().getNome() : null,
                 reporte.getEndereco(),
-                reporte.getBairro() != null ? reporte.getBairro().getTipoBairro() : null
+                reporte.getBairro() != null ? reporte.getBairro().getTipoBairro() : null,
+                reporte.getStatus() == StatusReporte.EDITADO
         );
     }
 }

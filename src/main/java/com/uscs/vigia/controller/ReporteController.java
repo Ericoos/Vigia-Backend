@@ -2,6 +2,7 @@ package com.uscs.vigia.controller;
 
 import java.util.List;
 
+import com.uscs.vigia.dto.EditarReporteRequest;
 import com.uscs.vigia.dto.ReporteRequest;
 import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.enums.TipoCategoria;
@@ -38,5 +39,18 @@ public class ReporteController {
     public ReporteResponse criar(@Valid @RequestBody ReporteRequest reporteRequest, @AuthenticationPrincipal Jwt jwt) {
         Long idUsuario = Long.valueOf(jwt.getSubject());
         return reporteService.criar(reporteRequest, idUsuario);
+    }
+
+    @PutMapping("/{idReporte}")
+    public ReporteResponse editar(@PathVariable Long idReporte, @Valid @RequestBody EditarReporteRequest request, @AuthenticationPrincipal Jwt jwt) {
+        Long idUsuario = Long.valueOf(jwt.getSubject());
+        return reporteService.editar(idReporte, request, idUsuario);
+    }
+
+    @DeleteMapping("/{idReporte}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluir(@PathVariable Long idReporte, @AuthenticationPrincipal Jwt jwt) {
+        Long idUsuario = Long.valueOf(jwt.getSubject());
+        reporteService.excluir(idReporte, idUsuario);
     }
 }

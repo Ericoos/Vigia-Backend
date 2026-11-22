@@ -160,3 +160,21 @@ Depende do painel administrativo, das punições e dos recursos (R44, R61, R69�
 - Entidade `Notificacao` (`usuarioDestinatario`, `tipo` com enum `TipoNotificacao`, `texto`, `dataNotificacao`, `lida`).
 - Os serviços que geram os eventos (denúncia, moderação, recurso) criam a notificação ao salvar.
 - Rotas: `GET /api/usuarios/me/notificacoes` (mais recentes primeiro) e `PATCH /api/usuarios/me/notificacoes/{id}/lida`.
+
+---
+
+## 7. Nota do bairro, mapa e reputação (decisões de 21/11/2026)
+
+**Para o relatório (§6, Classificação de Bairro / R65 e R15):**
+
+- **Nota do bairro (R65):** escala de 0 a 5. Todo bairro começa com 5,0; cada reporte recente altera a nota pelo peso da sua subcategoria (insegurança diminui, segurança aumenta). Internamente a nota pode passar de 5 (os reportes de segurança formam uma reserva), mas o usuário vê no máximo 5.
+- **Reportes recentes:** o mapa e a nota consideram apenas os reportes dos **últimos 30 dias** (janela móvel). Reportes mais antigos deixam de aparecer no mapa, mas continuam registrados e no histórico do autor.
+- **Reputação do usuário (R15):** é **permanente**, no modelo do "karma" do Reddit. As denúncias recebidas continuam contando mesmo depois que o reporte sai do mapa ou é excluído, o que impede que um usuário apague reportes denunciados para limpar a própria reputação.
+
+## 8. Funcionalidade futura: arquivamento de reportes (para "Trabalhos Futuros")
+
+- **Motivação:** com o crescimento da base, manter todos os reportes na tabela principal deixa as consultas do mapa mais pesadas e mistura dados ativos com dados históricos.
+- **Proposta:** uma rotina diária move os reportes com mais de N meses (a definir) e suas denúncias para tabelas de arquivo (`reporte_arquivado`, `denuncia_arquivada`). A tabela principal fica só com dados recentes; nada é perdido.
+- **Reputação preservada:** o total de denúncias recebidas fica guardado no próprio usuário (contador), então o arquivamento não altera a reputação.
+- **Evolução:** política de retenção alinhada à LGPD (exclusão definitiva após prazo), particionamento da tabela por mês e índices nas colunas usadas pelo mapa.
+- **Por que ficou fora do protótipo:** só traz benefício com grande volume de dados, que não existe na fase de testes; a base (contador de denúncias e índices) já fica pronta no MVP.

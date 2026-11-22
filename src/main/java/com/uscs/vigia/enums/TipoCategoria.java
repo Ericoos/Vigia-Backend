@@ -7,13 +7,13 @@ public enum TipoCategoria {
     SEGURANCA {
         @Override
         public Double calcularClassificacao(TipoSubcategoria subcategoria) {
-            return (getPeso() + subcategoria.getPeso()) / 100.0;
+            return (getPeso() + subcategoria.getPeso()) / 50.0;
         }
     },
     INSEGURANCA {
         @Override
         public Double calcularClassificacao(TipoSubcategoria subcategoria) {
-            return (getPeso() - subcategoria.getPeso()) / 100.0;
+            return (getPeso() - subcategoria.getPeso()) / 50.0;
         }
     };
 

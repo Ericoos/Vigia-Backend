@@ -100,12 +100,14 @@ public class UsuarioService {
                 reporte.getUsuario() != null ? reporte.getUsuario().getId() : null,
                 reporte.getUsuario() != null ? reporte.getUsuario().getNome() : null,
                 reporte.getEndereco(),
-                reporte.getBairro() != null ? reporte.getBairro().getTipoBairro() : null
+                reporte.getBairro() != null ? reporte.getBairro().getTipoBairro() : null,
+                reporte.getStatus() == StatusReporte.EDITADO
         );
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {
-        return new UsuarioResponse(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.getTelefone(), usuario.getDataNascimento(), usuario.getAvatar());
+        return new UsuarioResponse(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.getTelefone(), usuario.getDataNascimento(), usuario.getAvatar(),
+                usuario.getAvaliacao() != null ? usuario.getAvaliacao() : 5.0);
     }
 
 }

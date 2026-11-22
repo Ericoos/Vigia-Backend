@@ -34,7 +34,7 @@ public class DenunciaService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado: " + idUsuario));
 
         Reporte reporteAlvo = reporteRepository.findById(idReporte)
-                .filter(reporte -> reporte.getStatus() == StatusReporte.PUBLICADO)
+                .filter(reporte -> StatusReporte.VISIVEIS.contains(reporte.getStatus()))
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Reporte não encontrado: " + idReporte));
 
         if (reporteAlvo.getUsuario() != null && reporteAlvo.getUsuario().getId().equals(idUsuario)) {

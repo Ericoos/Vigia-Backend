@@ -43,7 +43,8 @@ public class AuthService {
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {
-        return new UsuarioResponse(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.getTelefone(), usuario.getDataNascimento(), usuario.getAvatar());
+        return new UsuarioResponse(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.getTelefone(), usuario.getDataNascimento(), usuario.getAvatar(),
+                usuario.getAvaliacao() != null ? usuario.getAvaliacao() : 5.0);
     }
 
     private String normalizarEmail(String email) {
