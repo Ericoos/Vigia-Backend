@@ -438,8 +438,18 @@ Implementação de 22/11/2026 compilada, contexto conferido e roteiro HTTP/H2/EM
 - Nova senha segue exatamente as regras de força do cadastro (obrigatória, 8–30, maiúscula, minúscula, número e especial).
 - Código inválido, vencido, invalidado ou já usado → 400 (`CodigoInvalidoException`), inclusive email inexistente na redefinição.
 - O usuário é salvo antes de lançar 400, sem transação no método de redefinição, para preservar tentativas/invalidade. Sucesso grava BCrypt e consome o código, impedindo sua reutilização.
-- O aviso de senha alterada é a Tarefa 14, ainda pendente.
+- O aviso de senha alterada da Tarefa 14 está implementado e testado em modo DEV, após salvar a senha; ver §5.11.
 - Testes conferidos: solicitação existente/inexistente 204, somente o existente no EMAIL DEV; código lido do log aceito na redefinição (204); senha nova 200 e antiga 401 no login; reutilização, expiração, código errado, email inexistente e senha fraca 400. Tentativas 1–5 persistiram apesar do 400 e invalidaram o código na quinta; falhas não alteraram a senha salva.
+
+---
+
+## 5.11. Aviso de senha alterada — Tarefa 14 implementada e testada
+
+- Nenhuma rota nova. As respostas de `PUT /api/usuarios/me/senha` e `POST /api/auth/redefinir-senha` continuam 204 sem corpo.
+- Depois de salvar a senha com sucesso, os dois fluxos registram: `[EMAIL DEV] Para <email>: sua senha foi alterada em <data/hora>. Se não foi você, recupere sua senha.`
+- Data/hora usa `America/Sao_Paulo`. Não há envio real de email nesta entrega.
+- Registro protegido por try/catch; uma falha no aviso não desfaz a alteração da senha.
+- Compilação e roteiro HTTP/log conferidos em 22/11/2026: troca pelo perfil e redefinição válidas retornaram 204, logins com as novas senhas retornaram 200, senhas anteriores 401. Exatamente um aviso de UsuarioService e um de AuthService foram conferidos no log, com data/hora de São Paulo. Troca recusada/código errado ou reutilizado não geraram avisos extras. A proteção de falha foi revisada no código, sem simular falha artificial do logger.
 
 ---
 

@@ -20,9 +20,11 @@ import com.uscs.vigia.model.Usuario;
 import com.uscs.vigia.repository.ReporteRepository;
 import com.uscs.vigia.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
@@ -77,7 +79,8 @@ public class UsuarioService {
             throw new SenhaIgualException("A nova senha deve ser diferente da senha atual");
         }
         usuario.setSenhaHash(passwordEncoder.encode(request.novaSenha()));
-        usuarioRepository.save(usuario);
+        Usuario salvo = usuarioRepository.save(usuario);
+        avisarSenhaAlterada(salvo);
     }
 
     public void desativarConta(Long id, DesativarContaRequest request) {
@@ -115,6 +118,15 @@ public class UsuarioService {
                 reporte.getBairro() != null ? reporte.getBairro().getTipoBairro() : null,
                 reporte.getStatus() == StatusReporte.EDITADO
         );
+    }
+
+    private void avisarSenhaAlterada(Usuario usuario) {
+        try {
+            log.info("[EMAIL DEV] Para {}: sua senha foi alterada em {}. Se não foi você, recupere sua senha.",
+                    usuario.getEmail(), LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        } catch (RuntimeException falha) {
+            log.warn("Falha ao registrar aviso de senha alterada para {}", usuario.getEmail(), falha);
+        }
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {

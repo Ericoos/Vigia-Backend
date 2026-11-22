@@ -141,9 +141,19 @@ public class AuthService {
         if (codigoValido) {
             usuario.setSenhaHash(passwordEncoder.encode(request.novaSenha()));
         }
-        usuarioRepository.save(usuario);
+        Usuario salvo = usuarioRepository.save(usuario);
         if (!codigoValido) {
             throw new CodigoInvalidoException("Código inválido ou expirado");
+        }
+        avisarSenhaAlterada(salvo);
+    }
+
+    private void avisarSenhaAlterada(Usuario usuario) {
+        try {
+            log.info("[EMAIL DEV] Para {}: sua senha foi alterada em {}. Se não foi você, recupere sua senha.",
+                    usuario.getEmail(), LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        } catch (RuntimeException falha) {
+            log.warn("Falha ao registrar aviso de senha alterada para {}", usuario.getEmail(), falha);
         }
     }
 }

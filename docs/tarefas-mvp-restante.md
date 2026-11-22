@@ -309,6 +309,8 @@ notaExibida = notaInterna limitada entre 0 e 5, 1 casa      → o que vai no JSO
 
 ## TAREFA 14 — Aviso de senha alterada (R10) — Murilo
 
+**Etapa de 22/11/2026:** código implementado, compilado e conferido por HTTP/log nos dois fluxos, sempre após salvar e com proteção contra falha do aviso. Senha nova aceita no login e senha anterior recusada; dois avisos conferidos, nenhum para tentativas inválidas. Sem envio real de email. Publicação aguarda autorização.
+
 **O que é:** avisar o usuário sempre que a senha mudar. **Modo desenvolvimento:** o aviso é uma linha no log (`[EMAIL DEV] Para <email>: sua senha foi alterada em <data/hora>. Se não foi você, recupere sua senha.`).
 
 **Onde:** `UsuarioService.trocarSenha` (tarefa 3) e `AuthService` redefinir senha (tarefa 13)
