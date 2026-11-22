@@ -19,5 +19,9 @@ public class Usuario extends UsuarioBase {
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
     private Integer totalDenunciasRecebidas;
+    private Boolean telefoneConfirmado;
+    private String codigoVerificacao;
+    private LocalDateTime codigoExpiraEm;
+    private Integer tentativasCodigo;
 
 }

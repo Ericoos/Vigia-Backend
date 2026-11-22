@@ -10,6 +10,7 @@ import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.dto.TrocarSenhaRequest;
 import com.uscs.vigia.dto.UsuarioResponse;
 import com.uscs.vigia.exception.RecursoNaoEncontradoException;
+import com.uscs.vigia.exception.ConflitoException;
 import com.uscs.vigia.exception.SenhaIgualException;
 import com.uscs.vigia.exception.SenhaIncorretaException;
 import com.uscs.vigia.model.Reporte;
@@ -29,6 +30,8 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final ReporteRepository reporteRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CodigoService codigoService;
+    private final SmsService smsService;
 
     public UsuarioResponse buscarPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
@@ -41,16 +44,25 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Usuário não encontrado: " + id));
+        boolean telefoneAlterado = request.telefone() != null && !request.telefone().equals(usuario.getTelefone());
+        if (telefoneAlterado && usuarioRepository.existsByTelefone(request.telefone())) {
+            throw new ConflitoException("Telefone já cadastrado");
+        }
         if (request.nome() != null) {
             usuario.setNome(request.nome());
         }
-        if (request.telefone() != null) {
+        if (telefoneAlterado) {
             usuario.setTelefone(request.telefone());
+            usuario.setTelefoneConfirmado(false);
+            codigoService.gerar(usuario);
         }
         if (request.avatar() != null) {
             usuario.setAvatar(request.avatar());
         }
         Usuario salvo = usuarioRepository.save(usuario);
+        if (telefoneAlterado) {
+            smsService.enviar(salvo.getTelefone(), "Seu código de confirmação é " + salvo.getCodigoVerificacao());
+        }
         return toResponse(salvo);
     }
 

@@ -21,7 +21,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 | `201 Created` | Reporte ou usuário criado |
 | `400 Bad Request` | Validação falhou ou regra de negócio (sub desalinhada da categoria) |
 | `401 Unauthorized` | Login com e-mail ou senha inválidos, ou rota protegida sem token / com token inválido |
-| `403 Forbidden` | Login de conta que não está `USUARIO_ATIVO` |
+| `403 Forbidden` | Login de conta não ativa ou com telefone explicitamente não confirmado |
 | `404 Not Found` | Recurso inexistente |
 | `409 Conflict` | Cadastro com e-mail já existente |
 
@@ -40,7 +40,7 @@ Identificadores: sem acentos nem cedilha nos nomes dos campos
 - `400` de **validação** → `"erro": "Erro de validação"`.
 - `400` de **regra de negócio** (sub não pertence à categoria) → `"erro": "Regra de negócio"`.
 - `401` → `"erro": "Não autorizado"`.
-- `403` → `"erro": "Conta inativa"`.
+- `403` → `"erro": "Conta inativa"` ou `"Telefone não confirmado"`, conforme a regra que bloqueou o login.
 - `404` → `"erro": "Recurso não encontrado"`.
 - `409` → `"erro": "Conflito"`.
 
@@ -227,9 +227,10 @@ Requisição (`CadastroRequest`):
 
 - Validação: nome 3–100; e-mail válido; telefone só dígitos com DDD; data no passado; senha 8–30 com maiúscula, minúscula, número e especial → `400` se falhar.
 - O e-mail é normalizado (`trim` + minúsculas) antes de gravar.
-- E-mail já cadastrado (comparação já normalizada) → `409` `"Conflito"`.
+- E-mail já cadastrado (comparação já normalizada) ou telefone já usado → `409` `"Conflito"`. Para telefone, mensagem "Telefone já cadastrado".
 - A senha é gravada com BCrypt; a conta nasce `USUARIO_ATIVO` com `dataInicio` no horário de São Caetano do Sul.
-- `201` com `UsuarioResponse` (sem senha): `{ "id", "nome", "email", "telefone", "dataNascimento", "avatar" }`.
+- Cadastro novo marca telefoneConfirmado=false e gera código de seis dígitos válido por dez minutos. A entrega é somente no log `[SMS DEV]`, sem SMS real. O código não aparece na resposta JSON.
+- `201` com `UsuarioResponse` (sem senha/código): `{ "id", "nome", "email", "telefone", "dataNascimento", "avatar", "avaliacao" }`.
 
 ## 5.3. ENDPOINT: POST /api/auth/login — entrar
 
@@ -247,6 +248,7 @@ Resposta `200` (`LoginResponse`):
 - O e-mail é normalizado antes da busca (maiúsculas não importam).
 - E-mail inexistente **e** senha errada devolvem o mesmo `401` com a mesma mensagem, para não revelar quais e-mails têm conta.
 - Conta com senha certa mas `status` diferente de `USUARIO_ATIVO` → `403`. A checagem vem depois da senha.
+- Após senha e status, telefoneConfirmado=false → `403`, mensagem "Confirme seu telefone antes de entrar". TelefoneConfirmado nulo de usuário antigo não bloqueia login.
 - Token JWT HS256: `iss=vigia-api`, `sub`=id do usuário, `iat`, `exp` (24 h). O app manda nas próximas requisições como `Authorization: Bearer <token>`. Desde 15/11/2026 o token é exigido em toda rota que não seja `GET` de leitura ou `/api/auth/**` (ver "Regras de acesso" na seção 1).
 
 ---
@@ -400,6 +402,44 @@ Testado via HTTP em 21/11/2026 (todos os casos acima, com reporte id 65 e contas
 **Nota do bairro** (`classificacaoSeguranca` em `/api/bairros` e `/api/bairros/{tipoBairro}`): agora sempre entre **0 e 5**, com 1 casa decimal; bairro sem reportes = 5,0 (antes era `null`).
 
 **`UsuarioResponse`** (login, cadastro, `/api/usuarios/me`) ganhou `avaliacao` (0 a 5; usuários sem nota aparecem com 5,0). Calculada automaticamente (tarefa 9): `5 × (reportes + 1) / (reportes + 1 + denúncias recebidas)`; cai quando o autor recebe denúncia e sobe com novos reportes. Permanente: excluir reporte não altera.
+
+---
+
+## 5.9. Confirmação de telefone — Tarefa 12 implementada e testada
+
+Implementação de 22/11/2026 compilada; roteiro HTTP/H2 e SMS DEV conferido no log.
+
+| Método | Rota | Corpo | Resposta configurada |
+|---|---|---|---|
+| POST | `/api/auth/confirmar-telefone` | `{ "email": "maria@email.com", "codigo": "123456" }` | 204, sem corpo |
+| POST | `/api/auth/reenviar-codigo` | `{ "email": "maria@email.com" }` | 204, sem corpo |
+
+- Rotas públicas, como as demais `/api/auth/**`.
+- Código errado, vencido, invalidado ou já usado → 400 (`CodigoInvalidoException`), com a mesma mensagem genérica para e-mail inexistente: "Código inválido ou expirado".
+- Contador é salvo antes do 400; cinco erros invalidam o código. O método de confirmação não é transacional para preservar essa gravação.
+- Reenvio responde 204 para e-mail existente ou inexistente. Só gera/envia se o telefone não estiver confirmado e passou pelo menos um minuto do último código.
+- Confirmar telefone marca true e apaga o código, validade e tentativas.
+- `PUT /api/usuarios/me`: telefone novo já usado por outra conta → 409; telefone livre diferente do atual marca false, gera código e registra SMS DEV. O próximo login exige nova confirmação. Enviar o mesmo telefone mantém a confirmação e não gera outro código.
+- Testes conferidos: cadastro 201/SMS DEV; login não confirmado 403; senha errada 401; confirmação errada/vencida/usada 400; confirmação válida 204 e login 200; telefone repetido 409. Tentativas 1–5 persistiram apesar do 400. Reenvio imediato não mudou o código; após intervalo simulado no H2, renovou. Troca no perfil exigiu nova confirmação; mesmo telefone manteve a confirmação. Flag nula legada permitiu login. Campos de código não são expostos no JSON.
+
+---
+
+## 5.10. Recuperação de senha — Tarefa 13 implementada e testada
+
+Implementação de 22/11/2026 compilada, contexto conferido e roteiro HTTP/H2/EMAIL DEV concluído.
+
+| Método | Rota | Corpo | Resposta configurada |
+|---|---|---|---|
+| POST | `/api/auth/esqueci-senha` | `{ "email": "maria@email.com" }` | 204, sem corpo |
+| POST | `/api/auth/redefinir-senha` | `{ "email": "maria@email.com", "codigo": "123456", "novaSenha": "NovaSenha@123" }` | 204, sem corpo |
+
+- Rotas públicas. Solicitação retorna 204 tanto para email existente quanto inexistente; somente o existente gera código e linha `[EMAIL DEV] Para <email>: seu código de recuperação é <codigo>`.
+- Mesmo `CodigoService` da confirmação de telefone: seis dígitos, validade de dez minutos, cinco erros invalidam o código. Prazo confirmado por Murilo conforme o resumo mais recente enviado em 22/11.
+- Nova senha segue exatamente as regras de força do cadastro (obrigatória, 8–30, maiúscula, minúscula, número e especial).
+- Código inválido, vencido, invalidado ou já usado → 400 (`CodigoInvalidoException`), inclusive email inexistente na redefinição.
+- O usuário é salvo antes de lançar 400, sem transação no método de redefinição, para preservar tentativas/invalidade. Sucesso grava BCrypt e consome o código, impedindo sua reutilização.
+- O aviso de senha alterada é a Tarefa 14, ainda pendente.
+- Testes conferidos: solicitação existente/inexistente 204, somente o existente no EMAIL DEV; código lido do log aceito na redefinição (204); senha nova 200 e antiga 401 no login; reutilização, expiração, código errado, email inexistente e senha fraca 400. Tentativas 1–5 persistiram apesar do 400 e invalidaram o código na quinta; falhas não alteraram a senha salva.
 
 ---
 

@@ -263,6 +263,8 @@ notaExibida = notaInterna limitada entre 0 e 5, 1 casa      → o que vai no JSO
 
 ## TAREFA 12 — Confirmação de telefone (R03, alterado em 16/11)
 
+**Etapa de 22/11/2026 (Murilo):** implementação compilada, contexto conferido e roteiro HTTP/H2/log concluído, incluindo confirmação após troca de telefone pelo perfil. Contador persistido no 400, cinco erros, expiração, reenvio e flag nula conferidos. Campos genéricos e CodigoService reutilizados na recuperação; publicação aguarda autorização.
+
 > **Mudou em 16/11:** a confirmação passou de e-mail para **telefone**, e o relatório será atualizado (ver `mudancas-docs-relatorio.md` §4). O SMS roda em **modo desenvolvimento**: o código aparece no console da API em vez de ser enviado. Esta tarefa **não depende mais da 11**.
 
 **O que é:** a conta só loga depois de confirmar o telefone com o código de 6 dígitos gerado no cadastro.
@@ -279,12 +281,16 @@ notaExibida = notaInterna limitada entre 0 e 5, 1 casa      → o que vai no JSO
 - `POST /api/auth/reenviar-codigo` `{ email }` → 204 sempre (não revela se o e-mail existe); gera código novo. No máximo 1 reenvio por minuto.
 - Usuários já existentes no H2: marcar como confirmados ao migrar, ou recadastrar.
 - O `SmsService` fica isolado: trocar para um provedor real de SMS depois é só trocar a implementação.
+- Na troca de telefone pelo perfil, número usado por outra conta → 409; número diferente e livre marca telefoneConfirmado=false, gera novo código e registra SMS DEV. Mesmo número atual não muda a confirmação nem gera código novo.
+- A confirmação salva o usuário antes de lançar 400, sem @Transactional, para manter as tentativas. O reenvio só gera código para telefone não confirmado após um minuto do último envio.
 
-**Testes:** cadastro (código aparece no console) → login 403 → código errado 400 → código certo 200 → login 200 → mesmo código de novo 400 → código vencido 400 → 5 erros invalidam o código → telefone repetido no cadastro 409.
+**Testes:** cadastro (código aparece no console) → login 403 → código errado 400 → código certo 204 → login 200 → mesmo código de novo 400 → código vencido 400 → 5 erros invalidam o código → telefone repetido no cadastro 409. Conferir também reenvio antes de um minuto e troca de telefone pelo perfil (conflito, novo número, login 403, confirmar 204 e login 200).
 
 ---
 
 ## TAREFA 13 — Recuperação de senha (R07, R08, R09) — Murilo
+
+**Atualização de 22/11/2026:** Murilo confirmou seguir o último resumo recebido (`tarefas-murilo2.txt`): recuperação reutiliza o mesmo gerador com validade de **10 minutos**. Implementação compilada, contexto conferido e roteiro HTTP/H2/EMAIL DEV concluído (solicitação, redefinição, senha nova, uso único, expiração, força de senha e cinco tentativas persistidas). Publicação aguarda autorização.
 
 **O que é:** o usuário esquece a senha, recebe um **código de 6 dígitos** com prazo e define uma senha nova. **Modo desenvolvimento** (decisão de 21/11): o "e-mail" é uma linha no log da API com o código, sem envio real — igual à confirmação de telefone.
 
@@ -293,7 +299,7 @@ notaExibida = notaInterna limitada entre 0 e 5, 1 casa      → o que vai no JSO
 **Onde:** `AuthService`, `AuthController`, novos `dto/EsqueciSenhaRequest.java` (`email`), `dto/RedefinirSenhaRequest.java` (`email`, `codigo`, `novaSenha`)
 
 **Regras:**
-- `POST /api/auth/esqueci-senha` `{ email }` → 204 **sempre** (não revela se o e-mail existe). Se existir: gera o código pelo `CodigoService` (validade **30 min**, R08) e escreve no log: `[EMAIL DEV] Para <email>: seu código de recuperação é 123456`.
+- `POST /api/auth/esqueci-senha` `{ email }` → 204 **sempre** (não revela se o e-mail existe). Se existir: gera o código pelo `CodigoService` (validade **10 min**, conforme o resumo de 22/11 confirmado por Murilo) e escreve no log: `[EMAIL DEV] Para <email>: seu código de recuperação é 123456`.
 - `POST /api/auth/redefinir-senha` `{ email, codigo, novaSenha }` → 204. `novaSenha` com a **mesma regra de força** do cadastro (R09). Código errado, vencido ou já usado → 400; 5 erros invalidam o código.
 - Depois de redefinir, o código é descartado (não pode ser usado de novo).
 
