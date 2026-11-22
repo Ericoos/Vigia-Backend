@@ -1,6 +1,6 @@
-package com.uscs.vigia.model;
+package com.uscs.vigia.enums;
 
-public enum TipoUsuario {
+public enum StatusUsuario {
     USUARIO_ATIVO,
     USUARIO_SUSPENSO,
     USUARIO_BANIDO,

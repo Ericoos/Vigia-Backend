@@ -9,12 +9,12 @@ import com.uscs.vigia.dto.DesativarContaRequest;
 import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.dto.TrocarSenhaRequest;
 import com.uscs.vigia.dto.UsuarioResponse;
-import com.uscs.vigia.exception.ResourceNotFoundException;
+import com.uscs.vigia.exception.RecursoNaoEncontradoException;
 import com.uscs.vigia.exception.SenhaIgualException;
 import com.uscs.vigia.exception.SenhaIncorretaException;
 import com.uscs.vigia.model.Reporte;
-import com.uscs.vigia.model.StatusReporte;
-import com.uscs.vigia.model.TipoUsuario;
+import com.uscs.vigia.enums.StatusReporte;
+import com.uscs.vigia.enums.StatusUsuario;
 import com.uscs.vigia.model.Usuario;
 import com.uscs.vigia.repository.ReporteRepository;
 import com.uscs.vigia.repository.UsuarioRepository;
@@ -32,14 +32,14 @@ public class UsuarioService {
 
     public UsuarioResponse buscarPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Usuário não encontrado: " + id));
         return toResponse(usuario);
     }
 
     public UsuarioResponse atualizar(Long id, AtualizarUsuarioRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Usuário não encontrado: " + id));
         if (request.nome() != null) {
             usuario.setNome(request.nome());
@@ -56,7 +56,7 @@ public class UsuarioService {
 
     public void trocarSenha(Long id, TrocarSenhaRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Usuário não encontrado: " + id));
         if (!passwordEncoder.matches(request.senhaAtual(), usuario.getSenhaHash())) {
             throw new IllegalArgumentException("Senha atual incorreta");
@@ -70,12 +70,12 @@ public class UsuarioService {
 
     public void desativarConta(Long id, DesativarContaRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Usuário não encontrado: " + id));
         if (!passwordEncoder.matches(request.senha(), usuario.getSenhaHash())) {
             throw new SenhaIncorretaException("Senha incorreta");
         }
-        usuario.setStatus(TipoUsuario.USUARIO_INATIVO);
+        usuario.setStatus(StatusUsuario.USUARIO_INATIVO);
         usuario.setDataFim(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
         usuarioRepository.save(usuario);
     }

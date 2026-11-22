@@ -16,11 +16,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoriaController {
 
-	private final CategoriaService categoriaService;
+    private final CategoriaService categoriaService;
 
-	@GetMapping
-	public List<CategoriaResponse> listar() {
-		return categoriaService.listar();
-	}
+    @GetMapping
+    public List<CategoriaResponse> listar() {
+        return categoriaService.listar();
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.uscs.vigia.model;
 
+import com.uscs.vigia.enums.StatusUsuario;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,5 @@ public abstract class UsuarioBase {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private TipoUsuario status;
+    private StatusUsuario status;
 }

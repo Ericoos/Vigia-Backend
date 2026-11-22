@@ -204,7 +204,7 @@ Criado em 10/11/2026 e ampliado em 19/11/2026 conforme a Tarefa 7 de `docs/taref
 ```
 
 - `400` para texto que não existe no enum, como `NAO_EXISTE` (verificado via HTTP).
-- `404` via `ResourceNotFoundException` se a chave enum for válida, mas o bairro não estiver cadastrado.
+- `404` via `RecursoNaoEncontradoException` se a chave enum for válida, mas o bairro não estiver cadastrado.
 - Ao buscar o detalhe, o Service recalcula e salva a classificação somando as notas dos reportes `PUBLICADO` daquele bairro, com a fórmula existente em `TipoCategoria.calculaClassificacao`.
 - Sem reportes publicados associados, a classificação é `null` (não zero).
 - Verificado em 10/11/2026: três reportes publicados de `CENTRO` (`PRESENCA_POLICIAL`, `ROUBO`, `CAMERAS`) resultaram em `classificacaoSeguranca: 0.06` (`0.06 - 0.04 + 0.04`). O valor foi confirmado no banco. Um bairro sem reportes (`BARCELONA`) retornou e persistiu `null`.
@@ -346,6 +346,46 @@ Conferido no H2: usuário preservado com `USUARIO_INATIVO` e `dataFim` preenchid
 | Bairro inválido no filtro / POST sem token | 400 / 401 |
 
 - Caminho canônico definido por Murilo em 19/11/2026: `/api/bairros` e `/api/bairros/{tipoBairro}`. Controller e matcher GET do Security atualizados, sem alias no singular. Lista e detalhe sem token → 200; caminho antigo no singular com token → 404. Comunicar ao Fabrício. O banco local foi recriado pelo Hibernate/seed após reset autorizado, e os testes funcionais passaram nesse banco.
+
+---
+
+## 5.7. ENDPOINT: POST /api/reportes/{idReporte}/denuncias — denunciar reporte (Tarefa 8)
+
+**Requisitos:** R43, R45, R66. **Exige token** (`Authorization: Bearer <token>`); o denunciante vem do token.
+
+#### Requisição
+```json
+{
+  "motivo": "INFORMACAO_FALSA",
+  "descricao": "Esse reporte nao aconteceu nesse local"
+}
+```
+- `motivo` (obrigatório): `INFORMACAO_FALSA`, `LOCAL_INCORRETO`, `CONTEUDO_ENGANOSO`, `CONTEUDO_OFENSIVO`, `SPAM`, `OUTRO`.
+- `descricao` (obrigatória, 10 a 500 caracteres): a justificativa. No `OUTRO`, é o texto livre do motivo.
+
+#### Resposta `201`
+```json
+{
+  "idDenuncia": 1,
+  "idReporte": 65,
+  "motivo": "INFORMACAO_FALSA",
+  "descricao": "Esse reporte nao aconteceu nesse local",
+  "dataDenuncia": "2026-11-21T21:27:45.341-03:00",
+  "statusDenuncia": "PENDENTE"
+}
+```
+A resposta não mostra quem denunciou. Toda denúncia nasce `PENDENTE` (análise do admin fora do MVP).
+
+#### Erros
+| Situação | Status |
+|---|---|
+| Sem motivo, motivo inexistente, sem justificativa ou fora de 10–500 | 400 |
+| Sem token ou token inválido | 401 |
+| Denunciar o próprio reporte | 403 (`"erro": "Acesso negado"`) |
+| Reporte inexistente, `RASCUNHO` ou `EXCLUIDO` | 404 |
+| Já denunciou esse reporte | 409 |
+
+Testado via HTTP em 21/11/2026 (todos os casos acima, com reporte id 65 e contas de teste ids 34/35 no H2 local).
 
 ---
 

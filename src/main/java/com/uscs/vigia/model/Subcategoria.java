@@ -1,5 +1,6 @@
 package com.uscs.vigia.model;
 
+import com.uscs.vigia.enums.TipoSubcategoria;
 import jakarta.persistence.*;
 
 import lombok.Getter;
@@ -12,13 +13,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Subcategoria {
 
-	@Id
+    @Id
     @Enumerated(EnumType.STRING)
-	private TipoSubcategoria tipoSubCategoria;
+    private TipoSubcategoria tipoSubCategoria;
 
-	@ManyToOne
-	@JoinColumn(name = "categoria_id")
-	private Categoria categoria;
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
 
     public Subcategoria(TipoSubcategoria tipoSubCategoria, Categoria categoria) {
         this.tipoSubCategoria = tipoSubCategoria;

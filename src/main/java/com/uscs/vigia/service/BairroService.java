@@ -3,11 +3,11 @@ package com.uscs.vigia.service;
 import com.uscs.vigia.dto.BairroDetalheResponse;
 import com.uscs.vigia.dto.BairroResponse;
 import com.uscs.vigia.dto.ReporteResponse;
-import com.uscs.vigia.exception.ResourceNotFoundException;
+import com.uscs.vigia.exception.RecursoNaoEncontradoException;
 import com.uscs.vigia.model.Bairro;
 import com.uscs.vigia.model.Reporte;
-import com.uscs.vigia.model.StatusReporte;
-import com.uscs.vigia.model.TipoBairro;
+import com.uscs.vigia.enums.StatusReporte;
+import com.uscs.vigia.enums.TipoBairro;
 import com.uscs.vigia.repository.BairroRepository;
 import com.uscs.vigia.repository.ReporteRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class BairroService {
 
     public BairroDetalheResponse buscarPorTipo(TipoBairro tipoBairro) {
         Bairro bairro = bairroRepository.findById(tipoBairro)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Bairro não encontrado: " + tipoBairro));
         recalcularClassificacao(bairro);
         List<ReporteResponse> reportes = reporteRepository.findAllByBairroAndStatus(bairro, StatusReporte.PUBLICADO)
@@ -49,7 +49,7 @@ public class BairroService {
             classificacao = 0.0;
             for (Reporte reporte : reportes) {
                 classificacao += reporte.getCategoria().getTipoCategoria()
-                        .calculaClassificacao(reporte.getSubcategoria().getTipoSubCategoria());
+                        .calcularClassificacao(reporte.getSubcategoria().getTipoSubCategoria());
             }
         }
 

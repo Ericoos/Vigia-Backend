@@ -2,7 +2,7 @@ package com.uscs.vigia.controller;
 
 import com.uscs.vigia.dto.BairroDetalheResponse;
 import com.uscs.vigia.dto.BairroResponse;
-import com.uscs.vigia.model.TipoBairro;
+import com.uscs.vigia.enums.TipoBairro;
 import com.uscs.vigia.service.BairroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

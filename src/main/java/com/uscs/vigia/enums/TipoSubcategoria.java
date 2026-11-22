@@ -1,4 +1,4 @@
-package com.uscs.vigia.model;
+package com.uscs.vigia.enums;
 
 import lombok.Getter;
 

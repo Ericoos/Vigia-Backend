@@ -2,8 +2,8 @@ package com.uscs.vigia.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class ConflictException extends ApiException {
-    public ConflictException(String message) {
+public class ConflitoException extends ApiException {
+    public ConflitoException(String message) {
         super(HttpStatus.CONFLICT, "Conflito", message);
     }
 }

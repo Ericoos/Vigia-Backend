@@ -1,5 +1,8 @@
 package com.uscs.vigia.config;
 
+import com.uscs.vigia.enums.TipoBairro;
+import com.uscs.vigia.enums.TipoCategoria;
+import com.uscs.vigia.enums.TipoSubcategoria;
 import com.uscs.vigia.model.*;
 import com.uscs.vigia.repository.BairroRepository;
 import com.uscs.vigia.repository.CategoriaRepository;

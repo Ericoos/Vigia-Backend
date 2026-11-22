@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.uscs.vigia.dto.ReporteRequest;
 import com.uscs.vigia.dto.ReporteResponse;
-import com.uscs.vigia.model.TipoCategoria;
-import com.uscs.vigia.model.TipoBairro;
+import com.uscs.vigia.enums.TipoCategoria;
+import com.uscs.vigia.enums.TipoBairro;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,22 +21,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReporteController {
 
-	private final ReporteService reporteService;
+    private final ReporteService reporteService;
 
-	@GetMapping
-	public List<ReporteResponse> listar(@RequestParam(required = false) TipoCategoria categoria, @RequestParam(required = false) TipoBairro bairro) {
-		return reporteService.listar(categoria, bairro);
-	}
-
-    @GetMapping("/{id}")
-    public ReporteResponse listarPorId(@PathVariable Long id) {
-        return reporteService.listarPorId(id);
+    @GetMapping
+    public List<ReporteResponse> listar(@RequestParam(required = false) TipoCategoria categoria, @RequestParam(required = false) TipoBairro bairro) {
+        return reporteService.listar(categoria, bairro);
     }
 
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public ReporteResponse criar(@Valid @RequestBody ReporteRequest reporteRequest, @AuthenticationPrincipal Jwt jwt) {
+    @GetMapping("/{id}")
+    public ReporteResponse buscarPorId(@PathVariable Long id) {
+        return reporteService.buscarPorId(id);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ReporteResponse criar(@Valid @RequestBody ReporteRequest reporteRequest, @AuthenticationPrincipal Jwt jwt) {
         Long idUsuario = Long.valueOf(jwt.getSubject());
-		return reporteService.criar(reporteRequest, idUsuario);
-	}
+        return reporteService.criar(reporteRequest, idUsuario);
+    }
 }

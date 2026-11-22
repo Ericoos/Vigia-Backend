@@ -1,9 +1,9 @@
 package com.uscs.vigia.repository;
 
 import com.uscs.vigia.model.Bairro;
-import com.uscs.vigia.model.StatusReporte;
-import com.uscs.vigia.model.TipoBairro;
-import com.uscs.vigia.model.TipoCategoria;
+import com.uscs.vigia.enums.StatusReporte;
+import com.uscs.vigia.enums.TipoBairro;
+import com.uscs.vigia.enums.TipoCategoria;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.uscs.vigia.model.Reporte;
 

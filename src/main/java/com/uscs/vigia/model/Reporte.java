@@ -1,5 +1,6 @@
 package com.uscs.vigia.model;
 
+import com.uscs.vigia.enums.StatusReporte;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,37 +23,37 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Reporte {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long idReporte;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idReporte;
 
-	private String titulo;
+    private String titulo;
 
-	@Column(columnDefinition = "TEXT")
-	private String descricao;
+    @Column(columnDefinition = "TEXT")
+    private String descricao;
 
-	private double latitude;
-	private double longitude;
-	private String endereco;
+    private double latitude;
+    private double longitude;
+    private String endereco;
 
-	@Enumerated(EnumType.STRING)
-	private StatusReporte status;
+    @Enumerated(EnumType.STRING)
+    private StatusReporte status;
 
-	private OffsetDateTime dataReporte;
+    private OffsetDateTime dataReporte;
 
-	@ManyToOne
-	@JoinColumn(name = "usuario_id")
-	private Usuario usuario;
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
-	@ManyToOne
-	@JoinColumn(name = "categoria_id")
-	private Categoria categoria;
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
 
-	@ManyToOne
-	@JoinColumn(name = "subcategoria_id")
-	private Subcategoria subcategoria;
+    @ManyToOne
+    @JoinColumn(name = "subcategoria_id")
+    private Subcategoria subcategoria;
 
-	@ManyToOne
-	@JoinColumn(name = "bairro_id")
-	private Bairro bairro;
+    @ManyToOne
+    @JoinColumn(name = "bairro_id")
+    private Bairro bairro;
 }

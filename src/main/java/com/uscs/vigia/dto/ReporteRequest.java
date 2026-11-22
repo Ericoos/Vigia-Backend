@@ -1,7 +1,7 @@
 package com.uscs.vigia.dto;
 
-import com.uscs.vigia.model.TipoCategoria;
-import com.uscs.vigia.model.TipoSubcategoria;
+import com.uscs.vigia.enums.TipoCategoria;
+import com.uscs.vigia.enums.TipoSubcategoria;
 
 import jakarta.validation.constraints.*;
 

@@ -2,8 +2,8 @@ package com.uscs.vigia.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class InvalidCredentialsException extends ApiException {
-    public InvalidCredentialsException(String message) {
+public class CredenciaisInvalidasException extends ApiException {
+    public CredenciaisInvalidasException(String message) {
         super(HttpStatus.UNAUTHORIZED, "Não autorizado", message);
     }
 }

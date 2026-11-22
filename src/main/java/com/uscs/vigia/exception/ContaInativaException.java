@@ -2,8 +2,8 @@ package com.uscs.vigia.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class InactiveAccountException extends ApiException {
-    public InactiveAccountException(String message) {
+public class ContaInativaException extends ApiException {
+    public ContaInativaException(String message) {
         super(HttpStatus.FORBIDDEN, "Conta inativa", message);
     }
 }

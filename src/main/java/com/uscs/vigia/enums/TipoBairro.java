@@ -1,4 +1,4 @@
-package com.uscs.vigia.model;
+package com.uscs.vigia.enums;
 
 import java.text.Normalizer;
 import java.util.Optional;

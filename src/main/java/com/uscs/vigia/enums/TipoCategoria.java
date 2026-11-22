@@ -1,4 +1,4 @@
-package com.uscs.vigia.model;
+package com.uscs.vigia.enums;
 
 import lombok.Getter;
 
@@ -6,13 +6,13 @@ import lombok.Getter;
 public enum TipoCategoria {
     SEGURANCA {
         @Override
-        public Double calculaClassificacao(TipoSubcategoria subcategoria) {
+        public Double calcularClassificacao(TipoSubcategoria subcategoria) {
             return (getPeso() + subcategoria.getPeso()) / 100.0;
         }
     },
     INSEGURANCA {
         @Override
-        public Double calculaClassificacao(TipoSubcategoria subcategoria) {
+        public Double calcularClassificacao(TipoSubcategoria subcategoria) {
             return (getPeso() - subcategoria.getPeso()) / 100.0;
         }
     };
@@ -23,5 +23,5 @@ public enum TipoCategoria {
         this.peso = 1.0;
     }
 
-    public abstract Double calculaClassificacao(TipoSubcategoria subcategoria);
+    public abstract Double calcularClassificacao(TipoSubcategoria subcategoria);
 }

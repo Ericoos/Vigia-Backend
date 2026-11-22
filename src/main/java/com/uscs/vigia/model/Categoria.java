@@ -3,6 +3,7 @@ package com.uscs.vigia.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.uscs.vigia.enums.TipoCategoria;
 import jakarta.persistence.*;
 
 import lombok.Getter;
@@ -15,12 +16,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Categoria {
 
-	@Id
+    @Id
     @Enumerated(EnumType.STRING)
-	private TipoCategoria tipoCategoria;
+    private TipoCategoria tipoCategoria;
 
-	@OneToMany(mappedBy = "categoria", fetch = FetchType.EAGER)
-	private List<Subcategoria> subcategorias = new ArrayList<>();
+    @OneToMany(mappedBy = "categoria", fetch = FetchType.EAGER)
+    private List<Subcategoria> subcategorias = new ArrayList<>();
 
     public Categoria(TipoCategoria tipoCategoria) {
         this.tipoCategoria = tipoCategoria;

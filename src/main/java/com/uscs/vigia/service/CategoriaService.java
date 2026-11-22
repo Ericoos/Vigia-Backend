@@ -14,20 +14,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoriaService {
 
-	private final CategoriaRepository categoriaRepository;
+    private final CategoriaRepository categoriaRepository;
 
-	public List<CategoriaResponse> listar() {
-		return categoriaRepository.findAll()
-				.stream()
-				.map(this::toResponse)
-				.toList();
-	}
+    public List<CategoriaResponse> listar() {
+        return categoriaRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
 
-	private CategoriaResponse toResponse(Categoria categoria) {
-		return new CategoriaResponse(
-				categoria.getTipoCategoria(),
-				categoria.getSubcategorias().stream()
-						.map(SubcategoriaService::toResponse)
-						.toList());
-	}
+    private CategoriaResponse toResponse(Categoria categoria) {
+        return new CategoriaResponse(
+                categoria.getTipoCategoria(),
+                categoria.getSubcategorias().stream()
+                        .map(SubcategoriaService::toResponse)
+                        .toList());
+    }
 }

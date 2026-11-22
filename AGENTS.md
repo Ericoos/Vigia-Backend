@@ -42,7 +42,8 @@ Nunca compartilhamos código entre os repositórios — só o contrato da API (`
 
 ### Fora do MVP (decisões de escopo, 15/11/2026)
 
-- Denúncia de **perfil** (R68), painel e ações de admin (R44, R61, R67, R69), punições e recursos (R70–R72), notícias (R31–R32), exclusão permanente de conta (R63), busca textual (R42), agrupamento no mapa (R18), CAPTCHA, termos/LGPD, testes automáticos.
+- Denúncia de **perfil** (R68), painel e ações de admin (R44, R61, R67, R69), punições e recursos (R70–R72), notícias (R31–R32), exclusão permanente de conta (R63), busca textual (R42), agrupamento no mapa (R18), CAPTCHA, termos/LGPD, testes automáticos, **verificação por CPF** (funcionalidade futura, ver `docs/mudancas-docs-relatorio.md` §5), **central de notificações** (aba com status de reporte, denúncias, punição e recurso; funcionalidade futura, ver §6 do mesmo doc).
+- **Confirmação de conta (R03) é por telefone**, não por e-mail (decisão de 16/11/2026), com o código em **modo desenvolvimento** (vai para o log, sem SMS real). Recuperação de senha continua por e-mail.
 - **Geocodificação/OpenStreetMap**: feita no **front**; o back só recebe o texto do bairro/endereço.
 - **Não existe avaliação de 1 a 5 dada por usuários.** A "avaliação geral" do perfil é a **reputação automática do R15** (campo `Usuario.avaliacao`). `avaliacaoGravidade` foi **removida** do `Reporte` e não deve voltar.
 - Rate limiting (T40 no Trello) não é requisito do relatório: só se sobrar tempo.
@@ -124,6 +125,9 @@ O diagrama mostra `idSubcategoria: int`; no código isso vira um atributo do tip
 
 **3. Sem acentos nem cedilha em identificadores Java.**
 `endereço` no diagrama vira `endereco` no código. Vale para atributos, métodos, classes e pacotes.
+
+**3.1. Identificadores em português, sem nomes vagos.**
+Classes, atributos, métodos e exceções em português (`ConflitoException`, `normalizarEmail()`), verbo no infinitivo (`calcularClassificacao`, `buscarPorId` para um item, `listar` para lista). Enum de estado = `StatusX`, enum de motivo = `MotivoX`. Ficam em inglês só os padrões do Java/Spring (`toResponse`, `handleX`, `Request`/`Response`, `Repository`, `ApiException`). Indentação com 4 espaços, sem TAB. Padronização feita em 21/11/2026.
 
 **4. Herança (`Pessoa → Usuario/Admin`) vira `@MappedSuperclass`.**
 A `Pessoa` do diagrama é o molde `UsuarioBase` no código, sem tabela própria. Já está implementado; o módulo de usuário está **fora do foco atual**, mas o molde permanece no código.

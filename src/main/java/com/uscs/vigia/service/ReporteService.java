@@ -6,8 +6,11 @@ import java.util.List;
 
 import com.uscs.vigia.dto.ReporteRequest;
 import com.uscs.vigia.dto.ReporteResponse;
+import com.uscs.vigia.enums.StatusReporte;
+import com.uscs.vigia.enums.TipoBairro;
+import com.uscs.vigia.enums.TipoCategoria;
 import com.uscs.vigia.exception.BairroInvalidoException;
-import com.uscs.vigia.exception.ResourceNotFoundException;
+import com.uscs.vigia.exception.RecursoNaoEncontradoException;
 import com.uscs.vigia.model.*;
 import com.uscs.vigia.repository.BairroRepository;
 import com.uscs.vigia.repository.CategoriaRepository;
@@ -24,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReporteService {
 
-	private final ReporteRepository reporteRepository;
+    private final ReporteRepository reporteRepository;
     private final CategoriaRepository categoriaRepository;
     private final SubcategoriaRepository subcategoriaRepository;
     private final UsuarioRepository usuarioRepository;
@@ -32,7 +35,7 @@ public class ReporteService {
     private final BairroService bairroService;
 
     @Transactional(readOnly = true)
-	public List<ReporteResponse> listar(TipoCategoria categoria, TipoBairro bairro) {
+    public List<ReporteResponse> listar(TipoCategoria categoria, TipoBairro bairro) {
         List<Reporte> reportes;
         if (categoria != null && bairro != null) {
             reportes = reporteRepository.findAllByStatusAndCategoria_TipoCategoriaAndBairro_TipoBairro(StatusReporte.PUBLICADO, categoria, bairro);
@@ -46,13 +49,13 @@ public class ReporteService {
         return reportes.stream()
                 .map(this::toResponse)
                 .toList();
-	}
+    }
 
     @Transactional(readOnly = true)
-    public ReporteResponse listarPorId(Long id) {
+    public ReporteResponse buscarPorId(Long id) {
         Reporte reporte = reporteRepository.findById(id)
                 .filter(r -> r.getStatus() == StatusReporte.PUBLICADO)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Reporte não encontrado: " + id));
         return toResponse(reporte);
     }
@@ -60,14 +63,14 @@ public class ReporteService {
     @Transactional
     public ReporteResponse criar(ReporteRequest reporteRequest, Long idUsuario) {
         Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado, ID: " + idUsuario));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado, ID: " + idUsuario));
 
         Categoria categoria = categoriaRepository.findById(reporteRequest.categoria())
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Categoria não encontrada: " + reporteRequest.categoria()));
 
         Subcategoria subcategoria = subcategoriaRepository.findById(reporteRequest.subcategoria())
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Subcategoria não encontrada: " + reporteRequest.subcategoria()));
 
         if (subcategoria.getCategoria().getTipoCategoria() != categoria.getTipoCategoria()) {
@@ -88,7 +91,7 @@ public class ReporteService {
                     .orElseThrow(() -> new BairroInvalidoException(
                             "Bairro inválido: " + reporteRequest.bairro()));
             Bairro bairro = bairroRepository.findById(tipoBairro)
-                    .orElseThrow(() -> new ResourceNotFoundException(
+                    .orElseThrow(() -> new RecursoNaoEncontradoException(
                             "Bairro não encontrado: " + tipoBairro));
             reporte.setBairro(bairro);
         }

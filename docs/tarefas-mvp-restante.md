@@ -3,6 +3,8 @@
 Base: requisitos do §6.1.1 do relatório (`docs/relatorio-vigia.txt`, p. 54–62), Quadro 4 (Denuncia reportes), Apêndice D (`denuncia_reporte`) e o código da `main` em `fc6d156` + login (T16).
 Entrega: **30/11/2026**. Cada tarefa vira um cartão no Trello.
 
+**Atualização 16/11:** a confirmação de conta (R03) passa a ser por **telefone**, em modo desenvolvimento. A verificação por **CPF** ficou como **funcionalidade futura** (texto para o relatório em `mudancas-docs-relatorio.md` §5).
+
 **Escopo confirmado em 15/11:** entram denúncia de reporte, confirmação de e-mail, recuperação de senha, editar e excluir reporte e desativação de conta. Usuários **não** avaliam reportes de 1 a 5 (não há esse requisito). A "avaliação geral" que aparece no perfil público (Figura 20) é a **reputação automática do R15**.
 
 **Fora do MVP:** denúncia de perfil (R68), painel/ações de admin (R44, R61, R67, R69), punições e recursos (R70–R72), notícias (R31–R32), exclusão permanente de conta (R63), busca textual (R42), agrupamento no mapa (R18).
@@ -15,12 +17,12 @@ Entrega: **30/11/2026**. Cada tarefa vira um cartão no Trello.
 | 4 | ✅ Desativar conta (publicada em `a5d220f`) | R62 | Murilo | 18/11 | 3 |
 | 5 | Editar reporte (uma vez) | R29 | Erick | 19/11 | 2 |
 | 6 | Excluir reporte | R30 | Erick | 19/11 | 2 |
-| 7 | Reporte com bairro + filtro + detalhe do bairro | R64, R41 | Murilo | 20/11 | 2 |
-| 8 | Denúncia de reporte | R43, R45, R66 | Erick | 20/11 | 2 |
+| 7 | ✅ Reporte com bairro + filtro + detalhe do bairro (publicada em `e4641da`) | R64, R41 | Murilo | 20/11 | 2 |
+| 8 | ✅ Denúncia de reporte (feita e testada 21/11, aguardando commit) | R43, R45, R66 | Erick | 20/11 | 2 |
 | 9 | Reputação automática do usuário | R15 | Murilo | 21/11 | 8 |
 | 10 | Classificação do bairro considera denúncias | R65 | Murilo | 21/11 | 7, 8 |
 | 11 | Base de envio de e-mail | — | Erick | 21/11 | — |
-| 12 | Confirmação de e-mail | R03 | Erick | 22/11 | 11 |
+| 12 | Confirmação de telefone (modo desenvolvimento) | R03 (alterado) | Erick | 22/11 | — |
 | 13 | Recuperação de senha | R07, R08, R09 | Erick | 22/11 | 11 |
 | 14 | Aviso de senha alterada | R10 | Murilo | 22/11 | 3, 11, 13 |
 | 15 | Acesso pela rede + MySQL | — | Erick + Fernando | 25/11 | todas |
@@ -171,11 +173,12 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 
 **O que é:** um usuário logado denuncia o reporte de **outro** usuário, com motivo e justificativa. A denúncia fica registrada e alimenta a reputação do autor (tarefa 9) e a classificação do bairro (tarefa 10).
 
-**Onde:** novos `model/DenunciaReporte.java`, `model/StatusDenuncia.java`, `model/MotivoDenuncia.java`, `repository/DenunciaReporteRepository.java`, `service/DenunciaService.java`, `controller/DenunciaController.java`, `dto/DenunciaRequest.java`, `dto/DenunciaResponse.java`
+**Onde:** novos `model/Denuncia.java`, `enums/StatusDenuncia.java`, `enums/MotivoDenuncia.java`, `exception/AcessoNegadoException.java`, `repository/DenunciaRepository.java`, `service/DenunciaService.java`, `controller/DenunciaController.java`, `dto/DenunciaRequest.java`, `dto/DenunciaResponse.java`
 
-**Entidade `DenunciaReporte`** (Apêndice D, `denuncia_reporte`):
-- `id` (Long), `denunciante` (`@ManyToOne Usuario`), `reporte` (`@ManyToOne Reporte`), `motivo` (enum `MotivoDenuncia`), `descricao` (TEXT), `dataDenuncia` (`OffsetDateTime`, São Paulo), `status` (enum `StatusDenuncia`: `PENDENTE`, `ARQUIVADA`, `ACEITA`, `REJEITADA` — nasce `PENDENTE`).
-- `MotivoDenuncia`: conferir com a tela "Qual motivo da denúncia" do Fabrício antes de fechar a lista (sugestão: `INFORMACAO_FALSA`, `LOCAL_INCORRETO`, `CONTEUDO_OFENSIVO`, `SPAM`, `OUTRO`).
+**Entidade `Denuncia`** (Apêndice D, tabela `denuncia`; nomes definidos pelo Erick em 21/11):
+- `idDenuncia` (Long), `usuarioDenunciante` (`@ManyToOne Usuario`), `reporteAlvo` (`@ManyToOne Reporte`), `motivo` (enum `MotivoDenuncia`), `descricao` (TEXT), `dataDenuncia` (`OffsetDateTime`, São Paulo), `statusDenuncia` (enum `StatusDenuncia`: `PENDENTE`, `ARQUIVADA`, `ACEITA`, `REJEITADA` — nasce `PENDENTE`).
+- `MotivoDenuncia`: `INFORMACAO_FALSA`, `LOCAL_INCORRETO`, `CONTEUDO_ENGANOSO`, `CONTEUDO_OFENSIVO`, `SPAM`, `OUTRO` (no `OUTRO`, a justificativa obrigatória é o texto livre). Conferir com a tela do Fabrício.
+- Repositório: `DenunciaRepository.existsByUsuarioDenunciante_IdAndReporteAlvo_IdReporte` (regra de uma denúncia por usuário e reporte).
 
 **Endpoint:** `POST /api/reportes/{id}/denuncias` (com token) → 201 `DenunciaResponse(id, idReporte, motivo, descricao, dataDenuncia, status)`
 
@@ -187,7 +190,7 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 - `ReporteResponse` **não** mostra quem denunciou (o denunciante fica anônimo para o autor).
 - A análise das denúncias (admin) fica fora do MVP: todas ficam `PENDENTE`.
 
-**Testes:** denunciar reporte de outro 201 → de novo 409 → o próprio 403 → sem justificativa 400 → sem token 401 → reporte inexistente 404; no H2, linha em `DENUNCIA_REPORTE` com denunciante e reporte.
+**Testes:** denunciar reporte de outro 201 → de novo 409 → o próprio 403 → sem justificativa 400 → sem token 401 → reporte inexistente 404; no H2, linha em `DENUNCIA` com denunciante e reporte.
 
 ---
 
@@ -195,7 +198,7 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 
 **O que é:** a "avaliação geral" do perfil é calculada pelo sistema, não dada por outros usuários. "Quanto menos denúncias, maior a avaliação."
 
-**Onde:** `service/UsuarioService.java` (ou novo `ReputacaoService`), `DenunciaReporteRepository`, `ReporteRepository`, `UsuarioResponse`
+**Onde:** `service/UsuarioService.java` (ou novo `ReputacaoService`), `DenunciaRepository`, `ReporteRepository`, `UsuarioResponse`
 
 **Regras:**
 - Campo já existe: `Usuario.avaliacao` (`Double`).
@@ -223,7 +226,7 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 
 ## TAREFA 11 — Base de envio de e-mail
 
-**O que é:** infraestrutura usada pelas tarefas 12, 13 e 14.
+**O que é:** infraestrutura usada pelas tarefas 13 e 14 (a 12 passou a ser por telefone).
 
 **Onde:** `pom.xml` (`spring-boot-starter-mail`), `application.properties`, `application-local.properties.example`, novo `service/EmailService.java`
 
@@ -238,23 +241,26 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 
 ---
 
-## TAREFA 12 — Confirmação de e-mail (R03)
+## TAREFA 12 — Confirmação de telefone (R03, alterado em 16/11)
 
-**O que é:** a conta só loga depois de confirmar o e-mail pelo link enviado no cadastro.
+> **Mudou em 16/11:** a confirmação passou de e-mail para **telefone**, e o relatório será atualizado (ver `mudancas-docs-relatorio.md` §4). O SMS roda em **modo desenvolvimento**: o código aparece no console da API em vez de ser enviado. Esta tarefa **não depende mais da 11**.
 
-**Onde:** `model/Usuario.java`, novos `model/TokenVerificacao.java`, `model/TipoToken.java`, `repository/TokenVerificacaoRepository.java`, `AuthService`, `AuthController`
+**O que é:** a conta só loga depois de confirmar o telefone com o código de 6 dígitos gerado no cadastro.
 
-**Entidade `TokenVerificacao`:** `id`, `token` (UUID aleatório, único), `usuario` (`@ManyToOne`), `tipo` (`CONFIRMACAO_EMAIL`, `RECUPERACAO_SENHA`), `expiraEm`, `usadoEm`. Reaproveitada na tarefa 13.
+**Onde:** `model/Usuario.java`, `dto/CadastroRequest`, `AuthService`, `AuthController`, `repository/UsuarioRepository`, novo `service/SmsService.java` (versão de desenvolvimento que só escreve no log), novos DTOs `ConfirmarTelefoneRequest` (`email`, `codigo`) e `ReenviarCodigoRequest` (`email`)
 
 **Regras:**
-- `Usuario` ganha `boolean emailConfirmado` (default `false`).
-- Cadastro: cria token `CONFIRMACAO_EMAIL` com validade de 24 h e envia o link `http://<servidor>/api/auth/confirmar-email?token=...`.
-- `GET /api/auth/confirmar-email?token=` → 200 `{ "mensagem": "E-mail confirmado" }`; token inexistente, vencido ou já usado → 400.
-- Login com e-mail não confirmado → 403 `"Confirme seu e-mail antes de entrar"` (checado depois da senha, como o status).
-- `POST /api/auth/reenviar-confirmacao` `{ email }` → 204 sempre (não revela se o e-mail existe); gera token novo.
+- `Usuario` ganha `boolean telefoneConfirmado` (default `false`), `codigoConfirmacao`, `codigoExpiraEm` e `tentativasCodigo`.
+- **Telefone único:** cadastro com telefone já usado → 409 "Telefone já cadastrado" (`existsByTelefone` no repositório).
+- Cadastro: gera código aleatório de 6 dígitos (`SecureRandom`), validade de **10 min**, e chama `smsService.enviar(telefone, codigo)`. No modo desenvolvimento, isso só faz `log.info` com o telefone e o código.
+- `POST /api/auth/confirmar-telefone` `{ email, codigo }` → 200 `{ "mensagem": "Telefone confirmado" }`. Código errado ou vencido → 400. Depois de **5 erros**, o código é invalidado e é preciso reenviar.
+- Ao confirmar: `telefoneConfirmado = true` e apaga código, validade e tentativas.
+- Login com telefone não confirmado → 403 "Confirme seu telefone antes de entrar" (checado depois da senha, como o status).
+- `POST /api/auth/reenviar-codigo` `{ email }` → 204 sempre (não revela se o e-mail existe); gera código novo. No máximo 1 reenvio por minuto.
 - Usuários já existentes no H2: marcar como confirmados ao migrar, ou recadastrar.
+- O `SmsService` fica isolado: trocar para um provedor real de SMS depois é só trocar a implementação.
 
-**Testes:** cadastro → login 403 → abrir o link 200 → login 200 → mesmo link de novo 400 → link vencido 400.
+**Testes:** cadastro (código aparece no console) → login 403 → código errado 400 → código certo 200 → login 200 → mesmo código de novo 400 → código vencido 400 → 5 erros invalidam o código → telefone repetido no cadastro 409.
 
 ---
 
@@ -295,13 +301,13 @@ Sem token numa rota protegida o Spring devolve `401` sozinho (o `oauth2ResourceS
 **Regras:**
 - `server.address=0.0.0.0`; testar `http://<IP do PC>:8080/api/reportes` no celular (liberar a porta 8080 no Firewall se precisar).
 - `mysql-connector-j` + conexão com senha em variável de ambiente (`DB_SENHA`), fora do Git.
-- Repetir o roteiro completo do Postman: cadastro → confirmar e-mail → login → criar/editar/excluir reporte → denunciar → bairro → perfil → desativar.
+- Repetir o roteiro completo do Postman: cadastro → confirmar telefone → login → criar/editar/excluir reporte → denunciar → bairro → perfil → desativar.
 
 ---
 
 ## Do lado do front (Fabrício) — para combinar
 
-Logout (R06) é só apagar o token no app — a API não precisa de rota. Telas e chamadas novas: confirmar e-mail/reenviar, esqueci senha + deep link, editar/excluir reporte (botões só para o autor e editar só se `editado = false`), denunciar reporte, perfil com avaliação, desativar conta, detalhe do bairro com reportes.
+Logout (R06) é só apagar o token no app — a API não precisa de rota. Telas e chamadas novas: confirmar telefone (código de 6 dígitos)/reenviar, esqueci senha + deep link, editar/excluir reporte (botões só para o autor e editar só se `editado = false`), denunciar reporte, perfil com avaliação, desativar conta, detalhe do bairro com reportes.
 
 ## Decisões abertas antes de codar
 
