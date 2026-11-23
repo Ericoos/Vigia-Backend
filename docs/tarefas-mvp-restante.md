@@ -15,12 +15,12 @@ Entrega: **30/11/2026**. Cada tarefa vira um cartão no Trello.
 | 2 | ✅ Reporte ligado ao autor (feita 15/11) | R25 | Erick | 15/11 | 1 |
 | 3 | ✅ Perfil: controller + histórico + validações (publicada em `271ce38`) | R11, R12, R13 | Murilo | 18/11 | 1, 2 |
 | 4 | ✅ Desativar conta (publicada em `a5d220f`) | R62 | Murilo | 18/11 | 3 |
-| 5 | Editar reporte (uma vez, só a descrição) — código pronto, falta testar | R29 | Erick | 19/11 | 2 |
-| 6 | Excluir reporte (soft delete) — código pronto, falta testar | R30 | Erick | 19/11 | 2 |
+| 5 | ✅ Editar reporte (uma vez, só a descrição) — testado por HTTP em 22/11 | R29 | Erick | 19/11 | 2 |
+| 6 | ✅ Excluir reporte (soft delete) — testado por HTTP em 22/11 | R30 | Erick | 19/11 | 2 |
 | 7 | ✅ Reporte com bairro + filtro + detalhe do bairro (publicada em `e4641da`) | R64, R41 | Murilo | 20/11 | 2 |
 | 8 | ✅ Denúncia de reporte (commit `6b99a2c`, 21/11) | R43, R45, R66 | Erick | 20/11 | 2 |
-| 9 | Reputação automática (karma permanente) — código pronto, falta testar | R15 | Erick | 22/11 | 8 |
-| 10a | Nota do bairro começa em 5, peso ÷ 50, exibida entre 0 e 5 — código pronto, falta testar | R65 | Erick | 21/11 | 7 |
+| 9 | ✅ Reputação automática (karma permanente) — testado por HTTP em 22/11 | R15 | Erick | 22/11 | 8 |
+| 10a | ✅ Nota do bairro começa em 5, peso ÷ 50, exibida entre 0 e 5 — testado por HTTP em 22/11 | R65 | Erick | 21/11 | 7 |
 | 10 | ✅ Denúncias na nota do bairro (3+) (publicada em `9187305`); janela de 30 dias depende do Erick | R65 | Murilo | 22/11 | 8, 10a |
 | 11 | ~~Base de envio de e-mail~~ cortada (21/11): e-mail em modo desenvolvimento = linha no log | — | — | — | — |
 | 12 | ✅ Confirmação de telefone (publicada em `68d40bd`; código separado por finalidade em 22/11) | R03 (alterado) | Murilo | 22/11 | — |
