@@ -13,6 +13,7 @@ import com.uscs.vigia.exception.CodigoInvalidoException;
 import com.uscs.vigia.exception.ContaInativaException;
 import com.uscs.vigia.exception.CredenciaisInvalidasException;
 import com.uscs.vigia.exception.TelefoneNaoConfirmadoException;
+import com.uscs.vigia.enums.FinalidadeCodigo;
 import com.uscs.vigia.enums.StatusUsuario;
 import com.uscs.vigia.model.Usuario;
 import com.uscs.vigia.repository.UsuarioRepository;
@@ -53,7 +54,7 @@ public class AuthService {
         usuario.setTotalDenunciasRecebidas(0);
         usuario.setDataInicio(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
         usuario.setTelefoneConfirmado(false);
-        codigoService.gerar(usuario);
+        codigoService.gerar(usuario, FinalidadeCodigo.TELEFONE);
 
         Usuario salvo = usuarioRepository.save(usuario);
         smsService.enviar(salvo.getTelefone(), "Seu código de confirmação é " + salvo.getCodigoVerificacao());
@@ -86,7 +87,7 @@ public class AuthService {
         }
 
         if(usuario.getStatus() != StatusUsuario.USUARIO_ATIVO) {
-            throw new ContaInativaException("A está inativa");
+            throw new ContaInativaException("A conta está inativa");
         }
         if (Boolean.FALSE.equals(usuario.getTelefoneConfirmado())) {
             throw new TelefoneNaoConfirmadoException("Confirme seu telefone antes de entrar");
@@ -101,7 +102,7 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByEmail(normalizarEmail(request.email()))
                 .orElseThrow(() -> new CodigoInvalidoException("Código inválido ou expirado"));
 
-        boolean codigoValido = codigoService.validar(usuario, request.codigo());
+        boolean codigoValido = codigoService.validar(usuario, request.codigo(), FinalidadeCodigo.TELEFONE);
         if (codigoValido) {
             usuario.setTelefoneConfirmado(true);
             usuario.setCodigoExpiraEm(null);
@@ -118,7 +119,7 @@ public class AuthService {
                 .filter(usuario -> !Boolean.TRUE.equals(usuario.getTelefoneConfirmado()))
                 .filter(codigoService::podeReenviar)
                 .ifPresent(usuario -> {
-                    codigoService.gerar(usuario);
+                    codigoService.gerar(usuario, FinalidadeCodigo.TELEFONE);
                     Usuario salvo = usuarioRepository.save(usuario);
                     smsService.enviar(salvo.getTelefone(), "Seu código de confirmação é " + salvo.getCodigoVerificacao());
                 });
@@ -127,7 +128,7 @@ public class AuthService {
     public void solicitarRecuperacaoSenha(EsqueciSenhaRequest request) {
         usuarioRepository.findByEmail(normalizarEmail(request.email()))
                 .ifPresent(usuario -> {
-                    codigoService.gerar(usuario);
+                    codigoService.gerar(usuario, FinalidadeCodigo.RECUPERACAO_SENHA);
                     Usuario salvo = usuarioRepository.save(usuario);
                     log.info("[EMAIL DEV] Para {}: seu código de recuperação é {}", salvo.getEmail(), salvo.getCodigoVerificacao());
                 });
@@ -137,7 +138,7 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByEmail(normalizarEmail(request.email()))
                 .orElseThrow(() -> new CodigoInvalidoException("Código inválido ou expirado"));
 
-        boolean codigoValido = codigoService.validar(usuario, request.codigo());
+        boolean codigoValido = codigoService.validar(usuario, request.codigo(), FinalidadeCodigo.RECUPERACAO_SENHA);
         if (codigoValido) {
             usuario.setSenhaHash(passwordEncoder.encode(request.novaSenha()));
         }

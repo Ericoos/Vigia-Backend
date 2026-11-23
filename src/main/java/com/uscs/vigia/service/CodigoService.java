@@ -1,5 +1,6 @@
 package com.uscs.vigia.service;
 
+import com.uscs.vigia.enums.FinalidadeCodigo;
 import com.uscs.vigia.model.Usuario;
 import org.springframework.stereotype.Service;
 
@@ -17,35 +18,40 @@ public class CodigoService {
 
     private final SecureRandom geradorAleatorio = new SecureRandom();
 
-    public void gerar(Usuario usuario) {
+    public void gerar(Usuario usuario, FinalidadeCodigo finalidade) {
         usuario.setCodigoVerificacao(String.format(Locale.ROOT, "%06d", geradorAleatorio.nextInt(1_000_000)));
         usuario.setCodigoExpiraEm(LocalDateTime.now(FUSO).plusMinutes(VALIDADE_MINUTOS));
         usuario.setTentativasCodigo(0);
+        usuario.setFinalidadeCodigo(finalidade);
     }
 
-    public boolean validar(Usuario usuario, String codigo) {
+    public boolean validar(Usuario usuario, String codigo, FinalidadeCodigo finalidade) {
         if (usuario.getCodigoVerificacao() == null || usuario.getCodigoExpiraEm() == null) {
             return false;
         }
+        // Código gerado para outra finalidade não vale aqui (e não é consumido).
+        if (usuario.getFinalidadeCodigo() != finalidade) {
+            return false;
+        }
         if (!LocalDateTime.now(FUSO).isBefore(usuario.getCodigoExpiraEm())) {
-            usuario.setCodigoVerificacao(null);
+            limpar(usuario);
             return false;
         }
 
         int tentativas = usuario.getTentativasCodigo() != null ? usuario.getTentativasCodigo() : 0;
         if (tentativas >= LIMITE_TENTATIVAS) {
-            usuario.setCodigoVerificacao(null);
+            limpar(usuario);
             return false;
         }
         if (usuario.getCodigoVerificacao().equals(codigo)) {
-            usuario.setCodigoVerificacao(null);
+            limpar(usuario);
             return true;
         }
 
         tentativas++;
         usuario.setTentativasCodigo(tentativas);
         if (tentativas >= LIMITE_TENTATIVAS) {
-            usuario.setCodigoVerificacao(null);
+            limpar(usuario);
         }
         return false;
     }
@@ -56,5 +62,10 @@ public class CodigoService {
         }
         LocalDateTime ultimoCodigoEm = usuario.getCodigoExpiraEm().minusMinutes(VALIDADE_MINUTOS);
         return !LocalDateTime.now(FUSO).isBefore(ultimoCodigoEm.plusMinutes(1));
+    }
+
+    private void limpar(Usuario usuario) {
+        usuario.setCodigoVerificacao(null);
+        usuario.setFinalidadeCodigo(null);
     }
 }

@@ -18,6 +18,7 @@ import com.uscs.vigia.exception.SenhaIgualException;
 import com.uscs.vigia.exception.SenhaIncorretaException;
 import com.uscs.vigia.model.Reporte;
 import com.uscs.vigia.enums.StatusReporte;
+import com.uscs.vigia.enums.FinalidadeCodigo;
 import com.uscs.vigia.enums.StatusUsuario;
 import com.uscs.vigia.model.Usuario;
 import com.uscs.vigia.repository.ReporteRepository;
@@ -59,7 +60,7 @@ public class UsuarioService {
         if (telefoneAlterado) {
             usuario.setTelefone(request.telefone());
             usuario.setTelefoneConfirmado(false);
-            codigoService.gerar(usuario);
+            codigoService.gerar(usuario, FinalidadeCodigo.TELEFONE);
         }
         if (request.avatar() != null) {
             usuario.setAvatar(request.avatar());
@@ -97,7 +98,7 @@ public class UsuarioService {
         String novoEmail = normalizarEmail(request.novoEmail());
         validarEmailDisponivel(novoEmail, idUsuario);
         usuario.setEmailPendente(novoEmail);
-        codigoService.gerar(usuario);
+        codigoService.gerar(usuario, FinalidadeCodigo.TROCA_EMAIL);
         Usuario salvo = usuarioRepository.save(usuario);
         log.info("[EMAIL DEV] Para {}: seu código para confirmar o novo e-mail é {}", salvo.getEmailPendente(), salvo.getCodigoVerificacao());
     }
@@ -111,7 +112,7 @@ public class UsuarioService {
             throw new CodigoInvalidoException("Não há troca de e-mail pendente");
         }
 
-        boolean codigoValido = codigoService.validar(usuario, request.codigo());
+        boolean codigoValido = codigoService.validar(usuario, request.codigo(), FinalidadeCodigo.TROCA_EMAIL);
         usuarioRepository.save(usuario);
         if (!codigoValido) {
             throw new CodigoInvalidoException("Código inválido ou expirado");

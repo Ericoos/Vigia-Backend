@@ -21,13 +21,13 @@ Entrega: **30/11/2026**. Cada tarefa vira um cartão no Trello.
 | 8 | ✅ Denúncia de reporte (commit `6b99a2c`, 21/11) | R43, R45, R66 | Erick | 20/11 | 2 |
 | 9 | Reputação automática (karma permanente) — código pronto, falta testar | R15 | Erick | 22/11 | 8 |
 | 10a | Nota do bairro começa em 5, peso ÷ 50, exibida entre 0 e 5 — código pronto, falta testar | R65 | Erick | 21/11 | 7 |
-| 10 | ✅ Denúncias na nota do bairro (3+) — PUBLICADO/EDITADO testados; publicação pendente; janela depende do Erick | R65 | Murilo | 22/11 | 8, 10a |
+| 10 | ✅ Denúncias na nota do bairro (3+) (publicada em `9187305`); janela de 30 dias depende do Erick | R65 | Murilo | 22/11 | 8, 10a |
 | 11 | ~~Base de envio de e-mail~~ cortada (21/11): e-mail em modo desenvolvimento = linha no log | — | — | — | — |
-| 12 | Confirmação de telefone (modo desenvolvimento, cria o `CodigoService`) | R03 (alterado) | Murilo | 22/11 | — |
-| 13 | Recuperação de senha (código no log, modo desenvolvimento) | R07, R08, R09 | Murilo (passada pelo Erick em 21/11) | 22/11 | 12 (reaproveita o `CodigoService`) |
-| 14 | Aviso de senha alterada (log, modo desenvolvimento) | R10 | Murilo | 22/11 | 3, 13 |
+| 12 | ✅ Confirmação de telefone (publicada em `68d40bd`; código separado por finalidade em 22/11) | R03 (alterado) | Murilo | 22/11 | — |
+| 13 | ✅ Recuperação de senha (publicada em `68d40bd`) | R07, R08, R09 | Murilo (passada pelo Erick em 21/11) | 22/11 | 12 (reaproveita o `CodigoService`) |
+| 14 | ✅ Aviso de senha alterada (publicada em `b3f5614`) | R10 | Murilo | 22/11 | 3, 13 |
 | 15 | Acesso pela rede + MySQL | — | Erick + Fernando | 25/11 | todas |
-| 16 | Troca de email no perfil (código no log) — implementada/testada, publicação pendente | Figura 12 | Murilo | 22/11 | 12 |
+| 16 | ✅ Troca de email no perfil (publicada em `9187305`) | Figura 12 | Murilo | 22/11 | 12 |
 
 > Tarefas 5, 6 e 8 mexem no `ReporteService`/`ReporteController`; 7 também mexe no `ReporteService.criar`. Para não dar conflito, **Murilo só começa a 7 depois do push da 2**, e Erick faz 5, 6 e 8 em sequência.
 

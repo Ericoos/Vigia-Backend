@@ -419,6 +419,7 @@ Implementação de 22/11/2026 compilada; roteiro HTTP/H2 e SMS DEV conferido no 
 - Contador é salvo antes do 400; cinco erros invalidam o código. O método de confirmação não é transacional para preservar essa gravação.
 - Reenvio responde 204 para e-mail existente ou inexistente. Só gera/envia se o telefone não estiver confirmado e passou pelo menos um minuto do último código.
 - Confirmar telefone marca true e apaga o código, validade e tentativas.
+- **Código por finalidade (22/11/2026):** o código guarda para que foi gerado (`TELEFONE`, `RECUPERACAO_SENHA` ou `TROCA_EMAIL`). Um código só vale na rota da sua finalidade; nas outras responde 400 ("Código inválido ou expirado"). Pedir um código novo de outra finalidade substitui o pendente: se isso acontecer com o telefone, usar `/api/auth/reenviar-codigo`.
 - `PUT /api/usuarios/me`: telefone novo já usado por outra conta → 409; telefone livre diferente do atual marca false, gera código e registra SMS DEV. O próximo login exige nova confirmação. Enviar o mesmo telefone mantém a confirmação e não gera outro código.
 - Testes conferidos: cadastro 201/SMS DEV; login não confirmado 403; senha errada 401; confirmação errada/vencida/usada 400; confirmação válida 204 e login 200; telefone repetido 409. Tentativas 1–5 persistiram apesar do 400. Reenvio imediato não mudou o código; após intervalo simulado no H2, renovou. Troca no perfil exigiu nova confirmação; mesmo telefone manteve a confirmação. Flag nula legada permitiu login. Campos de código não são expostos no JSON.
 

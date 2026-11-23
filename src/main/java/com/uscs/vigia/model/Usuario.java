@@ -1,6 +1,9 @@
 package com.uscs.vigia.model;
 
+import com.uscs.vigia.enums.FinalidadeCodigo;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +26,10 @@ public class Usuario extends UsuarioBase {
     private String codigoVerificacao;
     private LocalDateTime codigoExpiraEm;
     private Integer tentativasCodigo;
+
+    @Enumerated(EnumType.STRING)
+    private FinalidadeCodigo finalidadeCodigo;
+
     private String emailPendente;
 
 }
