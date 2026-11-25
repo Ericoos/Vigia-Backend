@@ -51,9 +51,10 @@ Nunca compartilhamos código entre os repositórios — só o contrato da API (`
 ### 🧑‍🏫 Como trabalhar com o Erick
 
 - **O assistente guia; o Erick escreve as classes.** Não editar código Java por conta própria — só ler, revisar, compilar e testar. Escrever código apenas quando ele pedir explicitamente ("arrume o código", "pode corrigir").
+- **Vale também para configuração** (`application*.properties`, `pom.xml`, Docker, firewall): o Erick quer aprender, então ele digita e o assistente guia e confere (pedido de 24/11/2026).
 - **Explicações em passos curtos e numerados**: arquivo → o que digitar (código) → "O que faz" em poucas linhas. Separar claramente o passo da explicação; evitar texto longo e enrolado.
 - **Uma tarefa por vez**, dizendo sempre onde estamos ("tarefa X feita, agora a Y") — não perder o fio da meada.
-- **Subir a API para testes no terminal do app** (para o Erick poder parar com Ctrl+C). Rodar `mvnw spring-boot:run` em segundo plano deixa o processo Java preso na porta 8080 e segurando o H2; se acontecer, pedir para ele fechar o PID (`Stop-Process -Id <pid>`).
+- **Subir a API para testes no terminal do app** (para o Erick poder parar com Ctrl+C). Rodar `mvnw spring-boot:run` em segundo plano deixa o processo Java preso na porta 8080; se acontecer, pedir para ele fechar o PID (`Stop-Process -Id <pid>`).
 
 ## 🛠️ Stack
 
@@ -62,23 +63,20 @@ Nunca compartilhamos código entre os repositórios — só o contrato da API (`
 - Spring Security + OAuth2 Resource Server (JWT HS256) + BCrypt. A chave do JWT fica em `src/main/resources/application-local.properties`, **fora do Git** (modelo em `application-local.properties.example`); sem ela a API não sobe.
 - **Erros**: exceções de negócio herdam de `exception/ApiException` (carrega `HttpStatus` + texto de `erro`) e são tratadas por um único handler no `GlobalExceptionHandler`. Erro novo = nova filha de `ApiException`.
 - **Usuário logado**: `@AuthenticationPrincipal Jwt jwt` → `Long.valueOf(jwt.getSubject())`. O id vem sempre do token, nunca da URL ou do corpo.
-- **Acesso**: no `SecurityConfig`, só `/api/auth/**`, `/h2-console/**`, `/error` e os `GET` de leitura são livres; todo o resto exige token.
+- **Acesso**: no `SecurityConfig`, só `/api/auth/**`, `/error` e os `GET` de leitura são livres; todo o resto exige token.
 - **Bairros**: caminho canônico no plural, `/api/bairros` e `/api/bairros/{tipoBairro}` (definido por Murilo em 19/11/2026). O contrato deve ser comunicado ao Fabrício; não manter um segundo endpoint no singular.
 
 ### Banco de dados
 
 > **O banco do projeto é MySQL.** Todo o código é escrito pensando nele.
 
-O MySQL é responsabilidade de outra pessoa da equipe e ainda não existe. Enquanto isso, o **H2 é uma ponte temporária** para a aplicação conseguir subir — não é o banco do projeto.
+**Desde 24/11/2026 o H2 saiu do projeto** (tarefa 15). Em desenvolvimento o MySQL 8.4 roda num container Docker (`vigia-mysql`), e o esquema continua gerado pelo Hibernate a partir das `@Entity` (`spring.jpa.hibernate.ddl-auto=update`). Nenhum SQL é escrito à mão.
 
-Isso não afeta o código, porque o esquema é gerado pelo Hibernate a partir das `@Entity` (`spring.jpa.hibernate.ddl-auto=update`). Nenhum SQL é escrito à mão. Quando o MySQL existir, a troca é: substituir a dependência no `pom.xml` e ajustar a conexão no `application.properties`.
-
-**Para que essa troca continue indolor:**
-
+- **Conexão**: `application.properties` usa `${DB_HOST:localhost}`, `${DB_PORTA:3306}`, `${DB_USUARIO:root}` e `${DB_SENHA}`. Os valores locais ficam no `application-local.properties` (fora do Git). No PC do Erick já existe um MySQL do Windows na 3306, então o container usa **3307** (`DB_PORTA=3307`).
+- **Subir o MySQL local**: `docker start vigia-mysql` (criado com `docker run -d --name vigia-mysql -e MYSQL_ROOT_PASSWORD=<senha> -e MYSQL_DATABASE=vigia -p 127.0.0.1:3307:3306 mysql:8.4`). Docker Desktop precisa estar aberto.
 - **Nunca use `nativeQuery`.** Use métodos derivados do Spring Data ou JPQL.
-- Use `MODE=MySQL` na URL do H2, para desenvolver contra o mesmo dialeto.
-- Prefira o H2 em modo arquivo ao modo memória, para os dados não sumirem a cada reinício.
-- **Rodadas de testes locais (orientação do Erick, reafirmada por Murilo em 22/11/2026):** apagar a pasta `data/` inteira antes de cada nova rodada para o Hibernate/seed recriarem o H2 com o esquema atual. Confirmar primeiro que a API está parada e o banco não está em uso. Essa rotina se aplica somente ao H2 local de desenvolvimento.
+- **Enums viram colunas `enum(...)` do MySQL.** O `ddl-auto=update` não altera essas colunas: ao adicionar um valor novo num enum, recriar o banco local (`DROP DATABASE vigia;`) ou rodar um `ALTER TABLE` antes de usar o valor.
+- **Rodadas de testes do assistente**: subir uma cópia na porta 8090 apontando para um banco separado (`--spring.datasource.url=jdbc:mysql://localhost:3307/vigia_teste?createDatabaseIfNotExist=true`), rodar o roteiro e apagar `vigia_teste` no fim. O banco `vigia` do Erick não é tocado.
 
 ## 📁 Estrutura de Pastas
 

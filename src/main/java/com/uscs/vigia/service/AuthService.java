@@ -12,6 +12,7 @@ import com.uscs.vigia.exception.ConflitoException;
 import com.uscs.vigia.exception.CodigoInvalidoException;
 import com.uscs.vigia.exception.ContaInativaException;
 import com.uscs.vigia.exception.CredenciaisInvalidasException;
+import com.uscs.vigia.exception.IdadeMinimaException;
 import com.uscs.vigia.exception.TelefoneNaoConfirmadoException;
 import com.uscs.vigia.enums.FinalidadeCodigo;
 import com.uscs.vigia.enums.StatusUsuario;
@@ -22,7 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.ZoneId;
 
 @Slf4j
@@ -36,6 +39,11 @@ public class AuthService {
     private final SmsService smsService;
 
     public UsuarioResponse cadastrar(CadastroRequest cadastroRequest) {
+        int idade = Period.between(cadastroRequest.dataNascimento(), LocalDate.now(ZoneId.of("America/Sao_Paulo"))).getYears();
+        if (idade < 13) {
+            throw new IdadeMinimaException("É preciso ter pelo menos 13 anos");
+        }
+
         String email = normalizarEmail(cadastroRequest.email());
         validarEmail(email);
         if (usuarioRepository.existsByTelefone(cadastroRequest.telefone())) {
@@ -72,7 +80,7 @@ public class AuthService {
 
     private void validarEmail(String email) {
         if(usuarioRepository.existsByEmail(email)) {
-            throw new ConflitoException("Email já Existe");
+            throw new ConflitoException("E-mail já cadastrado");
         }
     }
 
@@ -80,10 +88,10 @@ public class AuthService {
         String email = normalizarEmail(loginRequest.email());
 
         Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new CredenciaisInvalidasException("E-mail ou Senha Inválidos"));
+                .orElseThrow(() -> new CredenciaisInvalidasException("E-mail ou senha inválidos"));
 
         if(!passwordEncoder.matches(loginRequest.senha(), usuario.getSenhaHash())) {
-            throw new CredenciaisInvalidasException("E-mail ou Senha Inválidos");
+            throw new CredenciaisInvalidasException("E-mail ou senha inválidos");
         }
 
         if(usuario.getStatus() != StatusUsuario.USUARIO_ATIVO) {

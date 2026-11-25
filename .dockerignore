@@ -1,0 +1,6 @@
+target
+data
+.git
+.idea
+.env
+src/main/resources/application-local.properties

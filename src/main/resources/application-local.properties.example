@@ -1,3 +1,6 @@
 # Copie este arquivo para application-local.properties (mesma pasta) e troque o valor.
 # A chave precisa ter pelo menos 32 caracteres aleatorios. Nao commite o arquivo local.
 JWT_SECRET=coloque-aqui-uma-chave-aleatoria-de-32-caracteres-ou-mais
+# Senha do MySQL local (container vigia-mysql). Porta: 3306 padrao; use 3307 se ja houver um MySQL instalado no Windows.
+DB_SENHA=troque-aqui
+DB_PORTA=3307

@@ -5,6 +5,7 @@ import java.util.List;
 import com.uscs.vigia.dto.AtualizarUsuarioRequest;
 import com.uscs.vigia.dto.ConfirmarEmailRequest;
 import com.uscs.vigia.dto.DesativarContaRequest;
+import com.uscs.vigia.dto.PerfilPublicoResponse;
 import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.dto.TrocarSenhaRequest;
 import com.uscs.vigia.dto.TrocarEmailRequest;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,5 +75,10 @@ public class UsuarioController {
     public List<ReporteResponse> listarReportes(@AuthenticationPrincipal Jwt jwt) {
         Long idUsuario = Long.valueOf(jwt.getSubject());
         return usuarioService.listarReportes(idUsuario);
+    }
+
+    @GetMapping("/{id}")
+    public PerfilPublicoResponse buscarPerfilPublico(@PathVariable Long id) {
+        return usuarioService.buscarPerfilPublico(id);
     }
 }

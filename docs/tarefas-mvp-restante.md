@@ -26,7 +26,7 @@ Entrega: **30/11/2026**. Cada tarefa vira um cartão no Trello.
 | 12 | ✅ Confirmação de telefone (publicada em `68d40bd`; código separado por finalidade em 22/11) | R03 (alterado) | Murilo | 22/11 | — |
 | 13 | ✅ Recuperação de senha (publicada em `68d40bd`) | R07, R08, R09 | Murilo (passada pelo Erick em 21/11) | 22/11 | 12 (reaproveita o `CodigoService`) |
 | 14 | ✅ Aviso de senha alterada (publicada em `b3f5614`) | R10 | Murilo | 22/11 | 3, 13 |
-| 15 | Acesso pela rede + MySQL | — | Erick + Fernando | 25/11 | todas |
+| 15 | ✅ Acesso pela rede + MySQL + Docker (concluída e testada em 24/11; inclui índice, perfil público e idade mínima) | — | Erick + Fernando | 25/11 | todas |
 | 16 | ✅ Troca de email no perfil (publicada em `9187305`) | Figura 12 | Murilo | 22/11 | 12 |
 
 > Tarefas 5, 6 e 8 mexem no `ReporteService`/`ReporteController`; 7 também mexe no `ReporteService.criar`. Para não dar conflito, **Murilo só começa a 7 depois do push da 2**, e Erick faz 5, 6 e 8 em sequência.
@@ -364,8 +364,8 @@ Logout (R06) é só apagar o token no app — a API não precisa de rota. Telas 
 
 ## Decisões abertas antes de codar
 
-1. Fórmula da reputação (tarefa 9).
-2. Regra das denúncias na classificação do bairro (tarefa 10).
+1. ~~Fórmula da reputação (tarefa 9)~~ — fechada (24/11/2026, Erick): `5 × (reportes + 1) / (reportes + 1 + denúncias)`, como está no `ReputacaoService`.
+2. ~~Regra das denúncias na classificação do bairro (tarefa 10)~~ — fechada: base 5, peso ÷ 50, reporte com 3+ denúncias fora da nota (calibração considerada feita em 24/11/2026). **Janela de 30 dias adiada para depois do MVP.**
 3. Lista de motivos de denúncia (tarefa 8) — conferir com a tela do app.
 4. Provedor de e-mail (tarefa 11).
 5. ~~Caminho de bairros (tarefa 7)~~ — definido por Murilo em 19/11/2026: `/api/bairros` (plural); avisar Fabrício.

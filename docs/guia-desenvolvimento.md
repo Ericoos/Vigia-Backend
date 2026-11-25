@@ -31,8 +31,7 @@ Nunca é compartilhado código entre repositórios — só o **contrato da API**
 - **Spring Boot 4.1.1** (Spring Web, Spring Data JPA, Validation)
 - **Maven** com wrapper (`./mvnw`)
 - **Lombok** (gera getters/setters via `@Getter @Setter`)
-- **H2** em modo arquivo (`MODE=MySQL`) — ponte temporária
-- **MySQL** — banco final (de outra pessoa, ainda não existe)
+- **MySQL 8.4** em container Docker (desde 24/11/2026; o H2 saiu do projeto)
 
 ---
 
@@ -55,6 +54,13 @@ Nunca é compartilhado código entre repositórios — só o **contrato da API**
      [Convert]::ToBase64String((1..48 | ForEach-Object { Get-Random -Max 256 }))
      ```
    - sem esse arquivo (ou a variável de ambiente `JWT_SECRET`), a API **não sobe** e avisa que falta `JWT_SECRET`. Em produção, a chave vem só da variável de ambiente.
+   - no mesmo arquivo, preencha `DB_SENHA` (senha do MySQL local) e `DB_PORTA` (3306, ou 3307 se já houver um MySQL instalado no Windows).
+
+7. **Suba o MySQL** (Docker Desktop aberto), trocando a senha e a porta pelas do passo 6:
+   ```powershell
+   docker run -d --name vigia-mysql -e MYSQL_ROOT_PASSWORD=<senha> -e MYSQL_DATABASE=vigia -p 127.0.0.1:3307:3306 mysql:8.4
+   ```
+   Nas próximas vezes basta `docker start vigia-mysql`.
 
 > Dica: se `New → Java Class` não aparecer no menu, o Maven não foi importado. Reabra a pasta escolhendo "Open as Project".
 
@@ -71,13 +77,9 @@ Esperado:
 - `Tomcat started on port 8080`
 - O programa **fica rodando** (não termina) — é normal. Para parar: `Ctrl+C`.
 
-Validando o console H2 (web): navegador em `localhost:8080/h2-console`
+Consultando o banco: `docker exec -it vigia-mysql mysql -uroot -p vigia` (ou qualquer cliente MySQL em `localhost:<DB_PORTA>`).
 
-- JDBC URL: `jdbc:h2:file:./data/vigia`
-- User Name: `sa`
-- Password: (vazio)
-
-> `localhost:8080` sem caminho mostra uma página de erro Whitelabel — é normal, ainda não há rota na raiz. Acesse sempre caminhos como `/h2-console` ou `/api/...`.
+> `localhost:8080` sem caminho mostra uma página de erro Whitelabel — é normal, ainda não há rota na raiz. Acesse sempre caminhos como `/api/...`.
 
 ---
 

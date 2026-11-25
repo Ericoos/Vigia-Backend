@@ -226,6 +226,8 @@ Requisição (`CadastroRequest`):
 ```
 
 - Validação: nome 3–100; e-mail válido; telefone só dígitos com DDD; data no passado; senha 8–30 com maiúscula, minúscula, número e especial → `400` se falhar.
+- Idade mínima de 13 anos (24/11/2026): menor de 13 → `400` `"Regra de negócio"`, mensagem "É preciso ter pelo menos 13 anos". O front deve usar o mesmo limite.
+- Mensagens revisadas em 24/11/2026: e-mail repetido → "E-mail já cadastrado"; login inválido → "E-mail ou senha inválidos".
 - O e-mail é normalizado (`trim` + minúsculas) antes de gravar.
 - E-mail já cadastrado (comparação já normalizada) ou telefone já usado → `409` `"Conflito"`. Para telefone, mensagem "Telefone já cadastrado".
 - A senha é gravada com BCrypt; a conta nasce `USUARIO_ATIVO` com `dataInicio` no horário de São Caetano do Sul.
@@ -484,6 +486,13 @@ Implementação de 22/11/2026 compilada, contexto conferido e roteiro HTTP/H2/EM
 - Janela de 30 dias não foi adicionada: o resumo recebido de 22/11 pede falar com Erick antes dessa decisão.
 - Compilação/contexto e teste HTTP/H2 com PUBLICADO conferidos em 22/11/2026: três denunciantes diferentes receberam 201; nota na lista antes do detalhe ficou 4.9 após uma/duas denúncias e 5.0 após a terceira. Nota interna, denúncias, karma e presença do reporte no mapa conferidos.
 - Reteste com EDITADO aprovado no H2 recriado: edição retornou 200 com editado=true e contribuição 4.9 preservada; três denúncias de contas diferentes retornaram 201, com notas imediatas 4.9/4.9/5.0 na lista. H2 confirmou as três pessoas/denúncias, nota interna 5.0 e karma do autor em 3. Reporte permaneceu no mapa e detalhe (200). O enum antigo do H2, que antes causava 500 na edição, foi resolvido pela recriação de `data/` com API parada, sem alteração do contrato da edição.
+
+## 5.14. GET /api/usuarios/{id} — perfil público (24/11/2026)
+
+- Autenticado (sem token → `401`). Mostra o perfil de outro usuário ao clicar no autor de um reporte (Figura 19).
+- `200` com `PerfilPublicoResponse`: `{ "id", "nome", "avatar", "avaliacao", "reportes": [ReporteResponse...] }`. **Não** expõe e-mail, telefone nem data de nascimento.
+- `reportes` segue o histórico do perfil (sem os excluídos, mais novo primeiro). `avaliacao` nula vira 5,0.
+- Usuário inexistente → `404`.
 
 ---
 

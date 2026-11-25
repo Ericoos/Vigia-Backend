@@ -7,6 +7,7 @@ import java.util.List;
 import com.uscs.vigia.dto.AtualizarUsuarioRequest;
 import com.uscs.vigia.dto.ConfirmarEmailRequest;
 import com.uscs.vigia.dto.DesativarContaRequest;
+import com.uscs.vigia.dto.PerfilPublicoResponse;
 import com.uscs.vigia.dto.ReporteResponse;
 import com.uscs.vigia.dto.TrocarSenhaRequest;
 import com.uscs.vigia.dto.TrocarEmailRequest;
@@ -142,6 +143,13 @@ public class UsuarioService {
                 .stream()
                 .map(this::toReporteResponse)
                 .toList();
+    }
+
+    public PerfilPublicoResponse buscarPerfilPublico(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado: " + id));
+        Double avaliacao = usuario.getAvaliacao() != null ? usuario.getAvaliacao() : 5.0;
+        return new PerfilPublicoResponse(usuario.getId(), usuario.getNome(), usuario.getAvatar(), avaliacao, listarReportes(id));
     }
 
     private ReporteResponse toReporteResponse(Reporte reporte) {
